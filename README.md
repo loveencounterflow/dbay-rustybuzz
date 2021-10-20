@@ -19,5 +19,8 @@
 
 ## To Do
 
-* **[–]** everything
+* **[–]** [RustyBuzz-WASM] modify `glyph_to_svg_pathdata()` / `rectangle_from_bbox()` to return coordinates
+  instead of ready-built SVG `<rect/>` as wee need those numbers to construct the line bounding box
+* **[–]** [RustyBuzz-WASM] implement caching of font face in `glyph_to_svg_pathdata()` to avoid re-building
+  it for each single outline; benchmark
 
