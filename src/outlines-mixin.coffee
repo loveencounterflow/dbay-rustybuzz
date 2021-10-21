@@ -21,6 +21,7 @@ FS                        = require 'fs'
 E                         = require './errors'
 _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" width="(?<width>[-+0-9]+)" height="(?<height>[-+0-9]+)"\/>$/
 
+
 #-----------------------------------------------------------------------------------------------------------
 @Drb_outlines = ( clasz = Object ) => class extends clasz
 
@@ -49,7 +50,16 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  _fspath_from_fontnick: ( fontnick ) -> @db.single_value @sql.fspath_from_fontnick, { fontnick, }
+  _fspath_from_fontnick: ( fontnick ) ->
+    ### TAINT use fallback to configure behavior in case of failure ###
+    return @db.single_value @sql.fspath_from_fontnick, { fontnick, }
+
+  #---------------------------------------------------------------------------------------------------------
+  _font_idx_from_fontnick: ( fontnick )->
+    ### TAINT use fallback to configure behavior in case of failure ###
+    unless ( R = @state.font_idx_by_fontnicks[ fontnick ] )?
+      throw new E.Dbr_unknown_fontnick '^dbr/outlines@1^', fontnick
+    return R
 
   #---------------------------------------------------------------------------------------------------------
   load_font: ( cfg ) ->
@@ -75,15 +85,11 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
   get_single_outline: ( cfg ) ->
     ### TAINT this method is highly inefficient for large numbers of outline retrievals; the intention is to
     replace it with a function that allows for lists of `gid`s to be handled with a single call. ###
-    clasz = @constructor
-    unless @state.prv_fontidx < clasz.C.last_fontidx
-      throw new E.Dbr_font_capacity_exceeded '^dbr/outlines@1^', clasz.C.last_fontidx + 1
     #.........................................................................................................
     @types.validate.dbr_get_single_outline_cfg ( cfg = { @constructor.C.defaults.dbr_get_single_outline_cfg..., cfg..., } )
     { fontnick
       gid     } = cfg
-    unless ( font_idx = @state.font_idx_by_fontnicks[ fontnick ] )?
-      throw new E.Dbr_unknown_fontnick '^dbr/outlines@1^', fontnick
+    font_idx    = @_font_idx_from_fontnick fontnick
     #.........................................................................................................
     { br, pd, } = JSON.parse @RBW.glyph_to_svg_pathdata font_idx, gid
     #.........................................................................................................
@@ -98,6 +104,25 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     width       = parseInt match.groups.width,  10
     height      = parseInt match.groups.height, 10
     return { bbox: { x, y, width, height, }, pd, }
+
+  #---------------------------------------------------------------------------------------------------------
+  gids_from_cids: ( cfg ) ->
+    ### Given a list of Unicode CIDs as `cids` and a `fontnick`, return a `Map` from CIDs to GIDs
+    (glyf IDs). Unmappable CIDs will be left out. ###
+    { cids
+      fontnick }  = cfg
+    font_idx    = @_font_idx_from_fontnick fontnick
+    text        = ( ( ( String.fromCodePoint cid ) for cid in cids ).join '\n' ) + '\n'
+    gids        = @RBW.shape_text { format: 'short', text, font_idx, } # formats: json, rusty, short
+    gids        = gids.replace /\|([0-9]+:)[^|]+\|[^|]+/g, '$1'
+    gids        = gids[ ... gids.length - 2 ]
+    gids        = gids.split ':'
+    gids        = ( ( parseInt gid ) for gid in gids )
+    R           = new Map()
+    for cid, idx in cids
+      continue if ( gid = gids[ idx ] ) is 0
+      R.set cid, gid
+    return R
 
 
 
