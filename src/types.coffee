@@ -28,4 +28,18 @@ dbay_types                = require 'dbay/lib/types'
   "@isa_optional.nonempty_text x.path":             ( x ) -> @isa_optional.nonempty_text x.path
   "dbay_types.dbay_schema x.schema":                ( x ) -> dbay_types.isa.dbay_schema x.schema
   "@isa.boolean x.create":                          ( x ) -> @isa.boolean x.create
+  "( @isa.object x.db ) or ( @isa.function x.db ":  ( x ) -> ( @isa.object x.db ) or ( @isa.function x.db )
+
+#-----------------------------------------------------------------------------------------------------------
+@declare 'dbr_register_fontnick_cfg', tests:
+  "@isa.object x":                                  ( x ) -> @isa.object x
+  "@isa.nonempty_text x.fontnick":                  ( x ) -> @isa.nonempty_text x.fontnick
+  "@isa.nonempty_text x.fspath":                    ( x ) -> @isa.nonempty_text x.fspath
+
+#-----------------------------------------------------------------------------------------------------------
+@declare 'dbr_load_font_cfg', tests:
+  "@isa.object x":                                  ( x ) -> @isa.object x
+  "@isa.nonempty_text x.fontnick":                  ( x ) -> @isa.nonempty_text x.fontnick
+  "@isa_optional.nonempty_text x.fspath":           ( x ) -> @isa_optional.nonempty_text x.fspath
+
 
