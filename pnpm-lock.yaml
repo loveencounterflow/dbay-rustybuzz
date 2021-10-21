@@ -5,11 +5,13 @@ specifiers:
   dbay: 10.113.1
   guy: 2.5.0
   intertype: 7.6.7
+  rustybuzz-wasm: ^0.3.0
 
 dependencies:
   cnd: 9.2.2
   guy: 2.5.0
   intertype: 7.6.7
+  rustybuzz-wasm: 0.3.0
 
 devDependencies:
   dbay: 10.113.1
@@ -61,3 +63,7 @@ packages:
 
   /multimix/5.0.0:
     resolution: {integrity: sha512-N9cdGSDDD7kxOV7R6e4iZqsHTZ4F4iiSDWqMcVqx4gEH6HBtRXav39Gj3fgT1YqvBcwPCQuf0Oa5R2cDaLWK8A==}
+
+  /rustybuzz-wasm/0.3.0:
+    resolution: {integrity: sha512-3iDVZ0uAmirulFULD1A9kHbLgYkcpeFXojuXK13YXxcX/Zerr1TdaNqxkUrjLb9Qg8iXDXt9BM1llDWKgX3Ypg==}
+    dev: false

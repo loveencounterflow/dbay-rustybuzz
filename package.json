@@ -29,7 +29,8 @@
   "dependencies": {
     "cnd": "9.2.2",
     "guy": "2.5.0",
-    "intertype": "7.6.7"
+    "intertype": "7.6.7",
+    "rustybuzz-wasm": "^0.3.0"
   },
   "devDependencies": {
     "dbay": "10.113.1"
