@@ -1,0 +1,13 @@
+{
+  "version": 3,
+  "file": "",
+  "sourceRoot": "",
+  "sources": [
+    "../src/errors.coffee"
+  ],
+  "names": [],
+  "mappings": "AAAA;EAAA;AAAA,MAAA,GAAA,EAAA,CAAA,EAAA,KAAA,EAAA,KAAA,EAAA,GAAA;;;EAIA,GAAA,GAA4B,OAAA,CAAQ,KAAR;;EAC5B,GAAA,GAA4B,GAAG,CAAC;;EAChC,KAAA,GAA4B;;EAC5B,KAAA,GAA4B,GAAG,CAAC,UAAJ,CAAe,OAAf,EAA4B,KAA5B,EAP5B;;;;;;;;EAcA,CAAA,GAA4B,OAAA,CAAQ,iBAAR,EAd5B;;;;EAkBM,IAAC,CAAA,sBAAP,MAAA,oBAAA,QAAmC,CAAC,CAAC,qBAArC,CAAA;AAlBA",
+  "sourcesContent": [
+    "'use strict'\n\n\n############################################################################################################\nCND                       = require 'cnd'\nrpr                       = CND.rpr\nbadge                     = 'DBR/ERRORS'\ndebug                     = CND.get_logger 'debug',     badge\n# warn                      = CND.get_logger 'warn',      badge\n# info                      = CND.get_logger 'info',      badge\n# urge                      = CND.get_logger 'urge',      badge\n# help                      = CND.get_logger 'help',      badge\n# whisper                   = CND.get_logger 'whisper',   badge\n# echo                      = CND.echo.bind CND\nE                         = require 'dbay/lib/errors'\n\n#===========================================================================================================\n# class @Dbr_not_implemented extends E.Dbay_error\nclass @Dbr_not_implemented extends E.DBay_not_implemented\n\n\n"
+  ]
+}
