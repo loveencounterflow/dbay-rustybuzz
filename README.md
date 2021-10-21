@@ -23,4 +23,6 @@
   instead of ready-built SVG `<rect/>` as wee need those numbers to construct the line bounding box
 * **[–]** [RustyBuzz-WASM] implement caching of font face in `glyph_to_svg_pathdata()` to avoid re-building
   it for each single outline; benchmark
+* **[–]** Two independent imports of [RustyBuzz-WASM] will share state if they happen to import the same
+  file
 
