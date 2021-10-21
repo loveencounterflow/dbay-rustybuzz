@@ -7,7 +7,7 @@
 ############################################################################################################
 CND                       = require 'cnd'
 rpr                       = CND.rpr
-badge                     = 'DBAY-CMUDICT/TYPES'
+badge                     = 'DBAY-RUSTYBUZZ'
 debug                     = CND.get_logger 'debug',     badge
 alert                     = CND.get_logger 'alert',     badge
 whisper                   = CND.get_logger 'whisper',   badge
