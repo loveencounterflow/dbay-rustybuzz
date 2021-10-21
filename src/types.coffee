@@ -42,4 +42,10 @@ dbay_types                = require 'dbay/lib/types'
   "@isa.nonempty_text x.fontnick":                  ( x ) -> @isa.nonempty_text x.fontnick
   "@isa_optional.nonempty_text x.fspath":           ( x ) -> @isa_optional.nonempty_text x.fspath
 
+#-----------------------------------------------------------------------------------------------------------
+@declare 'dbr_get_single_outline_cfg', tests:
+  "@isa.object x":                                  ( x ) -> @isa.object x
+  "@isa.nonempty_text x.fontnick":                  ( x ) -> @isa.nonempty_text x.fontnick
+  "@isa.cardinal x.gid":                            ( x ) -> @isa.cardinal x.gid
+
 
