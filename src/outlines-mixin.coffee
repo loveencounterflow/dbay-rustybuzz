@@ -103,7 +103,9 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     y           = parseInt match.groups.y,      10
     width       = parseInt match.groups.width,  10
     height      = parseInt match.groups.height, 10
-    return { bbox: { x, y, width, height, }, pd, }
+    x1          = x + width
+    y1          = y + height
+    return { bbox: { x, y, x1, y1, width, height, }, pd, }
 
   #---------------------------------------------------------------------------------------------------------
   gids_from_cids: ( cfg ) ->

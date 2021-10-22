@@ -114,7 +114,11 @@ class @Drb extends Drb_outlines()
       create table #{schema}.outlines (
           fontnick  text    not null references fontnicks ( fontnick ),
           gid       integer not null,
-          path      text    not null,
+          x         float   not null,
+          y         float   not null,
+          x1        float   not null,
+          y1        float   not null,
+          pd        text    not null,
           primary key ( fontnick, gid ) );
       """
     return null
@@ -127,9 +131,17 @@ class @Drb extends Drb_outlines()
     guy.props.hide @, 'sql',
       #.....................................................................................................
       get_db_object_count:  SQL"select count(*) as count from #{schema}.sqlite_schema;"
+      #.....................................................................................................
       upsert_fontnick: @db.create_insert {
-        schema, into: 'fontnicks', fields: [ 'fontnick', 'fspath', ], on_conflict: { update: true, }, }
+        schema, into: 'fontnicks', fields: [ 'fontnick', 'fspath', ],
+        on_conflict: { update: true, }, }
+      #.....................................................................................................
+      insert_outline: @db.create_insert {
+        schema, into: 'outlines', fields: [ 'fontnick', 'gid', 'x', 'y', 'x1', 'y1', 'pd', ],
+        on_conflict: { update: true, }, }
+      #.....................................................................................................
       fspath_from_fontnick: SQL"select fspath from fontnicks where fontnick = $fontnick;"
+    #.......................................................................................................
     return null
 
   #---------------------------------------------------------------------------------------------------------
