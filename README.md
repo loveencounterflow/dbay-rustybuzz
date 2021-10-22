@@ -25,4 +25,6 @@
   it for each single outline; benchmark
 * **[–]** Two independent imports of [RustyBuzz-WASM] will share state if they happen to import the same
   file
+* **[+]** keep bounding box as `{ x, y, x1, y1, }` in outline table to make it easier to compute composite
+  bounding box
 
