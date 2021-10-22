@@ -3,13 +3,13 @@ lockfileVersion: 5.3
 specifiers:
   cnd: 9.2.2
   dbay: 10.113.1
-  guy: 2.5.0
+  guy: 2.6.0
   intertype: 7.6.7
   rustybuzz-wasm: ^0.3.0
 
 dependencies:
   cnd: 9.2.2
-  guy: 2.5.0
+  guy: 2.6.0
   intertype: 7.6.7
   rustybuzz-wasm: 0.3.0
 
@@ -30,7 +30,7 @@ packages:
     dependencies:
       cnd: 9.2.2
       exit-hook: 2.2.1
-      guy: 2.5.0
+      guy: 2.6.0
       intertype: 7.6.7
     transitivePeerDependencies:
       - deasync
@@ -41,8 +41,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /guy/2.5.0:
-    resolution: {integrity: sha512-H+pVvZdLa7BGmg5M+vPFEgnMD6e+p9zMQVhj7A2dlgQLO+20v23ZpdjAt6c47OfmtXiFZ2dyU4mhRSAv3EJqMg==}
+  /guy/2.6.0:
+    resolution: {integrity: sha512-PtNQaSVvwKgcO/YKqrnupRu/3yHVHvaGPMhXAFzzvPisVNJoIMO6BpkMcpK0qcBSRmROunLXZnEM1QAeDViKJg==}
     peerDependencies:
       deasync: ^0.1.22
     dependencies:
