@@ -82,14 +82,14 @@ class @Drb extends Drb_outlines()
     me.types.validate.constructor_cfg me.cfg
     { db, }       = guy.obj.pluck_with_fallback me.cfg, null, 'db'
     me.cfg        = guy.lft.freeze guy.obj.omit_nullish me.cfg
-    guy.props.def me, 'db',     { enumerable: false, value: db, }
-    guy.props.def me, 'cache',  { enumerable: false, value: {}, }
+    guy.props.hide me, 'db',     db
+    guy.props.hide me, 'cache',  {}
     return null
 
   #---------------------------------------------------------------------------------------------------------
   constructor: ( cfg ) ->
     super()
-    guy.props.def @, 'RBW', { enumerable: false, value: RBW, }
+    guy.props.hide @, 'RBW', RBW
     guy.cfg.configure_with_types @, cfg, types
     @_compile_sql()
     @_open_drb_db()
@@ -123,13 +123,13 @@ class @Drb extends Drb_outlines()
   _compile_sql: ->
     { prefix
       schema }  = @cfg
-    sql         =
+    #.......................................................................................................
+    guy.props.hide @, 'sql',
+      #.....................................................................................................
       get_db_object_count:  SQL"select count(*) as count from #{schema}.sqlite_schema;"
       upsert_fontnick: @db.create_insert {
         schema, into: 'fontnicks', fields: [ 'fontnick', 'fspath', ], on_conflict: { update: true, }, }
       fspath_from_fontnick: SQL"select fspath from fontnicks where fontnick = $fontnick;"
-    #  truncate_entries:     SQL"delete from #{schema}.entries where source = $source;"
-    guy.props.def @, 'sql', { enumerable: false, value: sql, }
     return null
 
   #---------------------------------------------------------------------------------------------------------

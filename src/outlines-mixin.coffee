@@ -28,7 +28,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
   #---------------------------------------------------------------------------------------------------------
   constructor: ->
     super()
-    guy.props.def @, 'state', { enumerable: false, value: {}, } unless @state?
+    guy.props.hide @, 'state', {} unless @state?
     @state.prv_fontidx            = -1
     @state.font_idx_by_fontnicks  = {}
     #.........................................................................................................
