@@ -19,6 +19,7 @@ guy                       = require 'guy'
 PATH                      = require 'path'
 FS                        = require 'fs'
 E                         = require './errors'
+ZLIB                      = require 'zlib'
 _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" width="(?<width>[-+0-9]+)" height="(?<height>[-+0-9]+)"\/>$/
 
 
@@ -125,6 +126,17 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
       continue if ( gid = gids[ idx ] ) is 0
       R.set cid, gid
     return R
+
+  #-----------------------------------------------------------------------------------------------------------
+  _despace_svg_pathdata: ( svg_pathdata ) ->
+    R = svg_pathdata
+    R = R.replace /([0-9])\x20([^0-9])/g, '$1$2'
+    R = R.replace /([^0-9])\x20([0-9])/g, '$1$2'
+    return R
+
+  #-----------------------------------------------------------------------------------------------------------
+  _compress_svg_pathdata: ( svg_pathdata ) -> ZLIB.deflateRawSync ( Buffer.from svg_pathdata ), {
+    level: 1, strategy: ZLIB.constants.Z_HUFFMAN_ONLY, }
 
 
 

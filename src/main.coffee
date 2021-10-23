@@ -56,6 +56,8 @@ class @Drb extends Drb_outlines()
         schema:           'drb'
         create:           false
         # path:             PATH.join home,      'cmudict.sqlite'
+        despace_svg:      true
+        compress_svg:     true
         std_fontnicks:
           gi:            PATH.join font_path, 'ebgaramond/EBGaramond12-Italic.otf'
           gr:            PATH.join font_path, 'ebgaramond/EBGaramond12-Regular.otf'
@@ -99,7 +101,8 @@ class @Drb extends Drb_outlines()
   #---------------------------------------------------------------------------------------------------------
   _create_db_structure: ->
     { prefix
-      schema } = @cfg
+      schema    } = @cfg
+    outline_type  = if @cfg.compress_svg then 'blob' else 'text'
     @db.execute SQL"""
       drop table if exists #{schema}.outlines;
       drop table if exists #{schema}.fontnicks;
@@ -114,11 +117,13 @@ class @Drb extends Drb_outlines()
       create table #{schema}.outlines (
           fontnick  text    not null references fontnicks ( fontnick ),
           gid       integer not null,
+          cid       integer,
+          glyph     text,
           x         float   not null,
           y         float   not null,
           x1        float   not null,
           y1        float   not null,
-          pd        text    not null,
+          pd        #{outline_type} not null,
           primary key ( fontnick, gid ) );
       """
     return null
@@ -137,7 +142,7 @@ class @Drb extends Drb_outlines()
         on_conflict: { update: true, }, }
       #.....................................................................................................
       insert_outline: @db.create_insert {
-        schema, into: 'outlines', fields: [ 'fontnick', 'gid', 'x', 'y', 'x1', 'y1', 'pd', ],
+        schema, into: 'outlines', fields: [ 'fontnick', 'gid', 'cid', 'glyph', 'x', 'y', 'x1', 'y1', 'pd', ],
         on_conflict: { update: true, }, }
       #.....................................................................................................
       fspath_from_fontnick: SQL"select fspath from fontnicks where fontnick = $fontnick;"
