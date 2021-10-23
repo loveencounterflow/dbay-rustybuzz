@@ -27,4 +27,14 @@
   file
 * **[+]** keep bounding box as `{ x, y, x1, y1, }` in outline table to make it easier to compute composite
   bounding box
+* **[–]** [RustyBuzz-WASM] implement
+
+  ```coffee
+  despace_svg_pathdata = ( svg_pathda ) ->
+    R = svg_pathda
+    R = R.replace /([0-9])\x20([^0-9])/g, '$1$2'
+    R = R.replace /([^0-9])\x20([0-9])/g, '$1$2'
+    return R
+  ```
+
 
