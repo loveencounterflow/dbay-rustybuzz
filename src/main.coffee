@@ -26,6 +26,7 @@ home                      = PATH.resolve PATH.join __dirname, '..'
 # data_path                 = PATH.join home, 'data'
 { Drb_outlines }          = require './outlines-mixin'
 font_path                 = PATH.resolve PATH.join __dirname, '../fonts'
+ZLIB                      = require 'zlib'
 
 
 #===========================================================================================================
@@ -35,6 +36,7 @@ class @Drb extends Drb_outlines()
   @C: guy.lft.freeze
     # replacement:  '█'
     last_fontidx:       15
+    zlib_zip_cfg:       { level: 1, strategy: ZLIB.constants.Z_HUFFMAN_ONLY, }
     defaults:
       #.....................................................................................................
       dbr_register_fontnick_cfg:
@@ -166,7 +168,7 @@ class @Drb extends Drb_outlines()
       name:           prefix + 'decompress'
       deterministic:  true
       varargs:        false
-      call:           ( pd_bfr ) => @_decompress_svg_pathdata( pd_bfr )
+      call:           ( pd_bfr ) => @_unzip pd_bfr
     #.......................................................................................................
     return null
 

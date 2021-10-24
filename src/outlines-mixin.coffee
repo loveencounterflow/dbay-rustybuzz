@@ -128,14 +128,9 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     return R
 
   #-----------------------------------------------------------------------------------------------------------
-  _compress_svg_pathdata: ( svg_pathdata ) -> ZLIB.deflateRawSync ( Buffer.from svg_pathdata ), {
-    level: 1, strategy: ZLIB.constants.Z_HUFFMAN_ONLY, }
-
-  #-----------------------------------------------------------------------------------------------------------
-  _decompress_svg_pathdata: ( pd_blob ) -> ZLIB.inflateRawSync pd_blob
-
-  #-----------------------------------------------------------------------------------------------------------
-  prepare_insert_outline: -> @db.prepare @sql.insert_outline
+  _zip:                     ( txt ) -> ZLIB.deflateRawSync ( Buffer.from txt ), @constructor.C.zlib_zip_cfg
+  _unzip:                   ( bfr ) -> ZLIB.inflateRawSync bfr
+  _prepare_insert_outline:          -> @db.prepare @sql.insert_outline
 
 
 
