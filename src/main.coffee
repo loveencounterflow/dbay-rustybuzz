@@ -26,7 +26,6 @@ home                      = PATH.resolve PATH.join __dirname, '..'
 # data_path                 = PATH.join home, 'data'
 { Drb_outlines }          = require './outlines-mixin'
 font_path                 = PATH.resolve PATH.join __dirname, '../fonts'
-RBW                       = require 'rustybuzz-wasm'
 
 
 #===========================================================================================================
@@ -59,9 +58,10 @@ class @Drb extends Drb_outlines()
         despace_svg:      true
         compress_svg:     true
         std_fontnicks:
-          gi:            PATH.join font_path, 'ebgaramond/EBGaramond12-Italic.otf'
-          gr:            PATH.join font_path, 'ebgaramond/EBGaramond12-Regular.otf'
-          amr:           PATH.join font_path, 'amiri/Amiri-Regular.ttf'
+          gi:               PATH.join font_path, 'ebgaramond/EBGaramond12-Italic.otf'
+          gr:               PATH.join font_path, 'ebgaramond/EBGaramond12-Regular.otf'
+          amr:              PATH.join font_path, 'amiri/Amiri-Regular.ttf'
+        RBW:              null
 
   #---------------------------------------------------------------------------------------------------------
   @cast_constructor_cfg: ( me, cfg = null ) ->
@@ -82,6 +82,11 @@ class @Drb extends Drb_outlines()
     ### called from constructor via `guy.cfg.configure_with_types()` ###
     me.cfg        = @cast_constructor_cfg me
     me.types.validate.constructor_cfg me.cfg
+    #.......................................................................................................
+    if me.cfg.RBW?  then  { RBW, }  = guy.obj.pluck_with_fallback me.cfg, null, 'RBW'
+    else                    RBW     = require 'rustybuzz-wasm'
+    guy.props.hide me, 'RBW', RBW
+    #.......................................................................................................
     { db, }       = guy.obj.pluck_with_fallback me.cfg, null, 'db'
     me.cfg        = guy.lft.freeze guy.obj.omit_nullish me.cfg
     guy.props.hide me, 'db',     db
@@ -91,7 +96,6 @@ class @Drb extends Drb_outlines()
   #---------------------------------------------------------------------------------------------------------
   constructor: ( cfg ) ->
     super()
-    guy.props.hide @, 'RBW', RBW
     guy.cfg.configure_with_types @, cfg, types
     @_create_sql_functions()
     @_compile_sql()

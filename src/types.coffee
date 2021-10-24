@@ -31,6 +31,7 @@ dbay_types                = require 'dbay/lib/types'
   "( @isa.object x.db ) or ( @isa.function x.db ":  ( x ) -> ( @isa.object x.db ) or ( @isa.function x.db )
   "@isa.boolean x.despace_svg":                     ( x ) -> @isa.boolean x.despace_svg
   "@isa.boolean x.compress_svg":                    ( x ) -> @isa.boolean x.compress_svg
+  "@isa_optional.object x.RBW":                     ( x ) -> @isa_optional.object x.RBW
 
 #-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_register_fontnick_cfg', tests:
