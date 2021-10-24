@@ -55,7 +55,6 @@ class @Drb extends Drb_outlines()
         schema:           'drb'
         create:           false
         # path:             PATH.join home,      'cmudict.sqlite'
-        despace_svg:      true
         compress_svg:     true
         std_fontnicks:
           gi:               PATH.join font_path, 'ebgaramond/EBGaramond12-Italic.otf'
