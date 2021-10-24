@@ -138,5 +138,10 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
   _compress_svg_pathdata: ( svg_pathdata ) -> ZLIB.deflateRawSync ( Buffer.from svg_pathdata ), {
     level: 1, strategy: ZLIB.constants.Z_HUFFMAN_ONLY, }
 
+  #-----------------------------------------------------------------------------------------------------------
+  prepare_insert_outline: -> @db.prepare @sql.insert_outline
+
+
+
 
 
