@@ -28,9 +28,9 @@
   "homepage": "https://github.com/loveencounterflow/dbay-rustybuzz#readme",
   "dependencies": {
     "cnd": "9.2.2",
-    "guy": "2.6.0",
+    "guy": "2.7.0",
     "intertype": "7.6.7",
-    "rustybuzz-wasm": "^0.3.0"
+    "rustybuzz-wasm": "1.0.0"
   },
   "devDependencies": {
     "dbay": "10.113.1"
