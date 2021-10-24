@@ -36,5 +36,5 @@
     R = R.replace /([^0-9])\x20([0-9])/g, '$1$2'
     return R
   ```
-
+* **[–]** [RustyBuzz-WASM] implement SVG path compression
 
