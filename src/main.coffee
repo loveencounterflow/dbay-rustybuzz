@@ -93,16 +93,22 @@ class @Drb extends Drb_outlines()
     super()
     guy.props.hide @, 'RBW', RBW
     guy.cfg.configure_with_types @, cfg, types
+    @_create_sql_functions()
     @_compile_sql()
     @_open_drb_db()
-    @_create_sql_functions()
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
   _create_db_structure: ->
     { prefix
       schema    } = @cfg
-    outline_type  = if @cfg.compress_svg then 'blob' else 'text'
+    if @cfg.compress_svg
+      outline_type      = 'blob'
+      decompress_clause = prefix + 'decompress( pd )'
+    else
+      outline_type      = 'text'
+      decompress_clause = 'pd'
+    #.......................................................................................................
     @db.execute SQL"""
       drop table if exists #{schema}.outlines;
       drop table if exists #{schema}.fontnicks;
@@ -119,10 +125,16 @@ class @Drb extends Drb_outlines()
           gid       integer not null,
           cid       integer,
           glyph     text,
+          /* Unscaled Outline ID (UOID): */
+          -- uoid      text generated always as ( 'uo' || '_' || fontnick || '_' || gid ) virtual,
+          uoid      text generated always as ( 'uo' || gid || fontnick ) virtual,
+          /* bounding box */
           x         float   not null,
           y         float   not null,
           x1        float   not null,
           y1        float   not null,
+          /* PathData (PD): */
+          pd_txt    text generated always as ( #{decompress_clause} ) virtual,
           pd        #{outline_type} not null,
           primary key ( fontnick, gid ) );
       """
@@ -153,12 +165,12 @@ class @Drb extends Drb_outlines()
   _create_sql_functions: ->
     { prefix
       schema } = @cfg
-    # #-------------------------------------------------------------------------------------------------------
-    # @db.create_function
-    #   name:           prefix + 'ipa_from_abs1'
-    #   deterministic:  true
-    #   varargs:        false
-    #   call:           ( abs1 ) => @ipa_from_abs1( abs1 )
+    #-------------------------------------------------------------------------------------------------------
+    @db.create_function
+      name:           prefix + 'decompress'
+      deterministic:  true
+      varargs:        false
+      call:           ( pd_bfr ) => @_decompress_svg_pathdata( pd_bfr )
     #.......................................................................................................
     return null
 
