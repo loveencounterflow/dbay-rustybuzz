@@ -139,7 +139,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     level: 1, strategy: ZLIB.constants.Z_HUFFMAN_ONLY, }
 
   #-----------------------------------------------------------------------------------------------------------
-  _decompress_svg_pathdata: ( pd_bfr ) -> ZLIB.inflateRawSync pd_bfr
+  _decompress_svg_pathdata: ( pd_blob ) -> ZLIB.inflateRawSync pd_blob
 
   #-----------------------------------------------------------------------------------------------------------
   prepare_insert_outline: -> @db.prepare @sql.insert_outline

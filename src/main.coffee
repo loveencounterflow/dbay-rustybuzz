@@ -104,10 +104,10 @@ class @Drb extends Drb_outlines()
       schema    } = @cfg
     if @cfg.compress_svg
       outline_type      = 'blob'
-      decompress_clause = prefix + 'decompress( pd )'
+      decompress_clause = prefix + 'decompress( pd_blob )'
     else
       outline_type      = 'text'
-      decompress_clause = 'pd'
+      decompress_clause = 'pd_blob'
     #.......................................................................................................
     @db.execute SQL"""
       drop table if exists #{schema}.outlines;
@@ -134,8 +134,8 @@ class @Drb extends Drb_outlines()
           x1        float   not null,
           y1        float   not null,
           /* PathData (PD): */
-          pd_txt    text generated always as ( #{decompress_clause} ) virtual,
-          pd        #{outline_type} not null,
+          pd        text generated always as ( #{decompress_clause} ) virtual,
+          pd_blob   #{outline_type} not null,
           primary key ( fontnick, gid ) );
       """
     return null
@@ -154,7 +154,7 @@ class @Drb extends Drb_outlines()
         on_conflict: { update: true, }, }
       #.....................................................................................................
       insert_outline: @db.create_insert {
-        schema, into: 'outlines', fields: [ 'fontnick', 'gid', 'cid', 'glyph', 'x', 'y', 'x1', 'y1', 'pd', ],
+        schema, into: 'outlines', fields: [ 'fontnick', 'gid', 'cid', 'glyph', 'x', 'y', 'x1', 'y1', 'pd_blob', ],
         on_conflict: { update: true, }, }
       #.....................................................................................................
       fspath_from_fontnick: SQL"select fspath from fontnicks where fontnick = $fontnick;"
