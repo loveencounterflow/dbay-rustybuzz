@@ -37,4 +37,5 @@
     return R
   ```
 * **[–]** [RustyBuzz-WASM] implement SVG path compression
+* **[+]** allow to pass in custom instance of `rustybuzz-wasm` as `cfg.RBW` for testing purposes
 
