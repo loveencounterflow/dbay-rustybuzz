@@ -55,7 +55,6 @@ class @Drb extends Drb_outlines()
         schema:           'drb'
         create:           false
         # path:             PATH.join home,      'cmudict.sqlite'
-        compress_svg:     true
         std_fontnicks:
           gi:               PATH.join font_path, 'ebgaramond/EBGaramond12-Italic.otf'
           gr:               PATH.join font_path, 'ebgaramond/EBGaramond12-Regular.otf'
@@ -105,12 +104,6 @@ class @Drb extends Drb_outlines()
   _create_db_structure: ->
     { prefix
       schema    } = @cfg
-    if @cfg.compress_svg
-      outline_type      = 'blob'
-      decompress_clause = prefix + 'decompress( pd_blob )'
-    else
-      outline_type      = 'text'
-      decompress_clause = 'pd_blob'
     #.......................................................................................................
     @db.execute SQL"""
       drop table if exists #{schema}.outlines;
@@ -137,8 +130,8 @@ class @Drb extends Drb_outlines()
           x1        float   not null,
           y1        float   not null,
           /* PathData (PD): */
-          pd        text generated always as ( #{decompress_clause} ) virtual,
-          pd_blob   #{outline_type} not null,
+          pd        text generated always as ( #{prefix}decompress( pd_blob ) ) virtual,
+          pd_blob   blob    not null,
           primary key ( fontnick, gid ) );
       """
     return null
