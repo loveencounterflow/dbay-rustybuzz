@@ -115,7 +115,9 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     ### TAINT validate ###
     @types.validate.dbr_get_cgid_map_cfg ( cfg = { @constructor.C.defaults.dbr_get_cgid_map_cfg..., cfg..., } )
     { cids
+      text
       fontnick }  = cfg
+    cids       ?= ( ( chr.codePointAt 0 ) for chr in Array.from text )
     font_idx    = @_font_idx_from_fontnick fontnick
     text        = ( ( ( String.fromCodePoint cid ) for cid in cids ).join '\n' ) + '\n'
     gids        = @RBW.shape_text { format: 'short', text, font_idx, } # formats: json, rusty, short
@@ -144,8 +146,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
       text
       cids
       cgid_map }        = cfg
-    throw new Error "not implemented" if text?
-    throw new Error "not implemented" if cids?
+    cgid_map           ?= @get_cgid_map { fontnick, text, cids, }
     insert_outline      = @_prepare_insert_outline()
     @db =>
       for [ cid, gid, ] from cgid_map
