@@ -113,6 +113,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     ### Given a list of Unicode CIDs as `cids` and a `fontnick`, return a `Map` from CIDs to GIDs
     (glyf IDs). Unmappable CIDs will be left out. ###
     ### TAINT validate ###
+    @types.validate.dbr_get_cgid_map_cfg ( cfg = { @constructor.C.defaults.dbr_get_cgid_map_cfg..., cfg..., } )
     { cids
       fontnick }  = cfg
     font_idx    = @_font_idx_from_fontnick fontnick
