@@ -59,7 +59,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
   _font_idx_from_fontnick: ( fontnick )->
     ### TAINT use fallback to configure behavior in case of failure ###
     unless ( R = @state.font_idx_by_fontnicks[ fontnick ] )?
-      throw new E.Dbr_unknown_fontnick '^dbr/outlines@1^', fontnick
+      throw new E.Dbr_unknown_or_unprepared_fontnick '^dbr/outlines@1^', fontnick
     return R
 
   #---------------------------------------------------------------------------------------------------------

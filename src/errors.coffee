@@ -21,7 +21,7 @@ class @Dbr_internal_error extends E.DBay_internal_error
 #-----------------------------------------------------------------------------------------------------------
 class @Dbr_font_capacity_exceeded extends E.DBay_error
   constructor: ( ref, max_font_count ) -> super ref, "can only load up to #{max_font_count} fonts"
-class @Dbr_unknown_fontnick extends E.DBay_error
-  constructor: ( ref, fontnick ) -> super ref, "unknown fontnick #{rpr fontnick}"
+class @Dbr_unknown_or_unprepared_fontnick extends E.DBay_error
+  constructor: ( ref, fontnick ) -> super ref, "unknown or unprepared fontnick #{rpr fontnick}"
 
 
