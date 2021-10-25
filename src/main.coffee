@@ -134,7 +134,7 @@ class @Drb extends Drb_outlines()
           x1        float   not null,
           y1        float   not null,
           /* PathData (PD): */
-          pd        text generated always as ( #{prefix}decompress( pd_blob ) ) virtual,
+          pd        text generated always as ( #{prefix}unzip( pd_blob ) ) virtual,
           pd_blob   blob    not null,
           primary key ( fontnick, gid ) );
       """
@@ -167,7 +167,7 @@ class @Drb extends Drb_outlines()
       schema } = @cfg
     #-------------------------------------------------------------------------------------------------------
     @db.create_function
-      name:           prefix + 'decompress'
+      name:           prefix + 'unzip'
       deterministic:  true
       varargs:        false
       call:           ( pd_bfr ) => @_unzip pd_bfr
