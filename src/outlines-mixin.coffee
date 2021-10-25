@@ -109,7 +109,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     return { bbox: { x, y, x1, y1, width, height, }, pd, }
 
   #---------------------------------------------------------------------------------------------------------
-  gids_from_cids: ( cfg ) ->
+  get_cgid_map: ( cfg ) ->
     ### Given a list of Unicode CIDs as `cids` and a `fontnick`, return a `Map` from CIDs to GIDs
     (glyf IDs). Unmappable CIDs will be left out. ###
     ### TAINT validate ###
@@ -135,15 +135,19 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
 
   #-----------------------------------------------------------------------------------------------------------
   insert_outlines: ( cfg ) =>
-    ### Given a `cfg.fontnick` and a (list or map of) `cfg.gid_by_cids`, insert the outlines and bounding
+    ### Given a `cfg.fontnick` and a (list or map of) `cfg.cgid_map`, insert the outlines and bounding
     boxes of the referred glyfs. ###
     ### TAINT validate ###
     @types.validate.dbr_insert_outlines_cfg ( cfg = { @constructor.C.defaults.dbr_insert_outlines_cfg..., cfg..., } )
     { fontnick
-      gid_by_cids }     = cfg
+      text
+      cids
+      cgid_map }        = cfg
+    throw new Error "not implemented" if text?
+    throw new Error "not implemented" if cids?
     insert_outline      = @_prepare_insert_outline()
     @db =>
-      for [ cid, gid, ] from gid_by_cids
+      for [ cid, gid, ] from cgid_map
         glyph       = String.fromCodePoint cid
         { bbox
           pd    }   = @get_single_outline { gid, fontnick, }
