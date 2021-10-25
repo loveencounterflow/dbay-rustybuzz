@@ -47,6 +47,12 @@ class @Drb extends Drb_outlines()
         fontnick:         null
         gid:              null
       #.....................................................................................................
+      dbr_insert_outlines_cfg:
+        fontnick:         null
+        cgid_map:         null
+        cids:             null
+        text:             null
+      #.....................................................................................................
       constructor_cfg:
         db:               null
         prefix:           'drb_'
