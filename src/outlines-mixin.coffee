@@ -112,6 +112,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
   gids_from_cids: ( cfg ) ->
     ### Given a list of Unicode CIDs as `cids` and a `fontnick`, return a `Map` from CIDs to GIDs
     (glyf IDs). Unmappable CIDs will be left out. ###
+    ### TAINT validate ###
     { cids
       fontnick }  = cfg
     font_idx    = @_font_idx_from_fontnick fontnick
@@ -131,6 +132,26 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
   _zip:                     ( txt ) -> ZLIB.deflateRawSync ( Buffer.from txt ), @constructor.C.zlib_zip_cfg
   _unzip:                   ( bfr ) -> ZLIB.inflateRawSync bfr
   _prepare_insert_outline:          -> @db.prepare @sql.insert_outline
+
+  #-----------------------------------------------------------------------------------------------------------
+  insert_outlines: ( cfg ) =>
+    ### Given a `cfg.fontnick` and a (list or map of) `cfg.gid_by_cids`, insert the outlines and bounding
+    boxes of the referred glyfs. ###
+    ### TAINT validate ###
+    { fontnick
+      gid_by_cids }     = cfg
+    insert_outline      = @_prepare_insert_outline()
+    @db =>
+      for [ cid, gid, ] from gid_by_cids
+        glyph       = String.fromCodePoint cid
+        { bbox
+          pd    }   = @get_single_outline { gid, fontnick, }
+        { x,  y,
+          x1, y1, } = bbox
+        pd_blob     = @_zip pd
+        insert_outline.run { fontnick, gid, cid, glyph, x, y, x1, y1, pd_blob, }
+      return null
+    return null
 
 
 
