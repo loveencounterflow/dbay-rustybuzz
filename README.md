@@ -38,4 +38,16 @@
   ```
 * **[–]** [RustyBuzz-WASM] implement SVG path compression
 * **[+]** allow to pass in custom instance of `rustybuzz-wasm` as `cfg.RBW` for testing purposes
-
+* **[–]** [RustyBuzz-WASM] move to WASI to enable reading from file system &c:
+  * https://github.com/topheman/webassembly-wasi-experiments#file-system-access
+  * https://github.com/rustwasm/wasm-pack/issues/654
+  * `rustwasmc` doesn't allow file access for Rust versions >= 1.51, see
+    https://github.com/second-state/rustwasmc#known-issues
+  * https://www.secondstate.io/articles/wasi-access-system-resources/
+  * https://blog.knoldus.com/hosting-wasm-modules-in-rust-easily-using-wasmi/
+  * https://lib.rs/search?q=wasi
+  * https://wasi.dev/
+  * https://github.com/bytecodealliance/wasmtime/blob/main/docs/WASI-documents.md
+  * https://wasmer.io/
+  * https://de.wikipedia.org/wiki/WebAssembly#Nutzung_au%C3%9Ferhalb_des_Browsers
+  * https://forum.holochain.org/t/wasmi-vs-wasmer/1929
