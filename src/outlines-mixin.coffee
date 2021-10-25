@@ -138,6 +138,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     ### Given a `cfg.fontnick` and a (list or map of) `cfg.gid_by_cids`, insert the outlines and bounding
     boxes of the referred glyfs. ###
     ### TAINT validate ###
+    @types.validate.dbr_insert_outlines_cfg ( cfg = { @constructor.C.defaults.dbr_insert_outlines_cfg..., cfg..., } )
     { fontnick
       gid_by_cids }     = cfg
     insert_outline      = @_prepare_insert_outline()
