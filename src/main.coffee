@@ -125,9 +125,10 @@ class @Drb extends Drb_outlines()
           gid       integer not null,
           cid       integer,
           glyph     text,
-          /* Unscaled Outline ID (UOID): */
-          -- uoid      text generated always as ( 'uo' || '_' || fontnick || '_' || gid ) virtual,
-          uoid      text generated always as ( 'uo' || gid || fontnick ) virtual,
+          /* Unscaled Outline ID (OID): */
+          uoid      text generated always as ( 'o' || gid || fontnick ) virtual,
+          /* Scaled Outline ID (OID): */
+          -- soid      text generated always as ( 'o' || gid || fontnick || '_' || 4.5 ) virtual,
           /* bounding box */
           x         float   not null,
           y         float   not null,
