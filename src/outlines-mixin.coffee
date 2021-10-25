@@ -133,7 +133,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
 
   #-----------------------------------------------------------------------------------------------------------
   _zip:                     ( txt ) -> ZLIB.deflateRawSync ( Buffer.from txt ), @constructor.C.zlib_zip_cfg
-  _unzip:                   ( bfr ) -> ZLIB.inflateRawSync bfr
+  _unzip:                   ( bfr ) -> ( ZLIB.inflateRawSync bfr ).toString()
   _prepare_insert_outline:          -> @db.prepare @sql.insert_outline
 
   #-----------------------------------------------------------------------------------------------------------
