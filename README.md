@@ -8,6 +8,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [𓆤DBay 𓏞RustyBuzz](#%F0%93%86%A4dbay-%F0%93%8F%9Erustybuzz)
+  - [Notes](#notes)
+    - [IDs of SVG Paths / Glyf Outlines](#ids-of-svg-paths--glyf-outlines)
   - [To Do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -15,7 +17,33 @@
 
 # 𓆤DBay 𓏞RustyBuzz
 
+*There's no documentation, yet, just [demos, tests,
+benchmarks,](https://github.com/loveencounterflow/hengist/tree/master/dev/dbay-rustybuzz/src) and a few
+scattered notes*
 
+## Notes
+
+### IDs of SVG Paths / Glyf Outlines
+
+* Unscaled Outline IDs (UOIDs)
+  * identify unscaled outlines ('Urbilder'), each being an SVG path element that pictures a glyf outline in
+    a 1000⨉1000 em square.
+  * initial letter `o` (**O**utline)
+  * followed by decimal Glyf ID / `gid`
+  * followed by `fontnick`; these must always start with a letter
+  * Ex.: `s42foo-4.5` identifies `s`caled glyf outline with GID `42` from font `foo` at size `4.5mm`
+* Scaled Outline IDs (SOIDs)
+  * identify scaled outlines; these are implemented as SVG `<use/>` elements whose `href` attribute are
+    fragment identifiers that reference an Unscaled Outline.
+  * start with letter `s` (**S**caled)
+  * followed by the referenced UOID
+  * followed by a `-` (U+002D hyphen-minus)
+  * followed by the (possibly fractional) font size in mm
+  * Ex.: `s42foo-4.5` identifies `s`caled glyf outline with GID `42` from font `foo` at size `4.5mm`
+  * transformations other than uniform scaling are possible and practically relevant, for example,
+    translation, rotation and non-uniform scaling. These will be expressed by putting a single letter in
+    front of any optional digits, ex.: `s42foo-4.5r180` might identify the same scaled outline as before,
+    only rotated by 180°. Details for these IDs have not been worked out as yet.
 
 ## To Do
 
