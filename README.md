@@ -31,7 +31,7 @@ scattered notes*
   * initial letter `o` (**O**utline)
   * followed by decimal Glyf ID / `gid`
   * followed by `fontnick`; these must always start with a letter
-  * Ex.: `s42foo-4.5` identifies `s`caled glyf outline with GID `42` from font `foo` at size `4.5mm`
+  * Ex.: `o42foo` identifies an `u`nscaled glyf outline with GID `42` from font `foo`
 * Scaled Outline IDs (SOIDs)
   * identify scaled outlines; these are implemented as SVG `<use/>` elements whose `href` attribute are
     fragment identifiers that reference an Unscaled Outline.
