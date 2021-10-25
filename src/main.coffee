@@ -25,12 +25,13 @@ guy                       = require 'guy'
 home                      = PATH.resolve PATH.join __dirname, '..'
 # data_path                 = PATH.join home, 'data'
 { Drb_outlines }          = require './outlines-mixin'
+{ Drb_codepoints }        = require './codepoints-mixin'
 font_path                 = PATH.resolve PATH.join __dirname, '../fonts'
 ZLIB                      = require 'zlib'
 
 
 #===========================================================================================================
-class @Drb extends Drb_outlines()
+class @Drb extends Drb_outlines Drb_codepoints()
 
   #---------------------------------------------------------------------------------------------------------
   @C: guy.lft.freeze
