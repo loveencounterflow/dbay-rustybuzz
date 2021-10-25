@@ -63,12 +63,12 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     return R
 
   #---------------------------------------------------------------------------------------------------------
-  load_font: ( cfg ) ->
+  prepare_font: ( cfg ) ->
     clasz = @constructor
     unless @state.prv_fontidx < clasz.C.last_fontidx
       throw new E.Dbr_font_capacity_exceeded '^dbr/outlines@1^', clasz.C.last_fontidx + 1
     #.........................................................................................................
-    @types.validate.dbr_load_font_cfg ( cfg = { @constructor.C.defaults.dbr_load_font_cfg..., cfg..., } )
+    @types.validate.dbr_prepare_font_cfg ( cfg = { @constructor.C.defaults.dbr_prepare_font_cfg..., cfg..., } )
     { fontnick
       fspath  } = cfg
     #.........................................................................................................
