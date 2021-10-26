@@ -23,6 +23,7 @@ ZLIB                      = require 'zlib'
 _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" width="(?<width>[-+0-9]+)" height="(?<height>[-+0-9]+)"\/>$/
 
 
+
 #-----------------------------------------------------------------------------------------------------------
 @Drb_outlines = ( clasz = Object ) => class extends clasz
 
@@ -109,15 +110,20 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     return { bbox: { x, y, x1, y1, width, height, }, pd, }
 
   #---------------------------------------------------------------------------------------------------------
+  _normalize_drb_chrs: ( chrs ) ->
+    chrs = ( chrs.flat Infinity ).join '' if @types.isa.list chrs
+    return ( ( chr.codePointAt 0 ) for chr in Array.from chrs )
+
+  #---------------------------------------------------------------------------------------------------------
   get_cgid_map: ( cfg ) ->
     ### Given a list of Unicode CIDs as `cids` and a `fontnick`, return a `Map` from CIDs to GIDs
     (glyf IDs). Unmappable CIDs will be left out. ###
     ### TAINT validate ###
     @types.validate.dbr_get_cgid_map_cfg ( cfg = { @constructor.C.defaults.dbr_get_cgid_map_cfg..., cfg..., } )
     { cids
-      text
+      chrs
       fontnick }  = cfg
-    cids       ?= ( ( chr.codePointAt 0 ) for chr in Array.from text )
+    cids       ?= @_normalize_drb_chrs chrs
     font_idx    = @_font_idx_from_fontnick fontnick
     text        = ( ( ( String.fromCodePoint cid ) for cid in cids ).join '\n' ) + '\n'
     gids        = @RBW.shape_text { format: 'short', text, font_idx, } # formats: json, rusty, short
@@ -143,10 +149,10 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     ### TAINT validate ###
     @types.validate.dbr_insert_outlines_cfg ( cfg = { @constructor.C.defaults.dbr_insert_outlines_cfg..., cfg..., } )
     { fontnick
-      text
+      chrs
       cids
       cgid_map }        = cfg
-    cgid_map           ?= @get_cgid_map { fontnick, text, cids, }
+    cgid_map           ?= @get_cgid_map { fontnick, chrs, cids, }
     insert_outline      = @_prepare_insert_outline()
     @db =>
       for [ cid, gid, ] from cgid_map
@@ -161,6 +167,42 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     return null
 
 
+
+#-----------------------------------------------------------------------------------------------------------
+get_assigned_unicode_cids = ( cfg ) ->
+  throw new Error "^3049385^ not implemented" if cfg?
+  R = []
+  ranges = [
+    # excluded: 0x00, control characters, space
+    [ 0x00021, 0x0d800 ]
+    # excluded: high and low surrogates
+    [ 0x0e000, 0x0f8ff ]
+    # excluded: PUA
+    [ 0x0f900, 0x0fffd ]
+    # excluded: non-characters
+    [ 0x10000, 0x1fffd ] # SMP
+    # excluded: non-characters
+    [ 0x20000, 0x2fffd ] # SIP
+    # excluded: non-characters
+    [ 0x30000, 0x3fffd ] # TIP
+    # excluded: non-characters
+    ]
+  ### see https://unicode.org/reports/tr18/#General_Category_Property ###
+  ### see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Unicode_Property_Escapes ###
+  pattern_A = /^(\p{L}|\p{M}|\p{N}|\p{S}|\p{P})/u
+  pattern_B = /^\P{Cn}$/u
+  R = []
+  for [ lo, hi, ] in ranges
+    for cid in [ lo .. hi ]
+      continue unless pattern_A.test String.fromCodePoint cid
+      # continue unless pattern_B.test String.fromCodePoint cid
+      R.push cid
+  return R
+# U+FFFE and U+FFFF on the BMP, U+1FFFE and U+1FFFF on Plane 1, and so on, up to U+10FFFE and U+10FFFF on
+# Plane 16, for a total of 34 code points. In addition, there is a contiguous range of another 32 noncharacter
+# code points in the BMP: U+FDD0..U+FDEF
+
+# D800–DBFF) and 1024 "low" surrogates (DC00–DFFF
 
 
 

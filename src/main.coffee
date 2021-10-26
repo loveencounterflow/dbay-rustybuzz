@@ -48,11 +48,16 @@ class @Drb extends Drb_outlines Drb_codepoints()
         fontnick:         null
         gid:              null
       #.....................................................................................................
+      dbr_get_cgid_map_cfg:
+        fontnick:         null
+        cids:             null
+        chrs:             null
+      #.....................................................................................................
       dbr_insert_outlines_cfg:
         fontnick:         null
         cgid_map:         null
         cids:             null
-        text:             null
+        chrs:             null
       #.....................................................................................................
       constructor_cfg:
         db:               null

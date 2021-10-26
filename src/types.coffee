@@ -50,32 +50,35 @@ dbay_types                = require 'dbay/lib/types'
   "@isa.cardinal x.gid":                            ( x ) -> @isa.cardinal x.gid
 
 #-----------------------------------------------------------------------------------------------------------
+@declare 'dbr_chrs', ( x ) -> ( @isa.text x ) or ( @isa.list x ) ### list of texts, really ###
+
+#-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_get_cgid_map_cfg', tests:
   "@isa.object x":                                    ( x ) -> @isa.object x
   "@isa.nonempty_text x.fontnick":                    ( x ) -> @isa.nonempty_text x.fontnick
-  "exactly one of x.text, x.cids, x.cgid_map is set": ( x ) ->
-    if x.text?
-      return false unless @isa.text x.text
+  "exactly one of x.chrs, x.cids, x.cgid_map is set": ( x ) ->
+    if x.chrs?
+      return false unless @isa.dbr_chrs x.chrs
       return ( not x.cids? ) and ( not x.cgid_map? )
     if x.cids?
       return false unless @isa.list x.cids
-      return ( not x.text? ) and ( not x.cgid_map? )
+      return ( not x.chrs? ) and ( not x.cgid_map? )
     return false
 
 #-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_insert_outlines_cfg', tests:
   "@isa.object x":                                    ( x ) -> @isa.object x
   "@isa.nonempty_text x.fontnick":                    ( x ) -> @isa.nonempty_text x.fontnick
-  "exactly one of x.text, x.cids, x.cgid_map is set": ( x ) ->
-    if x.text?
-      return false unless @isa.text x.text
+  "exactly one of x.chrs, x.cids, x.cgid_map is set": ( x ) ->
+    if x.chrs?
+      return false unless @isa.dbr_chrs x.chrs
       return ( not x.cids? ) and ( not x.cgid_map? )
     if x.cids?
       return false unless @isa.list x.cids
-      return ( not x.text? ) and ( not x.cgid_map? )
+      return ( not x.chrs? ) and ( not x.cgid_map? )
     if x.cgid_map?
       return false unless @isa.map x.cgid_map
-      return ( not x.text? ) and ( not x.cids? )
+      return ( not x.chrs? ) and ( not x.cids? )
     return false
 
 
