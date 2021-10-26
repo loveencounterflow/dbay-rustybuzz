@@ -59,6 +59,11 @@ class @Drb extends Drb_outlines Drb_codepoints()
         cids:             null
         chrs:             null
       #.....................................................................................................
+      dbr_shape_text_cfg:
+        fontnick:         null
+        text:             null
+        size_mm:          5
+      #.....................................................................................................
       constructor_cfg:
         db:               null
         prefix:           'drb_'

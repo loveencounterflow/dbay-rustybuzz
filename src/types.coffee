@@ -50,6 +50,13 @@ dbay_types                = require 'dbay/lib/types'
   "@isa.cardinal x.gid":                            ( x ) -> @isa.cardinal x.gid
 
 #-----------------------------------------------------------------------------------------------------------
+@declare 'dbr_shape_text_cfg', tests:
+  "@isa.object x":                                  ( x ) -> @isa.object x
+  "@isa.nonempty_text x.fontnick":                  ( x ) -> @isa.nonempty_text x.fontnick
+  "@isa.text x.text":                               ( x ) -> @isa.text x.text
+  "( @isa.float x.size_mm ) and ( 0 <= x.size_mm <= 1000 )": ( x ) -> ( @isa.float x.size_mm ) and ( 0 <= x.size_mm <= 1000 )
+
+#-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_chrs', ( x ) -> ( @isa.text x ) or ( @isa.list x ) ### list of texts, really ###
 
 #-----------------------------------------------------------------------------------------------------------

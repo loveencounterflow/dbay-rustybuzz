@@ -142,7 +142,10 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
     { fontnick
       text
-      size_mm }        = cfg
+      size_mm }   = cfg
+    font_idx      = @_font_idx_from_fontnick fontnick
+    arrangement   = @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
+    debug '^345^', arrangement
     # see get_cgid_map
 
   #-----------------------------------------------------------------------------------------------------------
