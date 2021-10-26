@@ -138,6 +138,14 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     return R
 
   #-----------------------------------------------------------------------------------------------------------
+  shape_text: ( cfg ) ->
+    @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
+    { fontnick
+      text
+      size_mm }        = cfg
+    # see get_cgid_map
+
+  #-----------------------------------------------------------------------------------------------------------
   _zip:                     ( txt ) -> ZLIB.deflateRawSync ( Buffer.from txt ), @constructor.C.zlib_zip_cfg
   _unzip:                   ( bfr ) -> ( ZLIB.inflateRawSync bfr ).toString()
   _prepare_insert_outline:          -> @db.prepare @sql.insert_outline
@@ -165,8 +173,6 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
         insert_outline.run { fontnick, gid, cid, glyph, x, y, x1, y1, pd_blob, }
       return null
     return null
-
-
 
 #-----------------------------------------------------------------------------------------------------------
 get_assigned_unicode_cids = ( cfg ) ->
