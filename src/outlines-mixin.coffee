@@ -144,8 +144,8 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
       text
       size_mm }   = cfg
     font_idx      = @_font_idx_from_fontnick fontnick
-    arrangement   = @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
-    debug '^345^', arrangement
+    arrangement   = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, size_mm, } # formats: json, rusty, short
+    return arrangement # ???????????????????????????????
     # see get_cgid_map
 
   #-----------------------------------------------------------------------------------------------------------
