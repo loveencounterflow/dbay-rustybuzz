@@ -57,6 +57,11 @@ dbay_types                = require 'dbay/lib/types'
   "( @isa.float x.size_mm ) and ( 0 <= x.size_mm <= 1000 )": ( x ) -> ( @isa.float x.size_mm ) and ( 0 <= x.size_mm <= 1000 )
 
 #-----------------------------------------------------------------------------------------------------------
+@declare 'dbr_get_font_metrics_cfg', tests:
+  "@isa.object x":                                  ( x ) -> @isa.object x
+  "@isa.nonempty_text x.fontnick":                  ( x ) -> @isa.nonempty_text x.fontnick
+
+#-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_chrs', ( x ) -> ( @isa.text x ) or ( @isa.list x ) ### list of texts, really ###
 
 #-----------------------------------------------------------------------------------------------------------

@@ -149,6 +149,13 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     # see get_cgid_map
 
   #-----------------------------------------------------------------------------------------------------------
+  get_font_metrics: ( cfg ) ->
+    @types.validate.dbr_get_font_metrics_cfg ( cfg = { @constructor.C.defaults.dbr_get_font_metrics_cfg..., cfg..., } )
+    { fontnick }  = cfg
+    font_idx      = @_font_idx_from_fontnick fontnick
+    return JSON.parse @RBW.get_font_metrics font_idx
+
+  #-----------------------------------------------------------------------------------------------------------
   _zip:                     ( txt ) -> ZLIB.deflateRawSync ( Buffer.from txt ), @constructor.C.zlib_zip_cfg
   _unzip:                   ( bfr ) -> ( ZLIB.inflateRawSync bfr ).toString()
   _prepare_insert_outline:          -> @db.prepare @sql.insert_outline
