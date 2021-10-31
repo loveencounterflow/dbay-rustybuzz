@@ -30,7 +30,7 @@
     "cnd": "9.2.2",
     "guy": "2.7.0",
     "intertype": "7.7.0",
-    "rustybuzz-wasm": "2.5.0"
+    "rustybuzz-wasm": "3.0.0"
   },
   "devDependencies": {
     "dbay": "10.113.2"
