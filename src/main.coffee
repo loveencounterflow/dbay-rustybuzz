@@ -62,7 +62,6 @@ class @Drb extends Drb_outlines Drb_codepoints()
       dbr_shape_text_cfg:
         fontnick:         null
         text:             null
-        size_mm:          5
       #.....................................................................................................
       dbr_get_font_metrics_cfg:
         fontnick:         null
