@@ -164,11 +164,16 @@ class @Drb extends Drb_outlines Drb_codepoints()
       get_db_object_count:  SQL"select count(*) as count from #{schema}.sqlite_schema;"
       #.....................................................................................................
       upsert_fontnick: @db.create_insert {
-        schema, into: 'fontnicks', fields: [ 'fontnick', 'fspath', ],
+        schema,
+        into:   'fontnicks',
+        fields: [ 'fontnick', 'fspath', ],
         on_conflict: { update: true, }, }
       #.....................................................................................................
       insert_outline: @db.create_insert {
-        schema, into: 'outlines', fields: [ 'fontnick', 'gid', 'cid', 'glyph', 'x', 'y', 'x1', 'y1', 'pd_blob', ],
+        schema,
+        into:       'outlines',
+        fields:     [ 'fontnick', 'gid', 'cid', 'glyph', 'x', 'y', 'x1', 'y1', 'pd_blob', ],
+        returning:  '*',
         on_conflict: { update: true, }, }
       #.....................................................................................................
       fspath_from_fontnick: SQL"select fspath from fontnicks where fontnick = $fontnick;"

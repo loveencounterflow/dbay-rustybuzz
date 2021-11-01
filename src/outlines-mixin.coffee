@@ -160,10 +160,9 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
   #-----------------------------------------------------------------------------------------------------------
   _zip:                     ( txt ) -> ZLIB.deflateRawSync ( Buffer.from txt ), @constructor.C.zlib_zip_cfg
   _unzip:                   ( bfr ) -> ( ZLIB.inflateRawSync bfr ).toString()
-  _prepare_insert_outline:          -> @db.prepare @sql.insert_outline
 
   #-----------------------------------------------------------------------------------------------------------
-  insert_outlines: ( cfg ) =>
+  insert_and_walk_outlines: ( cfg ) ->
     ### Given a `cfg.fontnick` and a (list or map of) `cfg.cgid_map`, insert the outlines and bounding
     boxes of the referred glyfs. ###
     ### TAINT validate ###
@@ -173,8 +172,10 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
       cids
       cgid_map }        = cfg
     cgid_map           ?= @get_cgid_map { fontnick, chrs, cids, }
-    insert_outline      = @_prepare_insert_outline()
-    @db =>
+    insert_outline      = @db.prepare @sql.insert_outline
+    #.......................................................................................................
+    try
+      @db.begin_transaction()
       for [ cid, gid, ] from cgid_map
         glyph       = String.fromCodePoint cid
         { bbox
@@ -182,8 +183,12 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
         { x,  y,
           x1, y1, } = bbox
         pd_blob     = @_zip pd
-        insert_outline.run { fontnick, gid, cid, glyph, x, y, x1, y1, pd_blob, }
+        yield @db.first_row insert_outline, { fontnick, gid, cid, glyph, x, y, x1, y1, pd_blob, }
       return null
+    catch error
+      @db.rollback_transaction()
+      throw error
+    @db.commit_transaction()
     return null
 
 #-----------------------------------------------------------------------------------------------------------
