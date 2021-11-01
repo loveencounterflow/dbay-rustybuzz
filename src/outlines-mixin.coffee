@@ -191,6 +191,9 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     @db.commit_transaction()
     return null
 
+  #-----------------------------------------------------------------------------------------------------------
+  insert_outlines: ( cfg ) -> [ ( @insert_and_walk_outlines cfg )..., ]
+
 #-----------------------------------------------------------------------------------------------------------
 get_assigned_unicode_cids = ( cfg ) ->
   throw new Error "^3049385^ not implemented" if cfg?
