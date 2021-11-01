@@ -148,6 +148,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     for d, idx in R
       nxt_b   = R[ idx + 1 ]?.b ? Infinity
       d.text  = bytes[ d.b ... nxt_b ].toString()
+      d.uoid  = "o#{d.gid}#{fontnick}"
     return R
 
   #-----------------------------------------------------------------------------------------------------------
