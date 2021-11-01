@@ -2,7 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   cnd: 9.2.2
-  dbay: 10.113.2
+  dbay: 10.117.0
   guy: 2.7.0
   intertype: 7.7.0
   rustybuzz-wasm: 3.2.0
@@ -14,7 +14,7 @@ dependencies:
   rustybuzz-wasm: 3.2.0
 
 devDependencies:
-  dbay: 10.113.2
+  dbay: 10.117.0
 
 packages:
 
@@ -24,8 +24,8 @@ packages:
     dependencies:
       jsx-number-format: 0.1.4
 
-  /dbay/10.113.2:
-    resolution: {integrity: sha512-hm/HQ8NQ+gTwDKzeR/aRrj/TbY82Rt4pcq9YTTTfQamMJfVq4vwl9cr1bpHPivQnBeTu3LSG1U4NQHNISYMyZw==}
+  /dbay/10.117.0:
+    resolution: {integrity: sha512-zUPmuX/2mrOsF0gaxQ4nJ64nJ70PWD1gg+/aXht4ECWZrZaTXHi29zLsngKLMlFeE2o4n1xNkHFuM1F6Tl5Qrw==}
     requiresBuild: true
     dependencies:
       cnd: 9.2.2
