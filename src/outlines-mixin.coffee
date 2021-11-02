@@ -93,7 +93,11 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     #.........................................................................................................
     @types.validate.dbr_get_single_outline_cfg ( cfg = { @constructor.C.defaults.dbr_get_single_outline_cfg..., cfg..., } )
     { fontnick
-      gid     } = cfg
+      gid
+      sid     } = cfg
+    { fontnick
+      gid     } = @_parse_sid sid if sid?
+    # debug '^3334^', { fontnick, gid, sid, }
     font_idx    = @_font_idx_from_fontnick fontnick
     #.........................................................................................................
     { br, pd, } = JSON.parse @RBW.glyph_to_svg_pathdata font_idx, gid
@@ -119,25 +123,19 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
 
   #---------------------------------------------------------------------------------------------------------
   get_cgid_map: ( cfg ) ->
-    ### Given a list of Unicode CIDs as `cids` and a `fontnick`, return a `Map` from CIDs to GIDs
-    (glyf IDs). Unmappable CIDs will be left out. ###
-    ### TAINT validate ###
+    ### Given a list of characters as `chrs` and a `fontnick`, return a `Map` from characters to GIDs
+    (glyf IDs). Unmappable characters will be left out. ###
     @types.validate.dbr_get_cgid_map_cfg ( cfg = { @constructor.C.defaults.dbr_get_cgid_map_cfg..., cfg..., } )
-    { cids
-      chrs
+    { chrs
       fontnick }  = cfg
-    cids       ?= @_normalize_drb_chrs chrs
     font_idx    = @_font_idx_from_fontnick fontnick
-    text        = ( ( ( String.fromCodePoint cid ) for cid in cids ).join '\n' ) + '\n'
-    gids        = @RBW.shape_text { format: 'short', text, font_idx, } # formats: json, rusty, short
-    gids        = gids.replace /\|([0-9]+:)[^|]+\|[^|]+/g, '$1'
-    gids        = gids[ ... gids.length - 2 ]
-    gids        = gids.split ':'
-    gids        = ( ( parseInt gid ) for gid in gids )
+    chrs        = Array.from chrs if @types.isa.text chrs
+    text        = ( chrs.join '\n' ) + '\n'
+    sds         = @RBW.shape_text { format: 'json', text, font_idx, }
     R           = new Map()
-    for cid, idx in cids
+    for sd in sds
       continue if ( gid = gids[ idx ] ) is 0
-      R.set cid, gid
+      R.set sd.chrs, sd.gid
     return R
 
   #-----------------------------------------------------------------------------------------------------------
@@ -150,8 +148,8 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     bytes         = Buffer.from text, { encoding: 'utf-8', }
     for d, idx in R
       nxt_b   = R[ idx + 1 ]?.b ? Infinity
-      d.text  = bytes[ d.b ... nxt_b ].toString()
-      d.uoid  = "o#{d.gid}#{fontnick}"
+      d.chrs  = bytes[ d.b ... nxt_b ].toString()
+      d.sid   = "o#{d.gid}#{fontnick}"
     return R
 
   #-----------------------------------------------------------------------------------------------------------
@@ -173,21 +171,19 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     @types.validate.dbr_insert_outlines_cfg ( cfg = { @constructor.C.defaults.dbr_insert_outlines_cfg..., cfg..., } )
     { fontnick
       chrs
-      cids
       cgid_map }        = cfg
-    cgid_map           ?= @get_cgid_map { fontnick, chrs, cids, }
+    cgid_map           ?= @get_cgid_map { fontnick, chrs, }
     insert_outline      = @db.prepare @sql.insert_outline
     #.......................................................................................................
     try
       @db.begin_transaction()
-      for [ cid, gid, ] from cgid_map
-        glyph       = String.fromCodePoint cid
+      for [ chrs, gid, ] from cgid_map
         { bbox
           pd    }   = @get_single_outline { gid, fontnick, }
         { x,  y,
           x1, y1, } = bbox
         pd_blob     = @_zip pd
-        yield @db.first_row insert_outline, { fontnick, gid, cid, glyph, x, y, x1, y1, pd_blob, }
+        yield @db.first_row insert_outline, { fontnick, gid, chrs, x, y, x1, y1, pd_blob, }
       return null
     catch error
       @db.rollback_transaction()

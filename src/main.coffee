@@ -141,12 +141,9 @@ class @Drb extends Drb_outlines Drb_codepoints()
       create table #{schema}.outlines (
           fontnick  text    not null references fontnicks ( fontnick ),
           gid       integer not null,
-          cid       integer,
-          glyph     text,
-          /* Unscaled Outline ID (OID): */
-          uoid      text generated always as ( 'o' || gid || fontnick ) virtual,
-          /* Scaled Outline ID (OID): */
-          -- soid      text generated always as ( 'o' || gid || fontnick || '_' || 4.5 ) virtual,
+          sid       text generated always as ( 'o' || gid || fontnick ) virtual,
+          chrs      text,
+          /* Shape ID (SID): */
           /* bounding box */
           x         float   not null,
           y         float   not null,
@@ -177,7 +174,7 @@ class @Drb extends Drb_outlines Drb_codepoints()
       insert_outline: @db.create_insert {
         schema,
         into:       'outlines',
-        fields:     [ 'fontnick', 'gid', 'cid', 'glyph', 'x', 'y', 'x1', 'y1', 'pd_blob', ],
+        fields:     [ 'fontnick', 'gid', 'chrs', 'x', 'y', 'x1', 'y1', 'pd_blob', ],
         returning:  '*',
         on_conflict: { update: true, }, }
       #.....................................................................................................

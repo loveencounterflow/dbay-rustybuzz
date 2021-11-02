@@ -46,8 +46,13 @@ dbay_types                = require 'dbay/lib/types'
 #-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_get_single_outline_cfg', tests:
   "@isa.object x":                                  ( x ) -> @isa.object x
-  "@isa.nonempty_text x.fontnick":                  ( x ) -> @isa.nonempty_text x.fontnick
-  "@isa.cardinal x.gid":                            ( x ) -> @isa.cardinal x.gid
+  "exactly one of x.sid or ( x.fontnick, x.gid ) is set": ( x ) ->
+    if x.sid?
+      return false if x.fontnick? or x.gid?
+      return @isa.nonempty_text x.sid
+    return false unless x.fontnick? and x.gid?
+    return false unless @isa.nonempty_text x.fontnick
+    return @isa.cardinal x.gid
 
 #-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_shape_text_cfg', tests:
@@ -68,29 +73,19 @@ dbay_types                = require 'dbay/lib/types'
 @declare 'dbr_get_cgid_map_cfg', tests:
   "@isa.object x":                                    ( x ) -> @isa.object x
   "@isa.nonempty_text x.fontnick":                    ( x ) -> @isa.nonempty_text x.fontnick
-  "exactly one of x.chrs, x.cids, x.cgid_map is set": ( x ) ->
+  "exactly one of x.chrs or x.cgid_map is set": ( x ) ->
     if x.chrs?
       return false unless @isa.dbr_chrs x.chrs
-      return ( not x.cids? ) and ( not x.cgid_map? )
-    if x.cids?
-      return false unless @isa.list x.cids
-      return ( not x.chrs? ) and ( not x.cgid_map? )
-    return false
+      return not x.cgid_map?
+    return @isa.map x.cgid_map
 
 #-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_insert_outlines_cfg', tests:
   "@isa.object x":                                    ( x ) -> @isa.object x
   "@isa.nonempty_text x.fontnick":                    ( x ) -> @isa.nonempty_text x.fontnick
-  "exactly one of x.chrs, x.cids, x.cgid_map is set": ( x ) ->
+  "exactly one of x.chrs or x.cgid_map is set": ( x ) ->
     if x.chrs?
       return false unless @isa.dbr_chrs x.chrs
-      return ( not x.cids? ) and ( not x.cgid_map? )
-    if x.cids?
-      return false unless @isa.list x.cids
-      return ( not x.chrs? ) and ( not x.cgid_map? )
-    if x.cgid_map?
-      return false unless @isa.map x.cgid_map
-      return ( not x.chrs? ) and ( not x.cids? )
-    return false
-
+      return not x.cgid_map?
+    return @isa.map x.cgid_map
 
