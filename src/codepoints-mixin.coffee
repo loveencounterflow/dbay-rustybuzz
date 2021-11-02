@@ -32,7 +32,7 @@ E                         = require './errors'
 
   #---------------------------------------------------------------------------------------------------------
   get_assigned_unicode_chrs: ( cfg ) ->
-    throw new E.Dbr_not_implemented '^Drb/codepoints@1^', "cfg for get_unicode_codepoints()" if cfg?
+    throw new E.Dbr_not_implemented '^Drb/codepoints@1^', "cfg for get_assigned_unicode_chrs()" if cfg?
     R = new Set()
     ranges = [
       # excluded: 0x00, control characters, space
