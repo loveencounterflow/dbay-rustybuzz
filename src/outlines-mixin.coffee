@@ -129,12 +129,14 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     { chrs
       fontnick }  = cfg
     font_idx    = @_font_idx_from_fontnick fontnick
-    chrs        = Array.from chrs if @types.isa.text chrs
-    text        = ( chrs.join '\n' ) + '\n'
-    sds         = @RBW.shape_text { format: 'json', text, font_idx, }
+    if @types.isa.list chrs then  text = chrs.join '\n'
+    else                          text = chrs
+    # chrs        = Array.from chrs if @types.isa.text chrs
+    # text        = ( chrs.join '\n' ) + '\n'
+    sds         = @shape_text { fontnick, text, }
     R           = new Map()
     for sd in sds
-      continue if ( gid = gids[ idx ] ) is 0
+      continue if sd.gid is 0
       R.set sd.chrs, sd.gid
     return R
 
