@@ -31,10 +31,9 @@ E                         = require './errors'
   #   return undefined
 
   #---------------------------------------------------------------------------------------------------------
-  get_unicode_codepoints: ( cfg ) ->
-    ### TAINT depending on the NodeJS version, this code may miss codepoints introduced after Unicode v13 ###
+  get_assigned_unicode_chrs: ( cfg ) ->
     throw new E.Dbr_not_implemented '^Drb/codepoints@1^', "cfg for get_unicode_codepoints()" if cfg?
-    R = []
+    R = new Set()
     ranges = [
       # excluded: 0x00, control characters, space
       [ 0x00021, 0x0d800 ]
@@ -52,15 +51,14 @@ E                         = require './errors'
       ]
     ### see https://unicode.org/reports/tr18/#General_Category_Property ###
     ### see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Unicode_Property_Escapes ###
-    pattern_A = /^(\p{L}|\p{M}|\p{N}|\p{S}|\p{P})/u   ### Printing codepoints ###
-    # pattern_B = /^\P{Cn}$/u                           ### Assigned codepoints ###
+    pattern_A = /^(\p{L}|\p{M}|\p{N}|\p{S}|\p{P})/u ### Printing codepoints ###
+    # pattern_B = /^\P{Cn}$/u                         ### Assigned codepoints ###
     R = []
     for [ lo, hi, ] in ranges
       for cid in [ lo .. hi ]
         continue unless pattern_A.test String.fromCodePoint cid
         # continue unless pattern_B.test String.fromCodePoint cid
-        R.push cid
-    return R
-
+        R.add String.fromCodePoint cid
+    return [ R..., ]
 
 
