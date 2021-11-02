@@ -53,7 +53,7 @@ E                         = require './errors'
     ### see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Unicode_Property_Escapes ###
     pattern_A = /^(\p{L}|\p{M}|\p{N}|\p{S}|\p{P})/u ### Printing codepoints ###
     # pattern_B = /^\P{Cn}$/u                         ### Assigned codepoints ###
-    R = []
+    R = new Set()
     for [ lo, hi, ] in ranges
       for cid in [ lo .. hi ]
         continue unless pattern_A.test String.fromCodePoint cid
