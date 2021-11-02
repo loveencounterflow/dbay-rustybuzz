@@ -84,6 +84,9 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     return null
 
   #---------------------------------------------------------------------------------------------------------
+  _parse_sid: ( sid ) -> ( sid.match /^o(?<gid>[0-9]+)(?<fontnick>.+)$/ ).groups
+
+  #---------------------------------------------------------------------------------------------------------
   get_single_outline: ( cfg ) ->
     ### TAINT this method is highly inefficient for large numbers of outline retrievals; the intention is to
     replace it with a function that allows for lists of `gid`s to be handled with a single call. ###
