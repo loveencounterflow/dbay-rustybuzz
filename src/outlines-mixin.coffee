@@ -193,7 +193,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     return null
 
   #-----------------------------------------------------------------------------------------------------------
-  insert_outlines: ( cfg ) -> [ ( @insert_and_walk_outlines cfg )..., ]
+  insert_outlines: ( cfg ) -> null for _ from @insert_and_walk_outlines cfg; null
 
 #-----------------------------------------------------------------------------------------------------------
 get_assigned_unicode_cids = ( cfg ) ->
