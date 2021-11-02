@@ -178,7 +178,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     insert_outline      = @db.prepare @sql.insert_outline
     #.......................................................................................................
     try
-      @db.begin_transaction()
+      @db.begin_transaction() unless @db.within_transaction()
       for [ chrs, gid, ] from cgid_map
         { bbox
           pd    }   = @get_single_outline { gid, fontnick, }
@@ -188,9 +188,9 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
         yield @db.first_row insert_outline, { fontnick, gid, chrs, x, y, x1, y1, pd_blob, }
       return null
     catch error
-      @db.rollback_transaction()
+      @db.rollback_transaction() if @db.within_transaction()
       throw error
-    @db.commit_transaction()
+    @db.commit_transaction() if @db.within_transaction()
     return null
 
   #-----------------------------------------------------------------------------------------------------------
