@@ -162,8 +162,8 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     return JSON.parse @RBW.get_font_metrics font_idx
 
   #-----------------------------------------------------------------------------------------------------------
-  _zip:                     ( txt ) -> ZLIB.deflateRawSync ( Buffer.from txt ), @constructor.C.zlib_zip_cfg
-  _unzip:                   ( bfr ) -> ( ZLIB.inflateRawSync bfr ).toString()
+  _zip:   ( txt ) -> ZLIB.deflateRawSync ( Buffer.from txt ), @constructor.C.zlib_zip_cfg
+  _unzip: ( bfr ) -> ( ZLIB.inflateRawSync bfr ).toString()
 
   #-----------------------------------------------------------------------------------------------------------
   insert_and_walk_outlines: ( cfg ) ->
