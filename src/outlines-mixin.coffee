@@ -22,6 +22,8 @@ E                         = require './errors'
 ZLIB                      = require 'zlib'
 _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" width="(?<width>[-+0-9]+)" height="(?<height>[-+0-9]+)"\/>$/
 SQL                       = String.raw
+{ width_of
+  to_width }              = require 'to-width'
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -151,14 +153,29 @@ SQL                       = String.raw
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
     { fontnick
       text      } = cfg
+    { missing }   =@constructor.C
     font_idx      = @_font_idx_from_fontnick fontnick
     ads           = @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
     R             = JSON.parse ads
     bytes         = Buffer.from text, { encoding: 'utf-8', }
+    ced_x         = 0 # cumulative error displacement
+    ced_y         = 0 # cumulative error displacement
     for d, idx in R
       nxt_b   = R[ idx + 1 ]?.b ? Infinity
       d.chrs  = bytes[ d.b ... nxt_b ].toString()
       d.sid   = "o#{d.gid}#{fontnick}"
+      d.x    += ced_x
+      d.y    += ced_y
+      #.....................................................................................................
+      # Replace original metrics with those of missing outline:
+      if d.gid is missing.gid
+        if ( width_of ( Array.from d.chrs )[ 0 ] ) < 2
+          width = 500
+        else
+          width = 1000
+        ed_x    = width - d.dx
+        ced_x  += ed_x
+        d.dx    = width
     return R
 
   #-----------------------------------------------------------------------------------------------------------

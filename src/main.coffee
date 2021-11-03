@@ -38,6 +38,8 @@ class @Drb extends Drb_outlines Drb_codepoints()
     # replacement:  '█'
     last_fontidx:       15
     zlib_zip_cfg:       { level: 1, strategy: ZLIB.constants.Z_HUFFMAN_ONLY, }
+    missing:
+      gid:              0
     defaults:
       #.....................................................................................................
       dbr_register_fontnick_cfg:
