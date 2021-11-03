@@ -73,19 +73,24 @@ dbay_types                = require 'dbay/lib/types'
 @declare 'dbr_get_cgid_map_cfg', tests:
   "@isa.object x":                                    ( x ) -> @isa.object x
   "@isa.nonempty_text x.fontnick":                    ( x ) -> @isa.nonempty_text x.fontnick
-  "exactly one of x.chrs or x.cgid_map is set": ( x ) ->
+  "exactly one of ( x.chrs, x.cgid_map, x.ads ) is set": ( x ) ->
     if x.chrs?
       return false unless @isa.dbr_chrs x.chrs
-      return not x.cgid_map?
-    return @isa.map x.cgid_map
+      return ( not x.cgid_map? ) and ( not x.ads? )
+    if x.cgid_map?
+      return @isa.map x.cgid_map
+    return @isa.list x.ads
 
 #-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_insert_outlines_cfg', tests:
   "@isa.object x":                                    ( x ) -> @isa.object x
   "@isa.nonempty_text x.fontnick":                    ( x ) -> @isa.nonempty_text x.fontnick
-  "exactly one of x.chrs or x.cgid_map is set": ( x ) ->
+  "exactly one of ( x.chrs, x.cgid_map, x.ads ) is set": ( x ) ->
     if x.chrs?
       return false unless @isa.dbr_chrs x.chrs
+      return ( not x.cgid_map? ) and ( not x.ads? )
       return not x.cgid_map?
-    return @isa.map x.cgid_map
+    if x.cgid_map?
+      return @isa.map x.cgid_map
+    return @isa.list x.ads
 

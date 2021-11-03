@@ -126,8 +126,10 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     ### Given a list of characters as `chrs` and a `fontnick`, return a `Map` from characters to GIDs
     (glyf IDs). Unmappable characters will be left out. ###
     @types.validate.dbr_get_cgid_map_cfg ( cfg = { @constructor.C.defaults.dbr_get_cgid_map_cfg..., cfg..., } )
-    { chrs
+    { ads
+      chrs
       fontnick }  = cfg
+    return @_get_cgid_map_from_ads ads if ads?
     font_idx    = @_font_idx_from_fontnick fontnick
     if @types.isa.list chrs then  text = chrs.join '\n'
     else                          text = chrs
@@ -178,8 +180,9 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     @types.validate.dbr_insert_outlines_cfg ( cfg = { @constructor.C.defaults.dbr_insert_outlines_cfg..., cfg..., } )
     { fontnick
       chrs
-      cgid_map }        = cfg
-    cgid_map           ?= @get_cgid_map { fontnick, chrs, }
+      cgid_map
+      ads             } = cfg
+    cgid_map           ?= @get_cgid_map { fontnick, chrs, ads, }
     insert_outline      = @db.prepare @sql.insert_outline
     #.......................................................................................................
     try
