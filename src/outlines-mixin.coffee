@@ -142,6 +142,9 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
       R.set sd.gid, sd.chrs
     return R
 
+  #---------------------------------------------------------------------------------------------------------
+  _get_cgid_map_from_ads: ( ads ) -> new Map ( [ ad.gid, ad.chrs, ] for ad in ads )
+
   #-----------------------------------------------------------------------------------------------------------
   shape_text: ( cfg ) ->
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
