@@ -1,6 +1,6 @@
 {
   "name": "dbay-rustybuzz",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Textshaping with SVG output, backed by DBay, SQLite, and RustyBuzz",
   "main": "lib/main.js",
   "scripts": {
