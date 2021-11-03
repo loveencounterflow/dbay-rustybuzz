@@ -21,7 +21,7 @@ FS                        = require 'fs'
 E                         = require './errors'
 ZLIB                      = require 'zlib'
 _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" width="(?<width>[-+0-9]+)" height="(?<height>[-+0-9]+)"\/>$/
-
+SQL                       = String.raw
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -208,33 +208,36 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
   typeset: ( cfg ) ->
     @types.validate.dbr_typeset_cfg ( cfg = { @constructor.C.defaults.dbr_typeset_cfg..., cfg..., } )
     { fontnick
-      text              } = cfg
+      text
+      known_ods         } = cfg
+    known_ods            ?= {}
+    new_ods               = {}
+    missing_ads           = {}
+    missing_chrs          = []
     #.......................................................................................................
     ### Shape text, which gives us positions, GIDs/SIDs, and the characters corresponding to each outline.
     The `required_ads` maps from SIDs to arrangement data items (ADs): ###
+    ### TAINt return standard glyph for all missing outlines ###
     ads                   = @shape_text { fontnick, text, }
-    required_ads          = {}
-    required_ads[ d.sid ] = d for d in ads
-    known_ods             = {}
+    missing_ads[ d.sid ]  = d for d in ads
     fm                    = @get_font_metrics { fontnick, }
     #.......................................................................................................
-    do =>
-      required_sids = Object.keys required_ads
-      for od from @db """
-        select
-            *
-          from outlines
-          where sid in #{@db.sql.V required_sids};"""
-        known_ods[ od.sid ] = od
-        delete required_ads[ od.sid ]
-      return null
+    required_sids = Object.keys missing_ads
+    for od from @db SQL"""select * from outlines
+        where ( gid != 0 ) and ( sid in #{@db.sql.V required_sids} );"""
+      known_ods[ od.sid ] = od
+      delete missing_ads[ od.sid ]
     #.......................................................................................................
     ### Retrieve (from font) and insert (into DB) missing outline data (ODs) items: ###
-    do =>
-      for od from @insert_and_walk_outlines { fontnick, ads, }
-        delete required_ads[ od.sid ]
-        known_ods[ od.sid ] = od
+    for od from @insert_and_walk_outlines { fontnick, ads, }
+      continue if od.gid is 0
+      delete missing_ads[ od.sid ]
+      known_ods[  od.sid ]  = od
+      new_ods[    od.sid ]  = od
     #.......................................................................................................
-    return { ods: known_ods, ads, fm, }
+    for sid, missing_ad of missing_ads
+      missing_chrs.push { chrs: missing_ad.chrs, x: missing_ad.x, y: missing_ad.y, }
+    #.......................................................................................................
+    return { known_ods, new_ods, missing_chrs, ads, fm, }
 
 
