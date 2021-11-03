@@ -6,17 +6,24 @@ specifiers:
   guy: 2.7.0
   intertype: 7.7.0
   rustybuzz-wasm: 3.2.0
+  to-width: ^1.2.0
 
 dependencies:
   cnd: 9.2.2
   guy: 2.7.0
   intertype: 7.7.0
   rustybuzz-wasm: 3.2.0
+  to-width: 1.2.0
 
 devDependencies:
   dbay: 10.117.0
 
 packages:
+
+  /ansi-regex/5.0.1:
+    resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
+    engines: {node: '>=8'}
+    dev: false
 
   /cnd/9.2.2:
     resolution: {integrity: sha512-F+/H+7luk4fZkvN0+MT0I2nwn80YM/EtfMttNUFxENR50XJH4g0KgQevzeyEJ8B6t6l8Tb4Xti6QAksa8DmePA==}
@@ -35,6 +42,10 @@ packages:
     transitivePeerDependencies:
       - deasync
     dev: true
+
+  /emoji-regex/8.0.0:
+    resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
+    dev: false
 
   /exit-hook/2.2.1:
     resolution: {integrity: sha512-eNTPlAD67BmP31LDINZ3U7HSF8l57TxOY2PmBJ1shpCvpnxBF93mWCE8YHBnXs8qiUZJc9WDcWIeC3a2HIAMfw==}
@@ -61,6 +72,11 @@ packages:
       multimix: 5.0.0
     dev: false
 
+  /is-fullwidth-code-point/3.0.0:
+    resolution: {integrity: sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==}
+    engines: {node: '>=8'}
+    dev: false
+
   /jsx-number-format/0.1.4:
     resolution: {integrity: sha512-uPc/Q90XqZoRE7Cu1OLFQB2cSrA2Dy8+okzPOtML8vbagNFDSipbndIPme+q0odBjEhL+wf3WH3Wo52was4Tsg==}
 
@@ -72,4 +88,42 @@ packages:
 
   /rustybuzz-wasm/3.2.0:
     resolution: {integrity: sha512-X2uLm3u8MyvKtDCn0Vzn32OSgxLD+oxqBjGOPIaLOeV+oduQv7L036uDQdopt2S0ciiSyZnOWuytvvENY+SFMQ==}
+    dev: false
+
+  /string-width/4.2.3:
+    resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
+    engines: {node: '>=8'}
+    dependencies:
+      emoji-regex: 8.0.0
+      is-fullwidth-code-point: 3.0.0
+      strip-ansi: 6.0.1
+    dev: false
+
+  /strip-ansi/6.0.1:
+    resolution: {integrity: sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==}
+    engines: {node: '>=8'}
+    dependencies:
+      ansi-regex: 5.0.1
+    dev: false
+
+  /to-width/1.2.0:
+    resolution: {integrity: sha512-ok/CRyzSZVA6xk9t5PuWuh3SHqCtKCkhI6dfF2YaVX11clXz4yAxxyesC27+m54ilrMRtqTI9UNQRct8lwVYZQ==}
+    dependencies:
+      string-width: 4.2.3
+      wcstring: 2.1.1
+    dev: false
+
+  /varsize-string/2.2.2:
+    resolution: {integrity: sha1-7xs7bHLbCDXqL4TN+R/sMMUgaIs=}
+    dev: false
+
+  /wcsize/1.0.0:
+    resolution: {integrity: sha1-qKLhXmqKdHkdulgPaaV9J+hQ6h4=}
+    dev: false
+
+  /wcstring/2.1.1:
+    resolution: {integrity: sha1-3tUtdFycceJNCkidKCbSKjZe0Gc=}
+    dependencies:
+      varsize-string: 2.2.2
+      wcsize: 1.0.0
     dev: false
