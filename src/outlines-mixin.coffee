@@ -204,6 +204,37 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
   #-----------------------------------------------------------------------------------------------------------
   insert_outlines: ( cfg ) -> null for _ from @insert_and_walk_outlines cfg; null
 
-
+  #-----------------------------------------------------------------------------------------------------------
+  typeset: ( cfg ) ->
+    # @types.validate.dbr_typeset_cfg ( cfg = { @constructor.C.defaults.dbr_typeset_cfg..., cfg..., } )
+    { fontnick
+      text              } = cfg
+    #.......................................................................................................
+    ### Shape text, which gives us positions, GIDs/SIDs, and the characters corresponding to each outline.
+    The `required_ads` maps from SIDs to arrangement data items (ADs): ###
+    ads                   = @shape_text { fontnick, text, }
+    required_ads          = {}
+    required_ads[ d.sid ] = d for d in ads
+    known_ods             = {}
+    fm                    = @get_font_metrics { fontnick, }
+    #.......................................................................................................
+    do =>
+      required_sids = Object.keys required_ads
+      for od from @db """
+        select
+            *
+          from outlines
+          where sid in #{@db.sql.V required_sids};"""
+        known_ods[ od.sid ] = od
+        delete required_ads[ od.sid ]
+      return null
+    #.......................................................................................................
+    ### Retrieve (from font) and insert (into DB) missing outline data (ODs) items: ###
+    do =>
+      for od from @insert_and_walk_outlines { fontnick, ads, }
+        delete required_ads[ od.sid ]
+        known_ods[ od.sid ] = od
+    #.......................................................................................................
+    return { ods: known_ods, ads, fm, }
 
 
