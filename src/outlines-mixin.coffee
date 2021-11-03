@@ -137,7 +137,9 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     R           = new Map()
     for sd in sds
       continue if sd.gid is 0
-      R.set sd.chrs, sd.gid
+      # info '^986^', [ sd.chrs, sd.gid, ]
+      ### TAINT it *might* happen that several distinct `chrs` sequences map to the *same* GID ###
+      R.set sd.gid, sd.chrs
     return R
 
   #-----------------------------------------------------------------------------------------------------------
@@ -180,7 +182,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     #.......................................................................................................
     try
       @db.begin_transaction() unless @db.within_transaction()
-      for [ chrs, gid, ] from cgid_map
+      for [ gid, chrs, ] from cgid_map
         { bbox
           pd    }   = @get_single_outline { gid, fontnick, }
         { x,  y,
