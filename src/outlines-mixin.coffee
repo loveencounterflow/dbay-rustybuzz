@@ -131,8 +131,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     font_idx    = @_font_idx_from_fontnick fontnick
     if @types.isa.list chrs then  text = chrs.join '\n'
     else                          text = chrs
-    # chrs        = Array.from chrs if @types.isa.text chrs
-    # text        = ( chrs.join '\n' ) + '\n'
+    # debug '^344321^', rpr chrs
     sds         = @shape_text { fontnick, text, }
     R           = new Map()
     for sd in sds
