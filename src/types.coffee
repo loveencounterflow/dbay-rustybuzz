@@ -27,7 +27,7 @@ dbay_types                = require 'dbay/lib/types'
   "@isa.nonempty_text x.prefix":                    ( x ) -> @isa.nonempty_text x.prefix
   "@isa_optional.nonempty_text x.path":             ( x ) -> @isa_optional.nonempty_text x.path
   "dbay_types.dbay_schema x.schema":                ( x ) -> dbay_types.isa.dbay_schema x.schema
-  "@isa.boolean x.create":                          ( x ) -> @isa.boolean x.create
+  "@isa.boolean x.rebuild":                         ( x ) -> @isa.boolean x.rebuild
   "( @isa.object x.db ) or ( @isa.function x.db ":  ( x ) -> ( @isa.object x.db ) or ( @isa.function x.db )
   "@isa_optional.object x.RBW":                     ( x ) -> @isa_optional.object x.RBW
 

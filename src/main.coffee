@@ -75,7 +75,7 @@ class @Drb extends Drb_outlines Drb_codepoints()
         db:               null
         prefix:           'drb_'
         schema:           'drb'
-        create:           false
+        rebuild:          false
         # path:             PATH.join home,      'cmudict.sqlite'
         std_fontnicks:
           gi:               PATH.join font_path, 'ebgaramond/EBGaramond12-Italic.otf'
@@ -203,7 +203,7 @@ class @Drb extends Drb_outlines Drb_codepoints()
   #---------------------------------------------------------------------------------------------------------
   _open_drb_db: ->
     @db.open @cfg
-    if @cfg.create or ( @_get_db_object_count() is 0 )
+    if @cfg.rebuild or ( @_get_db_object_count() is 0 )
       @_create_db_structure()
       @_populate_db()
     return null
