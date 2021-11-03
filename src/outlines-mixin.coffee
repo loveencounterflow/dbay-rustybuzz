@@ -206,7 +206,7 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
 
   #-----------------------------------------------------------------------------------------------------------
   typeset: ( cfg ) ->
-    # @types.validate.dbr_typeset_cfg ( cfg = { @constructor.C.defaults.dbr_typeset_cfg..., cfg..., } )
+    @types.validate.dbr_typeset_cfg ( cfg = { @constructor.C.defaults.dbr_typeset_cfg..., cfg..., } )
     { fontnick
       text              } = cfg
     #.......................................................................................................

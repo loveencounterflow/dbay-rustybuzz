@@ -73,6 +73,11 @@ class @Drb extends Drb_outlines Drb_codepoints()
       dbr_get_font_metrics_cfg:
         fontnick:         null
       #.....................................................................................................
+      dbr_typeset_cfg:
+        fontnick:         null
+        text:             null
+        known_ods:        null
+      #.....................................................................................................
       constructor_cfg:
         db:               null
         prefix:           'drb_'

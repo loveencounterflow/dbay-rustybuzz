@@ -94,3 +94,10 @@ dbay_types                = require 'dbay/lib/types'
       return @isa.map x.cgid_map
     return @isa.list x.ads
 
+#-----------------------------------------------------------------------------------------------------------
+@declare 'dbr_typeset_cfg', tests:
+  "@isa.object x":                                    ( x ) -> @isa.object x
+  "@isa.nonempty_text x.fontnick":                    ( x ) -> @isa.nonempty_text x.fontnick
+  "@isa.text x.text":                                 ( x ) -> @isa.text x.text
+  "@isa_optional.object x.known_ods":                 ( x ) -> @isa_optional.object x.known_ods
+
