@@ -146,7 +146,8 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
     { fontnick
       text      } = cfg
     font_idx      = @_font_idx_from_fontnick fontnick
-    R             = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
+    ads           = @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
+    R             = JSON.parse ads
     bytes         = Buffer.from text, { encoding: 'utf-8', }
     for d, idx in R
       nxt_b   = R[ idx + 1 ]?.b ? Infinity
