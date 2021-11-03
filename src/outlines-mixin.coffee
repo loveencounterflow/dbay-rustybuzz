@@ -230,7 +230,7 @@ SQL                       = String.raw
     known_ods            ?= {}
     new_ods               = {}
     missing_ads           = {}
-    missing_chrs          = []
+    { missing, }          = @constructor.C
     #.......................................................................................................
     ### Shape text, which gives us positions, GIDs/SIDs, and the characters corresponding to each outline.
     The `required_ads` maps from SIDs to arrangement data items (ADs): ###
@@ -247,13 +247,11 @@ SQL                       = String.raw
     #.......................................................................................................
     ### Retrieve (from font) and insert (into DB) missing outline data (ODs) items: ###
     for od from @insert_and_walk_outlines { fontnick, ads, }
-      continue if od.gid is 0
       delete missing_ads[ od.sid ]
       known_ods[  od.sid ]  = od
       new_ods[    od.sid ]  = od
     #.......................................................................................................
-    for sid, missing_ad of missing_ads
-      missing_chrs.push { chrs: missing_ad.chrs, x: missing_ad.x, y: missing_ad.y, }
+    missing_chrs = ( ad for ad in ads when ad.gid is missing.gid )
     #.......................................................................................................
     return { known_ods, new_ods, missing_chrs, ads, fm, }
 
