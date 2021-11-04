@@ -201,10 +201,12 @@ SQL                       = String.raw
       ads             } = cfg
     cgid_map           ?= @get_cgid_map { fontnick, chrs, ads, }
     insert_outline      = @db.prepare @sql.insert_outline
+    { missing }         = @constructor.C
     #.......................................................................................................
     try
       @db.begin_transaction() unless @db.within_transaction()
       for [ gid, chrs, ] from cgid_map
+        continue if gid is missing.gid
         { bbox
           pd    }   = @get_single_outline { gid, fontnick, }
         { x,  y,
