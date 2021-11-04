@@ -210,7 +210,9 @@ SQL                       = String.raw
         { x,  y,
           x1, y1, } = bbox
         pd_blob     = @_zip pd
-        yield @db.first_row insert_outline, { fontnick, gid, chrs, x, y, x1, y1, pd_blob, }
+        row         = @db.first_row insert_outline, { fontnick, gid, chrs, x, y, x1, y1, pd_blob, }
+        delete row.pd_blob
+        yield row
       return null
     catch error
       @db.rollback_transaction() if @db.within_transaction()
@@ -240,8 +242,11 @@ SQL                       = String.raw
     fm                    = @get_font_metrics { fontnick, }
     #.......................................................................................................
     required_sids = Object.keys missing_ads
-    for od from @db SQL"""select * from outlines
-        where ( gid != 0 ) and ( sid in #{@db.sql.V required_sids} );"""
+    for od from @db SQL"""
+      select
+          fontnick, gid, sid, chrs, x, y, x1, y1, pd
+      from outlines
+      where ( gid != 0 ) and ( sid in #{@db.sql.V required_sids} );"""
       known_ods[ od.sid ] = od
       delete missing_ads[ od.sid ]
     #.......................................................................................................
