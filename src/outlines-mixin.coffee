@@ -226,7 +226,8 @@ SQL                       = String.raw
   insert_outlines: ( cfg ) -> null for _ from @insert_and_walk_outlines cfg; null
 
   #-----------------------------------------------------------------------------------------------------------
-  typeset: ( cfg ) ->
+  compose: ( cfg ) ->
+    ### Compose (usually up to one paragraph's worth of) text on a single line without line breaks. ###
     @types.validate.dbr_typeset_cfg ( cfg = { @constructor.C.defaults.dbr_typeset_cfg..., cfg..., } )
     { fontnick
       text
