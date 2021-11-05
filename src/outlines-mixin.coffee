@@ -263,4 +263,10 @@ SQL                       = String.raw
     #.......................................................................................................
     return { known_ods, new_ods, missing_chrs, ads, fm, }
 
-
+  #-----------------------------------------------------------------------------------------------------------
+  distribute: ( cfg ) ->
+    ### TAINT must connect positions in text with line break opportunities, only possible with `bytes` from
+    `shape_text()` (?) ###
+    { ads
+      text
+      width_mm } = cfg
