@@ -32,7 +32,7 @@ scattered notes*
   * initial letter `o` (**O**utline)
   * followed by decimal Glyf ID / `gid`
   * followed by `fontnick`; these must always start with a letter
-  * Ex.: `o42foo` identifies an `u`nscaled glyf outline with GID `42` from font `foo`
+  * Ex.: `o42foo` identifies a glyf outline with GID `42` from font `foo`
 
 ### Selectable Text
 
