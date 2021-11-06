@@ -40,6 +40,9 @@ class @Drb extends Drb_outlines Drb_codepoints()
     zlib_zip_cfg:       { level: 1, strategy: ZLIB.constants.Z_HUFFMAN_ONLY, }
     missing:
       gid:              0
+    special_chrs:
+      shy:              '\u{00ad}'
+      wbr:              '\u{200b}'
     defaults:
       #.....................................................................................................
       dbr_register_fontnick_cfg:

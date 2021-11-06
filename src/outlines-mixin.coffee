@@ -153,7 +153,8 @@ SQL                       = String.raw
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
     { fontnick
       text      } = cfg
-    { missing }   =@constructor.C
+    { special_chrs
+      missing }   = @constructor.C
     font_idx      = @_font_idx_from_fontnick fontnick
     ads           = @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
     R             = JSON.parse ads
@@ -176,6 +177,10 @@ SQL                       = String.raw
         ed_x    = width - d.dx
         ced_x  += ed_x
         d.dx    = width
+      if d.chrs.startsWith special_chrs.shy
+        d.sid = "o-shy"
+      else if d.chrs.startsWith special_chrs.wbr
+        d.sid = "o-wbr"
     return R
 
   #-----------------------------------------------------------------------------------------------------------
