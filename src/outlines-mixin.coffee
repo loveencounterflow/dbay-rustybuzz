@@ -178,9 +178,9 @@ SQL                       = String.raw
         ced_x  += ed_x
         d.dx    = width
       if d.chrs.startsWith special_chrs.shy
-        d.sid = "o-shy"
+        d.sid = "oshy-#{fontnick}"
       else if d.chrs.startsWith special_chrs.wbr
-        d.sid = "o-wbr"
+        d.sid = "owbr-#{fontnick}"
     return R
 
   #-----------------------------------------------------------------------------------------------------------
