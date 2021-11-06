@@ -32,7 +32,23 @@ scattered notes*
   * initial letter `o` (**O**utline)
   * followed by decimal Glyf ID / `gid`
   * followed by `fontnick`; these must always start with a letter
+  * `o${gid}${fontnick}`
   * Ex.: `o42foo` identifies a glyf outline with GID `42` from font `foo`
+
+* Special SIDs
+  * `o0${fontnick}` represents the [`.notdef`
+    element](https://typedrawers.com/discussion/4199/best-practices-for-null-and-notdef) of a font
+    `${fontnick}`; this will normally displayed by a highly visible rectangle with an overlayed text
+    element.
+  * `oshy-${fontnick}` represents U+00ad, the [soft hyphen (SHY)](https://en.wikipedia.org/wiki/Soft_hyphen)
+    which is inserted manually or by using a hyphenating algorithm to signal positions in a text where line
+    breaking may occur by inserting a hyphen.
+  * `owbr-${fontnick}` represents U+200b, the [zero-width space
+    (WBR)](https://en.wikipedia.org/wiki/Zero-width_space) which is inserted manually or by applying the
+    [Unicode Line Breaking Algorithm(UAX#14)](https://unicode.org/reports/tr14/) to signal positions in a
+    text where line breaking may occur without inserting a hyphen.
+  * Normally SHYs and WBRs will not be output to the typeset SVG; when they are, they may be displayed as
+    vertical or slanted lines.
 
 ### Selectable Text
 
@@ -71,7 +87,6 @@ unless special care is taken.
 * As an aside, it does not seem to be possible to obtain full compatibility with the standard `<span>`
   element just by defining a custom element and declaring it to `display: inline;`; when text is copied
   across multiple such elements, line breaks will still be inserted by the browser.
-
 
 ```html
 <textcontainer><!--?textcontainer-start?-->
