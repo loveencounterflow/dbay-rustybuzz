@@ -137,3 +137,11 @@ unless special care is taken.
   * https://wasmer.io/
   * https://de.wikipedia.org/wiki/WebAssembly#Nutzung_au%C3%9Ferhalb_des_Browsers
   * https://forum.holochain.org/t/wasmi-vs-wasmer/1929
+* **[–]** document SVG construction principles
+* **[–]** document SVG units (mm, px, implicit)
+* **[–]** implement CSS scaling function (so `1mm` in CSS shows up as 1mm in rendering)
+
+
+
+
+
