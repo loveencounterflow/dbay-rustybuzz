@@ -334,6 +334,7 @@ SQL                       = String.raw
     left_adi      = null
     right_adi     = null
     delta_width   = 0
+    #.......................................................................................................
     loop
       brpi++
       break if brpi > last_brpi
@@ -347,6 +348,7 @@ SQL                       = String.raw
       lines.push line
       left_brpi     = brpi
       delta_width  = brp.x
+    #.......................................................................................................
     if right_adi < last_adi
       delta_width  = ads[ right_adi ].x
       left_brpi     = right_brpi + 1
@@ -354,6 +356,7 @@ SQL                       = String.raw
       left_adi      = right_adi + 1
       right_adi     = last_adi
       lines.push { adi1: left_adi, adi2: right_adi, dx0: delta_width, }
+    #.......................................................................................................
     return R
 
 
