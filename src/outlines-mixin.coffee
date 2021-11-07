@@ -149,6 +149,7 @@ SQL                       = String.raw
   _get_cgid_map_from_ads: ( ads ) -> new Map ( [ ad.gid, ad.chrs, ] for ad in ads )
 
   #-----------------------------------------------------------------------------------------------------------
+  ### 'arrange()' like 'compose()' and 'distribute()' ###
   shape_text: ( cfg ) ->
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
     { fontnick
@@ -179,8 +180,12 @@ SQL                       = String.raw
         d.dx    = width
       if d.chrs.startsWith special_chrs.shy
         d.sid = "oshy-#{fontnick}"
+        d.br  = 'shy'
       else if d.chrs.startsWith special_chrs.wbr
         d.sid = "owbr-#{fontnick}"
+        d.br  = 'wbr'
+      else if d.chrs is ' '
+        d.br  = 'spc'
       d.x   = Math.round d.x
       d.y   = Math.round d.y
       d.dx  = Math.round d.dx
@@ -272,10 +277,95 @@ SQL                       = String.raw
     #.......................................................................................................
     return { known_ods, new_ods, missing_chrs, ads, fm, }
 
+  # #-----------------------------------------------------------------------------------------------------------
+  # distribute: ( cfg ) ->
+  #   { ads
+  #     mm_p_u
+  #     width_mm  } = cfg
+  #   R             = []
+  #   width_u       = width_mm / mm_p_u
+  #   # line          = []
+  #   x             = 0
+  #   last_idx      = ads.length - 1
+  #   cur_idx       = -1
+  #   first_idx     = 0
+  #   br_idx        = null
+  #   x_ref         = 0
+  #   urge '^3453451^', ( ad.chrs for ad in ads )
+  #   loop
+  #     cur_idx++
+  #     break if cur_idx > last_idx
+  #     ad = ads[ cur_idx ]
+  #     debug '^44332^', cur_idx, ( rpr ad.chrs ), ( x = ad.x + ad.dx - x_ref ), width_u
+  #     continue unless ad.br?
+  #     unless ( x = ad.x + ad.dx - x_ref ) > width_u
+  #       br_idx  = cur_idx
+  #       continue
+  #     R.push ads[ first_idx .. br_idx ]
+  #     first_idx = br_idx
+  #     br_idx    = null
+  #     x_ref     = x
+  #     # cur_idx++
+  #   ### TAINT handle case when no breakpoint has been met so far ###
+  #   R.push ads[ first_idx .. ]
+  #   return R
+
   #-----------------------------------------------------------------------------------------------------------
   distribute: ( cfg ) ->
-    ### TAINT must connect positions in text with line break opportunities, only possible with `bytes` from
-    `shape_text()` (?) ###
     { ads
-      text
-      width_mm } = cfg
+      mm_p_u
+      width_mm  } = cfg
+    lines         = []
+    R             = { lines, }
+    width_u       = width_mm / mm_p_u
+    brps          = [] ### break points ###
+    #.......................................................................................................
+    # brps.push { adi: -Infinity, br: 'start', x: 0, }
+    brps.push { adi: 0, br: 'start', x: 0, }
+    for ad, adi in ads
+      continue unless ad.br?
+      brps.push { adi, br: ad.br, x: ad.x, }
+    last_adi      = ads.length - 1
+    # brps.push { adi: +Infinity, br: 'end', x: ads[ last_adi ].x, }
+    brps.push { adi: last_adi, br: 'end', x: ads[ last_adi ].x, }
+    #.......................................................................................................
+    brpi          = -1
+    left_brpi     = 0
+    last_brpi     = brps.length - 1
+    delta_widths  = 0
+    loop
+      brpi++
+      if brpi > last_brpi
+        ### deal with rest of material ###
+        break
+      brp           = brps[ brpi ]
+      corrected_x   = brp.x - delta_widths
+      debug '^4450^', brpi, brp
+      continue unless corrected_x > width_u
+      right_brpi    = brpi - 1 ### TAINT may be < 0 when first word too long ###
+      left_adi      = brps[ left_brpi  ].adi
+      right_adi     = brps[ right_brpi ].adi
+      line          = { left_brpi, right_brpi, left_adi, right_adi, delta_widths, }
+      help '^4409^', line
+      lines.push line
+      left_brpi     = brpi
+      delta_widths  = brp.x
+    warn '^5059^', { right_adi, last_adi, }
+    warn '^5059^', ads[ right_adi ... ]
+    if right_adi < last_adi
+      delta_widths  = ads[ right_adi ].x
+      left_brpi     = right_brpi + 1
+      right_brpi    = last_brpi
+      left_adi      = right_adi + 1
+      right_adi     = last_adi
+      lines.push { left_brpi, right_brpi, left_adi, right_adi, delta_widths, }
+    for line in lines
+      info '^5059^', line
+      # segments  = ( ( ad.chr for ad in ads[  ] ) for line in  )
+      line_ads = ads[ line.left_adi .. line.right_adi ]
+      urge '^5059^', ( ad.chrs for ad in line_ads ).join '|'
+    process.exit 1
+
+
+
+
