@@ -320,51 +320,41 @@ SQL                       = String.raw
     width_u       = width_mm / mm_p_u
     brps          = [] ### break points ###
     #.......................................................................................................
-    # brps.push { adi: -Infinity, br: 'start', x: 0, }
     brps.push { adi: 0, br: 'start', x: 0, }
     for ad, adi in ads
       continue unless ad.br?
       brps.push { adi, br: ad.br, x: ad.x, }
     last_adi      = ads.length - 1
-    # brps.push { adi: +Infinity, br: 'end', x: ads[ last_adi ].x, }
     brps.push { adi: last_adi, br: 'end', x: ads[ last_adi ].x, }
     #.......................................................................................................
     brpi          = -1
-    left_brpi     = 0
     last_brpi     = brps.length - 1
-    delta_widths  = 0
+    left_brpi     = 0
+    right_brpi    = null
+    left_adi      = null
+    right_adi     = null
+    delta_width   = 0
     loop
       brpi++
-      if brpi > last_brpi
-        ### deal with rest of material ###
-        break
+      break if brpi > last_brpi
       brp           = brps[ brpi ]
-      corrected_x   = brp.x - delta_widths
-      debug '^4450^', brpi, brp
+      corrected_x   = brp.x - delta_width
       continue unless corrected_x > width_u
       right_brpi    = brpi - 1 ### TAINT may be < 0 when first word too long ###
-      left_adi      = brps[ left_brpi  ].adi
+      left_adi      = ( right_adi ? brps[ left_brpi  ].adi - 1 ) + 1
       right_adi     = brps[ right_brpi ].adi
-      line          = { left_brpi, right_brpi, left_adi, right_adi, delta_widths, }
-      help '^4409^', line
+      line          = { adi1: left_adi, adi2: right_adi, dx0: delta_width, }
       lines.push line
       left_brpi     = brpi
-      delta_widths  = brp.x
-    warn '^5059^', { right_adi, last_adi, }
-    warn '^5059^', ads[ right_adi ... ]
+      delta_width  = brp.x
     if right_adi < last_adi
-      delta_widths  = ads[ right_adi ].x
+      delta_width  = ads[ right_adi ].x
       left_brpi     = right_brpi + 1
       right_brpi    = last_brpi
       left_adi      = right_adi + 1
       right_adi     = last_adi
-      lines.push { left_brpi, right_brpi, left_adi, right_adi, delta_widths, }
-    for line in lines
-      info '^5059^', line
-      # segments  = ( ( ad.chr for ad in ads[  ] ) for line in  )
-      line_ads = ads[ line.left_adi .. line.right_adi ]
-      urge '^5059^', ( ad.chrs for ad in line_ads ).join '|'
-    process.exit 1
+      lines.push { adi1: left_adi, adi2: right_adi, dx0: delta_width, }
+    return R
 
 
 
