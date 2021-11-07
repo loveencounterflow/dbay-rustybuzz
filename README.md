@@ -140,6 +140,14 @@ unless special care is taken.
 * **[–]** document SVG construction principles
 * **[–]** document SVG units (mm, px, implicit)
 * **[–]** implement CSS scaling function (so `1mm` in CSS shows up as 1mm in rendering)
+* **[–]** implement bbox display
+* **[–]** rename `shape_text()` to `arrange()`:
+  * `arrange() -> ads`: gets an arrangement of SIDs (`a`rrangement `d`ata item`s`); this called by
+  * `compose() -> { known_ods, new_ods, missing_chrs, ads, fm, }`: turns an arrangement into a hitherto
+    unnamed data structure that indicates which outlines to put where, which SIDs are known, which are new,
+    which are missing from the current font, and fontmetrics
+  * `distribute()`: distributes text over lines
+
 
 
 
