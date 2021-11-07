@@ -30,7 +30,7 @@
     "cnd": "9.2.2",
     "guy": "2.7.0",
     "intertype": "7.7.0",
-    "rustybuzz-wasm": "3.3.0",
+    "rustybuzz-wasm": "4.4.0",
     "to-width": "^1.2.0"
   },
   "devDependencies": {
