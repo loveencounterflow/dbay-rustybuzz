@@ -357,6 +357,12 @@ SQL                       = String.raw
       adi2  = last_adi
       lines.push { adi1, adi2, dx0, }
     #.......................................................................................................
+    for line in lines
+      continue unless ads[ line.adi2 ].br is 'shy'
+      ### TAINT not the way to do this ###
+      ads[ line.adi2 ].sid = 'o14eg8i'
+      debug '^94509^', line
+    #.......................................................................................................
     return R
 
 
