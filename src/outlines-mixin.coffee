@@ -327,35 +327,34 @@ SQL                       = String.raw
     last_adi      = ads.length - 1
     brps.push { adi: last_adi, br: 'end', x: ads[ last_adi ].x, }
     #.......................................................................................................
-    brpi          = -1
-    last_brpi     = brps.length - 1
-    left_brpi     = 0
-    right_brpi    = null
-    left_adi      = null
-    right_adi     = null
-    delta_width   = 0
+    brpi      = -1
+    last_brpi = brps.length - 1
+    brpi1     = 0
+    brpi2     = null
+    adi1      = null
+    adi2      = null
+    dx0       = 0
     #.......................................................................................................
     loop
       brpi++
       break if brpi > last_brpi
       brp           = brps[ brpi ]
-      corrected_x   = brp.x - delta_width
+      corrected_x   = brp.x - dx0
       continue unless corrected_x > width_u
-      right_brpi    = brpi - 1 ### TAINT may be < 0 when first word too long ###
-      left_adi      = ( right_adi ? brps[ left_brpi  ].adi - 1 ) + 1
-      right_adi     = brps[ right_brpi ].adi
-      line          = { adi1: left_adi, adi2: right_adi, dx0: delta_width, }
-      lines.push line
-      left_brpi     = brpi
-      delta_width  = brp.x
+      brpi2 = brpi - 1 ### TAINT may be < 0 when first word too long ###
+      adi1  = ( adi2 ? brps[ brpi1  ].adi - 1 ) + 1
+      adi2  = brps[ brpi2 ].adi
+      lines.push { adi1, adi2, dx0, }
+      brpi1 = brpi
+      dx0   = brp.x
     #.......................................................................................................
-    if right_adi < last_adi
-      delta_width  = ads[ right_adi ].x
-      left_brpi     = right_brpi + 1
-      right_brpi    = last_brpi
-      left_adi      = right_adi + 1
-      right_adi     = last_adi
-      lines.push { adi1: left_adi, adi2: right_adi, dx0: delta_width, }
+    if adi2 < last_adi
+      dx0   = ads[ adi2 ].x
+      brpi1 = brpi2 + 1
+      brpi2 = last_brpi
+      adi1  = adi2 + 1
+      adi2  = last_adi
+      lines.push { adi1, adi2, dx0, }
     #.......................................................................................................
     return R
 
