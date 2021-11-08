@@ -360,11 +360,12 @@ SQL                       = String.raw
     lnr = 0
     rnr = lines.length + 1
     for line in lines
-      continue unless ads[ line.adi2 ].br is 'shy'
       lnr++; line.lnr = lnr
       rnr--; line.rnr = rnr
+      # continue unless ads[ line.adi2 ].br is 'shy'
+      ### TAINT consider to always use visible hyphen but hide it in CSS ###
       ### TAINT not the way to do this ###
-      ads[ line.adi2 ].sid = 'o14eg8i'
+      # ads[ line.adi2 ].sid = 'o14eg8i'
       debug '^94509^', line
     #.......................................................................................................
     return R
