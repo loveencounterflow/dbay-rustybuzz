@@ -162,34 +162,37 @@ SQL                       = String.raw
     bytes         = Buffer.from text, { encoding: 'utf-8', }
     ced_x         = 0 # cumulative error displacement
     ced_y         = 0 # cumulative error displacement
-    for d, idx in R
-      nxt_b   = R[ idx + 1 ]?.b ? Infinity
-      d.chrs  = bytes[ d.b ... nxt_b ].toString()
-      d.sid   = "o#{d.gid}#{fontnick}"
-      d.x    += ced_x
-      d.y    += ced_y
+    for ad, idx in R
+      nxt_b     = R[ idx + 1 ]?.b ? Infinity
+      ad.chrs   = bytes[ ad.b ... nxt_b ].toString()
+      ad.sid    = "o#{ad.gid}#{fontnick}"
+      ad.x     += ced_x
+      ad.y     += ced_y
       #.....................................................................................................
       # Replace original metrics with those of missing outline:
-      if d.gid is missing.gid
-        if ( width_of ( Array.from d.chrs )[ 0 ] ) < 2
+      if ad.gid is missing.gid
+        if ( width_of ( Array.from ad.chrs )[ 0 ] ) < 2
           width = 500
         else
           width = 1000
-        ed_x    = width - d.dx
+        ed_x    = width - ad.dx
         ced_x  += ed_x
-        d.dx    = width
-      if d.chrs.startsWith special_chrs.shy
-        d.sid = "oshy-#{fontnick}"
-        d.br  = 'shy'
-      else if d.chrs.startsWith special_chrs.wbr
-        d.sid = "owbr-#{fontnick}"
-        d.br  = 'wbr'
-      else if d.chrs is ' '
-        d.br  = 'spc'
-      d.x   = Math.round d.x
-      d.y   = Math.round d.y
-      d.dx  = Math.round d.dx
-      d.dy  = Math.round d.dy
+        ad.dx   = width
+      if ad.chrs.startsWith special_chrs.shy
+        ### TAINT insert data about replacement gids, metrics if hyphen instead of soft hyphen should be
+        used at this position ###
+        ad.sid  = "oshy-#{fontnick}"
+        ad.br   = 'shy'
+      else if ad.chrs.startsWith special_chrs.wbr
+        ad.sid  = "owbr-#{fontnick}"
+        ad.br   = 'wbr'
+      else if ad.chrs is ' '
+        ad.br   = 'spc'
+      #.....................................................................................................
+      ad.x    = Math.round ad.x
+      ad.y    = Math.round ad.y
+      ad.dx   = Math.round ad.dx
+      ad.dy   = Math.round ad.dy
     return R
 
   #-----------------------------------------------------------------------------------------------------------
@@ -325,7 +328,7 @@ SQL                       = String.raw
     for ad, adi in ads
       continue unless ad.br?
       brps.push { adi, br: ad.br, x: ad.x, }
-    last_adi      = ads.length - 1
+    last_adi  = ads.length - 1
     brps.push { adi: last_adi, br: 'end', x: ads[ last_adi ].x, }
     #.......................................................................................................
     brpi      = -1                    # index to BRP
@@ -341,20 +344,21 @@ SQL                       = String.raw
       break if brpi > last_brpi
       brp           = brps[ brpi ]
       corrected_x   = brp.x - dx0
+      ### TAINT use tolerance to allow line break when line is just a bit too long ###
       continue unless corrected_x > width_u
-      brpi2 = brpi - 1 ### TAINT may be < 0 when first word too long ###
-      adi1  = ( adi2 ? brps[ brpi1  ].adi - 1 ) + 1
-      adi2  = brps[ brpi2 ].adi
+      brpi2         = brpi - 1 ### TAINT may be < 0 when first word too long ###
+      adi1          = ( adi2 ? brps[ brpi1  ].adi - 1 ) + 1
+      adi2          = brps[ brpi2 ].adi
       lines.push { adi1, adi2, dx0, }
-      brpi1 = brpi
-      dx0   = ads[ adi2 + 1 ].x
+      brpi1         = brpi
+      dx0           = ads[ adi2 + 1 ].x
     #.......................................................................................................
     if adi2 < last_adi
-      dx0   = ads[ adi2 + 1 ].x
-      brpi1 = brpi2 + 1
-      brpi2 = last_brpi
-      adi1  = adi2 + 1
-      adi2  = last_adi
+      dx0           = ads[ adi2 + 1 ].x
+      brpi1         = brpi2 + 1
+      brpi2         = last_brpi
+      adi1          = adi2 + 1
+      adi2          = last_adi
       lines.push { adi1, adi2, dx0, }
     #.......................................................................................................
     lnr = 0
