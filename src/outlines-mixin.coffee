@@ -238,7 +238,6 @@ SQL                       = String.raw
         row         = @db.first_row insert_outline, { fontnick, gid, chrs, x, y, x1, y1, pd_blob, }
         delete row.pd_blob
         yield row
-      return null
     catch error
       @db.rollback_transaction() if @db.within_transaction()
       throw error
