@@ -48,7 +48,8 @@ SQL                       = String.raw
       continue unless ad.br?
       brps.push { adi, br: ad.br, x: ad.x, }
     last_adi  = ads.length - 1
-    brps.push { adi: last_adi, br: 'end', x: ads[ last_adi ].x, }
+    last_ad   = ads[ last_adi ]
+    brps.push { adi: last_adi, br: 'end', x: last_ad.x + last_ad.dx, dx: 0, }
     #.......................................................................................................
     brpi      = -1                    # index to BRP
     last_brpi = brps.length - 1
