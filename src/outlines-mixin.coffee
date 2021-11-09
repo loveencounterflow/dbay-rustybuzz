@@ -132,21 +132,26 @@ SQL                       = String.raw
       chrs
       fontnick }  = cfg
     return @_get_cgid_map_from_ads ads if ads?
-    font_idx    = @_font_idx_from_fontnick fontnick
+    font_idx      = @_font_idx_from_fontnick fontnick
     if @types.isa.list chrs then  text = chrs.join '\n'
     else                          text = chrs
-    # debug '^344321^', rpr chrs
-    sds         = @shape_text { fontnick, text, }
-    R           = new Map()
+    sds           = @shape_text { fontnick, text, }
+    R             = new Map()
     for sd in sds
       continue if sd.gid is 0
-      # info '^986^', [ sd.chrs, sd.gid, ]
       ### TAINT it *might* happen that several distinct `chrs` sequences map to the *same* GID ###
       R.set sd.gid, sd.chrs
     return R
 
   #---------------------------------------------------------------------------------------------------------
-  _get_cgid_map_from_ads: ( ads ) -> new Map ( [ ad.gid, ad.chrs, ] for ad in ads )
+  _get_cgid_map_from_ads: ( ads ) ->
+    R = new Map()
+    for ad in ads
+      # if @types.isa.list ad
+      #   R.set d.gid, d.chrs for d in ad
+      #   continue
+      R.set ad.gid, ad.chrs
+    return R
 
   #-----------------------------------------------------------------------------------------------------------
   ### 'arrange()' like 'compose()' and 'distribute()' ###
@@ -160,10 +165,10 @@ SQL                       = String.raw
     ads           = @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
     R             = JSON.parse ads
     bytes         = Buffer.from text, { encoding: 'utf-8', }
-    ced_x         = 0 # cumulative error displacement
-    ced_y         = 0 # cumulative error displacement
-    for ad, idx in R
-      nxt_b     = R[ idx + 1 ]?.b ? Infinity
+    ced_x         = 0 # cumulative error displacement from missing outlines
+    ced_y         = 0 # cumulative error displacement from missing outlines
+    for ad, adi in R
+      nxt_b     = R[ adi + 1 ]?.b ? Infinity
       ad.chrs   = bytes[ ad.b ... nxt_b ].toString()
       ad.sid    = "o#{ad.gid}#{fontnick}"
       ad.x     += ced_x
@@ -183,6 +188,7 @@ SQL                       = String.raw
         used at this position ###
         ad.sid  = "oshy-#{fontnick}"
         ad.br   = 'shy'
+        # R[ adi ]  = [ ad, ]
       else if ad.chrs.startsWith special_chrs.wbr
         ad.sid  = "owbr-#{fontnick}"
         ad.br   = 'wbr'
