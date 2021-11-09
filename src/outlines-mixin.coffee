@@ -251,7 +251,7 @@ SQL                       = String.raw
   #-----------------------------------------------------------------------------------------------------------
   compose: ( cfg ) ->
     ### Compose (usually up to one paragraph's worth of) text on a single line without line breaks. ###
-    @types.validate.dbr_typeset_cfg ( cfg = { @constructor.C.defaults.dbr_typeset_cfg..., cfg..., } )
+    @types.validate.dbr_compose_cfg ( cfg = { @constructor.C.defaults.dbr_compose_cfg..., cfg..., } )
     { fontnick
       text
       known_ods         } = cfg
@@ -259,6 +259,7 @@ SQL                       = String.raw
     new_ods               = {}
     missing_ads           = {}
     { missing, }          = @constructor.C
+    fm                    = @get_font_metrics { fontnick, }
     #.......................................................................................................
     ### Shape text, which gives us positions, GIDs/SIDs, and the characters corresponding to each outline.
     The `required_ads` maps from SIDs to arrangement data items (ADs): ###
