@@ -147,9 +147,7 @@ SQL                       = String.raw
   _get_cgid_map_from_ads: ( ads ) ->
     R = new Map()
     for ad in ads
-      # if @types.isa.list ad
-      #   R.set d.gid, d.chrs for d in ad
-      #   continue
+      continue unless ad.gid?
       R.set ad.gid, ad.chrs
     return R
 
@@ -162,13 +160,13 @@ SQL                       = String.raw
     { special_chrs
       missing }   = @constructor.C
     font_idx      = @_font_idx_from_fontnick fontnick
-    ads           = @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
-    R             = JSON.parse ads
+    ads           = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
     bytes         = Buffer.from text, { encoding: 'utf-8', }
     ced_x         = 0 # cumulative error displacement from missing outlines
     ced_y         = 0 # cumulative error displacement from missing outlines
-    for ad, adi in R
-      nxt_b     = R[ adi + 1 ]?.b ? Infinity
+    for ad, adi in ads
+      ad.adi    = adi
+      nxt_b     = ads[ adi + 1 ]?.b ? Infinity
       ad.chrs   = bytes[ ad.b ... nxt_b ].toString()
       ad.sid    = "o#{ad.gid}#{fontnick}"
       ad.x     += ced_x
@@ -188,7 +186,7 @@ SQL                       = String.raw
         used at this position ###
         ad.sid  = "oshy-#{fontnick}"
         ad.br   = 'shy'
-        # R[ adi ]  = [ ad, ]
+        # ads[ adi ]  = [ ad, ]
       else if ad.chrs.startsWith special_chrs.wbr
         ad.sid  = "owbr-#{fontnick}"
         ad.br   = 'wbr'
@@ -199,7 +197,36 @@ SQL                       = String.raw
       ad.y    = Math.round ad.y
       ad.dx   = Math.round ad.dx
       ad.dy   = Math.round ad.dy
-    return R
+      ad.x1   = ad.x + ad.dx
+    #.......................................................................................................
+    ads.unshift
+      adi:    -1
+      gid:    null
+      b:      null
+      x:      0
+      y:      0
+      dx:     0
+      dy:     0
+      x1:     0
+      chrs:   null
+      sid:    null
+      br:     'start'
+    last_adi  = ads.length - 1
+    last_ad   = ads[ last_adi ]
+    ads.push
+      adi:    last_adi + 1
+      gid:    null
+      b:      null
+      x:      last_ad.x1
+      y:      last_ad.y
+      dx:     0
+      dy:     0
+      x1:     last_ad.x1
+      chrs:   null
+      sid:    null
+      br:     'end'
+    #.......................................................................................................
+    return ads
 
   #-----------------------------------------------------------------------------------------------------------
   get_font_metrics: ( cfg ) ->
