@@ -84,9 +84,9 @@ SQL                       = String.raw
     @db =>
       insert_into_ads.run { br: null, ad..., } for ad in ads
     console.table @db.all_rows SQL"select * from #{schema}.ads order by adi;"
-    console.table @db.all_rows SQL"select * from #{schema}.brps order by adi;"
+    console.table @db.all_rows SQL"select * from #{schema}.brps order by quality limit 5;"
     v.dx0 = 9842
-    console.table @db.all_rows SQL"select * from #{schema}.brps order by adi;"
+    console.table @db.all_rows SQL"select * from #{schema}.brps order by quality limit 5;"
     #.......................................................................................................
     # max_width = width_u + 100
     # console.table @db.all_rows SQL"""
