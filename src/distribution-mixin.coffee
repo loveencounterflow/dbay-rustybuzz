@@ -51,7 +51,7 @@ SQL                       = String.raw
     #.......................................................................................................
     create_udfs = ( v ) =>
       @db.create_function name: prefix + 'get_quality', deterministic: false, call: ( x1 ) =>
-        return ( x1 - v.dx0 ) - v.width_u
+        return Math.abs ( x1 - v.dx0 ) - v.width_u
       return null
     create_udfs v
     #.......................................................................................................
