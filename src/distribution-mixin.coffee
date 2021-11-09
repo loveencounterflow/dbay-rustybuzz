@@ -33,7 +33,74 @@ SQL                       = String.raw
   #   return undefined
 
   #-----------------------------------------------------------------------------------------------------------
-  distribute: ( cfg ) ->
+  distribute: ( cfg ) -> @_distribute_with_db cfg
+  # distribute: ( cfg ) -> @_distribute_v1 cfg
+
+  #-----------------------------------------------------------------------------------------------------------
+  _distribute_with_db: ( cfg ) ->
+    { schema,
+      prefix } = @cfg
+    @db =>
+      @db SQL"""
+        drop table if exists #{schema}.ads;
+        drop view if exists #{schema}.brps;
+        create table #{schema}.ads (
+            adi     integer not null primary key,
+            gid     integer not null,
+            b       integer not null,
+            x       integer not null,
+            y       integer not null,
+            dx      integer not null,
+            dy      integer not null,
+            chrs    text    not null,
+            sid     text    not null,
+            br      text );
+        create view #{schema}.brps as
+          with
+            v1 as ( select max( adi ) as last_adi from #{schema}.ads ),
+            v2 as ( select x, dx from #{schema}.ads as ads join v1 on ( ads.adi = v1.last_adi ) )
+          select
+            *
+          from #{schema}.ads
+          where br is not null
+          union all select
+              -1                as adi,
+              null              as gid,
+              null              as b,
+              0                 as x,
+              null              as y,
+              null              as dx,
+              null              as dy,
+              null              as chrs,
+              null              as sid,
+              'start'           as br
+          union all
+            select
+              v1.last_adi + 1   as adi,
+              null              as gid,
+              null              as b,
+              v2.x + v2.dx      as x,
+              null              as y,
+              0                 as dx,
+              null              as dy,
+              null              as chrs,
+              null              as sid,
+              'end'             as br
+            from v1, v2
+        ;
+      """
+    insert_into_ads = @db.prepare_insert { schema, into: 'ads', exclude: [ 'adi', ], }
+    { ads
+      mm_p_u
+      width_mm  } = cfg
+    @db =>
+      insert_into_ads.run { br: null, ad..., } for ad in ads
+    debug '^3321^', console.table @db.all_rows SQL"select * from #{schema}.ads;"
+    debug '^3321^', console.table @db.all_rows SQL"select * from #{schema}.brps order by adi;"
+    process.exit 1
+
+  #-----------------------------------------------------------------------------------------------------------
+  _distribute_v1: ( cfg ) ->
     { ads
       mm_p_u
       width_mm  } = cfg
