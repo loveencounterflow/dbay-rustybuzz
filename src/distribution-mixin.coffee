@@ -66,7 +66,7 @@ SQL                       = String.raw
       ### TAINT use tolerance to allow line break when line is just a bit too long ###
       continue unless corrected_x > width_u
       brpi2         = brpi - 1 ### TAINT may be < 0 when first word too long ###
-      adi1          = ( adi2 ? brps[ brpi1  ].adi - 1 ) + 1
+      adi1          = ( adi2 ? brps[ brpi1 ].adi - 1 ) + 1
       adi2          = brps[ brpi2 ].adi
       lines.push { adi1, adi2, dx0, }
       brpi1         = brpi
