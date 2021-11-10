@@ -147,6 +147,7 @@ unless special care is taken.
     unnamed data structure that indicates which outlines to put where, which SIDs are known, which are new,
     which are missing from the current font, and fontmetrics
   * `distribute()`: distributes text over lines
+* **[–]** [icql-dba-hollerith] update & rebrand as `dbay-hollerith`, removing peer dependency on `icql-dba`
 
 
 
