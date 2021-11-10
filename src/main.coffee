@@ -29,6 +29,7 @@ home                      = PATH.resolve PATH.join __dirname, '..'
 { Drb_distribution }      = require './distribution-mixin'
 font_path                 = PATH.resolve PATH.join __dirname, '../fonts'
 ZLIB                      = require 'zlib'
+{ Hollerith, }            = require 'icql-dba-hollerith'
 
 
 #===========================================================================================================
@@ -132,6 +133,7 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
     guy.cfg.configure_with_types @, cfg, types
     @_create_sql_functions()
     @_compile_sql()
+    @hollerith = new Hollerith { dba: @db, }
     @_open_drb_db()
     return undefined
 

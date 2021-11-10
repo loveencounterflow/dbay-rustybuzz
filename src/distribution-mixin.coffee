@@ -18,6 +18,7 @@ echo                      = CND.echo.bind CND
 guy                       = require 'guy'
 E                         = require './errors'
 SQL                       = String.raw
+jr                        = JSON.stringify
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -85,20 +86,21 @@ SQL                       = String.raw
             #{prefix}get_deviation( x1 ) as deviation
           from #{schema}.ads
           where br is not null;"""
-    insert_into_ads = @db.prepare_insert { schema, into: 'ads', exclude: [ 'adi', ], }
+    @hollerith.alter_table { schema, table_name: 'ads', }
+    insert_into_ads = @db.prepare_insert { schema, into: 'ads', }
     @db =>
-      insert_into_ads.run { br: null, ad..., } for ad in ads
-    console.table @db.all_rows SQL"select * from #{schema}.ads order by adi;"
-    console.table @db.all_rows SQL"select * from #{schema}.brps order by adi;"
-    console.table @db.all_rows SQL"select * from #{schema}.brps order by abs( deviation ) limit 5;"
+      insert_into_ads.run { br: null, ad..., vnr: ( jr [ ad.adi, ] ) } for ad in ads
+    console.table @db.all_rows SQL"select vnr, adi, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.ads order by adi;"
+    console.table @db.all_rows SQL"select vnr, adi, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by adi;"
+    console.table @db.all_rows SQL"select vnr, adi, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by abs( deviation ) limit 5;"
     #.......................................................................................................
     v.dx0     = 0
-    nxt_brp   = @db.single_row SQL"select * from #{schema}.brps where br = 'start' limit 1;"
+    nxt_brp   = @db.single_row SQL"select vnr, adi, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps where br = 'start' limit 1;"
     prv_brp   = null
     loop
       break if nxt_brp.br is 'end'
       prv_brp = nxt_brp
-      nxt_brp = @db.single_row SQL"select * from #{schema}.brps order by abs( deviation ) limit 1;"
+      nxt_brp = @db.single_row SQL"select vnr, adi, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by abs( deviation ) limit 1;"
       adi_1   = prv_brp.adi + 1
       adi_2   = nxt_brp.adi
       line    = @db.single_value SQL"select group_concat( chrs, '' ) as chrs from ads where adi between $adi_1 and $adi_2;", { adi_1, adi_2, }
