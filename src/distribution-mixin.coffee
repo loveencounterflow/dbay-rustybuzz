@@ -82,16 +82,29 @@ SQL                       = String.raw
             v2 as ( select x, dx, x1 from #{schema}.ads as ads join v1 on ( ads.adi = v1.last_adi ) )
           select
             *,
-            #{prefix}get_quality( x1 ) as quality
+            #{prefix}get_deviation( x1 ) as deviation
           from #{schema}.ads
           where br is not null;"""
     insert_into_ads = @db.prepare_insert { schema, into: 'ads', exclude: [ 'adi', ], }
     @db =>
       insert_into_ads.run { br: null, ad..., } for ad in ads
     console.table @db.all_rows SQL"select * from #{schema}.ads order by adi;"
-    console.table @db.all_rows SQL"select * from #{schema}.brps order by quality limit 5;"
-    v.dx0 = 9842
-    console.table @db.all_rows SQL"select * from #{schema}.brps order by quality limit 5;"
+    console.table @db.all_rows SQL"select * from #{schema}.brps order by adi;"
+    console.table @db.all_rows SQL"select * from #{schema}.brps order by abs( deviation ) limit 5;"
+    #.......................................................................................................
+    v.dx0     = 0
+    nxt_brp   = @db.single_row SQL"select * from #{schema}.brps where br = 'start' limit 1;"
+    prv_brp   = null
+    loop
+      break if nxt_brp.br is 'end'
+      prv_brp = nxt_brp
+      nxt_brp = @db.single_row SQL"select * from #{schema}.brps order by abs( deviation ) limit 1;"
+      adi_1   = prv_brp.adi + 1
+      adi_2   = nxt_brp.adi
+      line    = @db.single_value SQL"select group_concat( chrs, '' ) as chrs from ads where adi between $adi_1 and $adi_2;", { adi_1, adi_2, }
+      line   += '-' if nxt_brp.br is 'shy'
+      info '^33209^', line
+      v.dx0   = nxt_brp.x
     #.......................................................................................................
     # max_width = width_u + 100
     # console.table @db.all_rows SQL"""
