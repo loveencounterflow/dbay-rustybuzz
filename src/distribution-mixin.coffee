@@ -19,6 +19,7 @@ guy                       = require 'guy'
 E                         = require './errors'
 SQL                       = String.raw
 jr                        = JSON.stringify
+jp                        = JSON.parse
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -66,7 +67,7 @@ jr                        = JSON.stringify
         drop table if exists #{schema}.ads;
         drop view if exists #{schema}.brps;
         create table #{schema}.ads (
-            adi     integer not null primary key,
+            vnr     json not null primary key,
             gid     integer,
             b       integer,
             x       integer not null,
@@ -90,30 +91,32 @@ jr                        = JSON.stringify
     insert_into_ads = @db.prepare_insert { schema, into: 'ads', }
     @db =>
       insert_into_ads.run { br: null, ad..., vnr: ( jr [ ad.adi, ] ) } for ad in ads
-    console.table @db.all_rows SQL"select vnr, adi, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.ads order by adi;"
-    console.table @db.all_rows SQL"select vnr, adi, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by adi;"
-    console.table @db.all_rows SQL"select vnr, adi, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by abs( deviation ) limit 5;"
+    console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.ads order by vnr_blob;"
+    console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by vnr_blob;"
+    console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by abs( deviation ) limit 5;"
     #.......................................................................................................
-    v.dx0     = 0
-    nxt_brp   = @db.single_row SQL"select vnr, adi, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps where br = 'start' limit 1;"
-    prv_brp   = null
+    v.dx0         = 0
+    nxt_brp       = @db.single_row SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps where br = 'start' limit 1;"
+    nxt_brp.vnr   = jp nxt_brp.vnr
+    prv_brp       = null
+    lines         = []
+    R             = { lines, }
     loop
       break if nxt_brp.br is 'end'
-      prv_brp = nxt_brp
-      nxt_brp = @db.single_row SQL"select vnr, adi, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by abs( deviation ) limit 1;"
-      adi_1   = prv_brp.adi + 1
-      adi_2   = nxt_brp.adi
-      line    = @db.single_value SQL"select group_concat( chrs, '' ) as chrs from ads where adi between $adi_1 and $adi_2;", { adi_1, adi_2, }
-      line   += '-' if nxt_brp.br is 'shy'
-      info '^33209^', line
-      v.dx0   = nxt_brp.x
-    #.......................................................................................................
-    # max_width = width_u + 100
-    # console.table @db.all_rows SQL"""
-    #   select * from #{schema}.brps
-    #     where x1 < $max_width
-    #     order by adi;""", { max_width, }
-    process.exit 1
+      prv_brp       = nxt_brp
+      nxt_brp       = @db.single_row SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by abs( deviation ) limit 1;"
+      nxt_brp.vnr   = jp nxt_brp.vnr
+      debug '^59686^', prv_brp.vnr, ( @hollerith.advance prv_brp.vnr ), nxt_brp.vnr
+      vnr_1         = @hollerith.advance prv_brp.vnr
+      vnr_2         = nxt_brp.vnr
+      vnr_1_blob    = @hollerith.encode vnr_1
+      vnr_2_blob    = @hollerith.encode vnr_2
+      text          = @db.single_value SQL"select group_concat( chrs, '' ) as chrs from ads where vnr_blob between $vnr_1_blob and $vnr_2_blob;", { vnr_1_blob, vnr_2_blob, }
+      text         += '-' if nxt_brp.br is 'shy'
+      info '^33209^', text
+      lines.push    { vnr_1, vnr_2, dx0: v.dx0, }
+      v.dx0         = nxt_brp.x
+    return R
 
   #-----------------------------------------------------------------------------------------------------------
   _distribute_v1: ( cfg ) ->
