@@ -46,12 +46,17 @@ SQL                       = String.raw
       mm_p_u:     cfg.mm_p_u
       width_mm:   cfg.width_mm
       width_u:    cfg.width_mm / cfg.mm_p_u # line width in glyf design unites (1000 per em)
+      size_mm:    cfg.size_mm               # nominal type size (1em)
+      size_u:     cfg.size_mm  / cfg.mm_p_u
       adi0:       0                         # index of AD that represents current line start
       dx0:        0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
     create_udfs = ( v ) =>
-      @db.create_function name: prefix + 'get_quality', deterministic: false, call: ( x1 ) =>
-        return Math.abs ( x1 - v.dx0 ) - v.width_u
+      @db.create_function name: prefix + 'get_deviation', deterministic: false, call: ( x1 ) =>
+        ### Essentiall distance of any point in the text from the end of the current line *relative to
+        type size and scaled such that 1em = 1000u. Most favorable break points are the ones closest to
+        zero. ###
+        return Math.round ( x1 - v.dx0 - v.width_u ) / v.size_u * 1000
       return null
     create_udfs v
     #.......................................................................................................
