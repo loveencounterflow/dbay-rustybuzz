@@ -78,9 +78,9 @@ jr                        = JSON.stringify
             sid     text,
             br      text );
         create view #{schema}.brps as
-          with
-            v1 as ( select max( adi ) as last_adi from #{schema}.ads ),
-            v2 as ( select x, dx, x1 from #{schema}.ads as ads join v1 on ( ads.adi = v1.last_adi ) )
+          -- with
+          --   v1 as ( select max( adi ) as last_adi from #{schema}.ads ),
+          --   v2 as ( select x, dx, x1 from #{schema}.ads as ads join v1 on ( ads.adi = v1.last_adi ) )
           select
             *,
             #{prefix}get_deviation( x1 ) as deviation
