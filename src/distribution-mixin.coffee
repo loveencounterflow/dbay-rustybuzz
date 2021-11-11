@@ -113,9 +113,13 @@ jp                        = JSON.parse
       nxt_brp       = @db.all_rows SQL"select pgi, adi, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by vnr_blob limit 2;"
       nxt_brp       = nxt_brp[ 1 ]
       nxt_brp.vnr   = jp nxt_brp.vnr
-      debug '^59686^', prv_brp.vnr, ( @hollerith.advance prv_brp.vnr ), nxt_brp.vnr
-      vnr_1         = @hollerith.advance prv_brp.vnr
+      # vnr_1         = @hollerith.advance prv_brp.vnr
+      vnr_1         = prv_brp.vnr
       vnr_2         = nxt_brp.vnr
+      pgi_1         = prv_brp.pgi
+      pgi_2         = nxt_brp.pgi
+      adi_1         = prv_brp.adi
+      adi_2         = nxt_brp.adi
       vnr_1_blob    = @hollerith.encode vnr_1
       vnr_2_blob    = @hollerith.encode vnr_2
       text          = @db.single_value SQL"select group_concat( chrs, '' ) as chrs from ads where vnr_blob between $vnr_1_blob and $vnr_2_blob;", { vnr_1_blob, vnr_2_blob, }
