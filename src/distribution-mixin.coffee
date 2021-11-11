@@ -59,6 +59,8 @@ jp                        = JSON.parse
         type size and scaled such that 1em = 1000u. Most favorable break points are the ones closest to
         zero. ###
         return Math.round ( x1 - v.dx0 - v.width_u ) / v.size_u * 1000
+      @db.create_function name: prefix + 'vnr_pick', deterministic: true, call: ( vnr, nr ) =>
+        return ( jp vnr )[ nr - 1 ]
       return null
     create_udfs v
     #.......................................................................................................
@@ -67,6 +69,8 @@ jp                        = JSON.parse
         drop table if exists #{schema}.ads;
         drop view if exists #{schema}.brps;
         create table #{schema}.ads (
+            pgi     integer generated always as ( #{prefix}vnr_pick( vnr, 1 ) ) virtual not null,
+            adi     integer generated always as ( #{prefix}vnr_pick( vnr, 2 ) ) virtual not null,
             vnr     json not null primary key,
             gid     integer,
             b       integer,
@@ -90,13 +94,13 @@ jp                        = JSON.parse
     @hollerith.alter_table { schema, table_name: 'ads', }
     insert_into_ads = @db.prepare_insert { schema, into: 'ads', }
     @db =>
-      insert_into_ads.run { br: null, ad..., vnr: ( jr [ ad.adi, ] ) } for ad in ads
-    console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.ads order by vnr_blob;"
-    console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by vnr_blob;"
-    console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by abs( deviation ) limit 5;"
+      insert_into_ads.run { br: null, ad..., vnr: ( jr [ 1, ad.adi, ] ) } for ad in ads
+    console.table @db.all_rows SQL"select pgi, adi, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.ads order by vnr_blob;"
+    console.table @db.all_rows SQL"select pgi, adi, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by vnr_blob;"
+    console.table @db.all_rows SQL"select pgi, adi, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by abs( deviation ) limit 5;"
     #.......................................................................................................
     v.dx0         = 0
-    nxt_brp       = @db.single_row SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps where br = 'start' limit 1;"
+    nxt_brp       = @db.single_row SQL"select pgi, adi, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps where br = 'start' limit 1;"
     nxt_brp.vnr   = jp nxt_brp.vnr
     prv_brp       = null
     lines         = []
@@ -104,7 +108,9 @@ jp                        = JSON.parse
     loop
       break if nxt_brp.br is 'end'
       prv_brp       = nxt_brp
-      nxt_brp       = @db.single_row SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by abs( deviation ) limit 1;"
+      before_nxt_brp       = @db.single_row SQL"select pgi, adi, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by abs( deviation ) limit 1;"
+      nxt_brp       = @db.all_rows SQL"select pgi, adi, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by vnr_blob limit 2;"
+      nxt_brp       = nxt_brp[ 1 ]
       nxt_brp.vnr   = jp nxt_brp.vnr
       debug '^59686^', prv_brp.vnr, ( @hollerith.advance prv_brp.vnr ), nxt_brp.vnr
       vnr_1         = @hollerith.advance prv_brp.vnr
@@ -114,7 +120,7 @@ jp                        = JSON.parse
       text          = @db.single_value SQL"select group_concat( chrs, '' ) as chrs from ads where vnr_blob between $vnr_1_blob and $vnr_2_blob;", { vnr_1_blob, vnr_2_blob, }
       text         += '-' if nxt_brp.br is 'shy'
       info '^33209^', text
-      lines.push    { vnr_1, vnr_2, dx0: v.dx0, }
+      lines.push    { pgi_1, pgi_2, adi_1, adi_2, vnr_1, vnr_2, dx0: v.dx0, }
       v.dx0         = nxt_brp.x
     return R
 
