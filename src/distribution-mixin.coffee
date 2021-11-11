@@ -101,7 +101,12 @@ jp                        = JSON.parse
     prv_brp       = null
     lines         = []
     R             = { lines, }
+    count         = -1
     loop
+      count++
+      if count > 100
+        warn "infinite loop"
+        process.exit 119
       break if nxt_brp.br is 'end'
       prv_brp       = nxt_brp
       before_nxt_brp       = @db.single_row SQL"select pgi, adi, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.brps order by abs( deviation ) limit 1;"
