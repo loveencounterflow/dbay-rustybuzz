@@ -67,16 +67,13 @@ jp                        = JSON.parse
     @_v.adi0      = 0                         # index of AD that represents current line start
     @_v.dx0       = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
-    @db =>
-      insert_ad = @db.prepare @sql.insert_ad ?= @db.create_insert { schema, into: 'ads', }
-      insert_ad.run { br: null, ad..., vnr: ( jr [ 1, ad.adi, ] ) } for ad in ads
-    console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.ads order by vnr_blob;"
-    console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by vnr_blob;"
-    console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by abs( deviation ) limit 5;"
+    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.ads order by vnr_blob;"
+    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by vnr_blob;"
+    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by abs( deviation ) limit 5;"
     # console.table @db.all_rows SQL"select * from #{schema}.brps order by vnr_blob;"
     #.......................................................................................................
     @_v.dx0       = 0
-    brp_2         = @db.single_row SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by vnr_blob limit 1;"
+    brp_2         = @db.single_row SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by vnr_blob limit 1;"
     console.table [ brp_2, ]
     brp_2.vnr     = jp brp_2.vnr
     brp_1         = null
@@ -89,35 +86,44 @@ jp                        = JSON.parse
         warn "infinite loop"
         process.exit 119
       break if brp_2.br is 'end'
-      brp_1             = brp_2
-      brp_2             = @db.single_row SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by abs( deviation ) limit 1;"
-      brp_2.vnr         = jp brp_2.vnr
-      vnr_1             = @hollerith.advance brp_1.vnr # or use `select from ads`?
-      vnr_2             = brp_2.vnr
-      [ pgi, adi_1, ]   = vnr_1
-      [ _,   adi_2, ]   = vnr_2
+      brp_1                   = brp_2
+      brp_2                   = @db.single_row SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by abs( deviation ) limit 1;"
+      brp_2.vnr               = jp brp_2.vnr
+      vnr_1                   = brp_1.vnr # or use `select from ads`?
+      ### NOTE move from breakpoint to material ###
+      ### TAINT doesn't honor multiple consecutive breakpoints ###
+      vnr_1[ 2 ]++
+      vnr_2                       = brp_2.vnr
+      [ doc, par, adi_1, vrt_1, ] = vnr_1
+      [ _,   _,   adi_2, vrt_2, ] = vnr_2
       #.....................................................................................................
-      info '^4476^', rpr @_text_from_adis { schema, pgi, adi_1, adi_2, }
+      ### TAINT use `stamped` boolean column to select variant ###
+      info '^4476^', rpr @_text_from_adis { schema, doc, par, adi_1, adi_2, vrt: 1, }
       #.....................................................................................................
-      lines.push { pgi, adi_1, adi_2, vnr_1, vnr_2, dx0: @_v.dx0, }
+      lines.push { doc, par, adi_1, adi_2, vrt_1, vrt_2, vnr_1, vnr_2, dx0: @_v.dx0, }
       @_v.dx0 = brp_2.x1
     return R
 
   #---------------------------------------------------------------------------------------------------------
   _text_from_adis: ( cfg ) ->
     { schema
-      pgi
+      doc
+      par
       adi_1
-      adi_2  } = cfg
-    ads = @db.all_rows SQL"""
+      adi_2
+      vrt   } = cfg
+    ads       = @db.all_rows SQL"""
       select
           *
         from #{schema}.ads
         where true
-          and pgi = $pgi
+          and doc = $doc
+          and par = $par
           and adi between $adi_1 and $adi_2
-        order by vnr_blob;""", { pgi, adi_1, adi_2, }
-    # console.table ads
+          and vrt = $vrt
+        order by vnr_blob;""", { doc, par, adi_1, adi_2, vrt, }
+    debug '^870578^', { doc, par, adi_1, adi_2, vrt, }
+    debug '^870578^'; console.table ads
     ad_2  = ads[ ads.length - 1 ]
     R     = ( ad.chrs for ad in ads ).join ''
     R    += '-' if ad_2.br is 'shy'

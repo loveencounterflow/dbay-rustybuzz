@@ -24,6 +24,8 @@ _TO_BE_REMOVED_bbox_pattern = /^<rect x="(?<x>[-+0-9]+)" y="(?<y>[-+0-9]+)" widt
 SQL                       = String.raw
 { width_of
   to_width }              = require 'to-width'
+jr                        = JSON.stringify
+jp                        = JSON.parse
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -156,19 +158,28 @@ SQL                       = String.raw
   shape_text: ( cfg ) ->
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
     { fontnick
-      text      } = cfg
+      text
+      doc
+      par
+      vrt       } = cfg
     { special_chrs
       missing }   = @constructor.C
     font_idx      = @_font_idx_from_fontnick fontnick
     ads           = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
     #.......................................................................................................
-    ads.unshift { adi: 0, gid: null, b: null, x: 0, y: 0, dx: 0, dy: 0, x1: 0, chrs: null, sid: null, \
+    ads.unshift { doc, par, adi: 0, vrt, \
+      vnr: [ doc, par, 0, vrt, ], \
+      gid: null, b: null, x: 0, y: 0, dx: 0, dy: 0, x1: 0, chrs: null, sid: null, \
       br: 'start', }
     bytes         = Buffer.from text, { encoding: 'utf-8', }
     ced_x         = 0 # cumulative error displacement from missing outlines
     ced_y         = 0 # cumulative error displacement from missing outlines
     for ad, adi in ads
+      ad.doc    = doc
+      ad.par    = par
       ad.adi    = adi
+      ad.vrt    = vrt
+      ad.vnr    = [ doc, par, adi, vrt, ]
       nxt_b     = ads[ adi + 1 ]?.b ? Infinity
       ad.chrs   = bytes[ ad.b ... nxt_b ].toString()
       ad.sid    = "o#{ad.gid}#{fontnick}"
@@ -204,7 +215,9 @@ SQL                       = String.raw
     #.......................................................................................................
     last_adi  = ads.length - 1
     last_ad   = ads[ last_adi ]
-    ads.push { adi: last_adi + 1, gid: null, b: null, x: last_ad.x1, y: last_ad.y, dx: 0, dy: 0, \
+    ads.push { doc, par, adi: last_adi + 1, vrt, \
+      vnr: [ doc, par, last_adi + 1, vrt, ], \
+      gid: null, b: null, x: last_ad.x1, y: last_ad.y, dx: 0, dy: 0, \
       x1: last_ad.x1, chrs: null, sid: null, br: 'end', }
     #.......................................................................................................
     return ads
@@ -271,7 +284,18 @@ SQL                       = String.raw
     ### Shape text, which gives us positions, GIDs/SIDs, and the characters corresponding to each outline.
     The `required_ads` maps from SIDs to arrangement data items (ADs): ###
     ### TAINt return standard glyph for all missing outlines ###
-    ads                   = @shape_text { fontnick, text, }
+    doc                   = 1 ### Document ID ###
+    par                   = 1 ### Paragraph ID ###
+    ads                   = @shape_text { fontnick, text, doc, par, vrt: 1, }
+    # ads                   = [ ads..., ( @shape_text { fontnick, text, doc, par, vrt: 2, } )..., ]
+    #.......................................................................................................
+    @db =>
+      insert_ad = @db.prepare @sql.insert_ad ?= @db.create_insert { schema: @cfg.schema, into: 'ads', }
+      for ad in ads
+        vnr = jr ad.vnr
+        insert_ad.run { br: null, ad..., vnr, }
+      return null
+    #.......................................................................................................
     missing_ads[ d.sid ]  = d for d in ads
     fm                    = @get_font_metrics { fontnick, }
     #.......................................................................................................
