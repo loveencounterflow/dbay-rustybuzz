@@ -161,6 +161,9 @@ SQL                       = String.raw
       missing }   = @constructor.C
     font_idx      = @_font_idx_from_fontnick fontnick
     ads           = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
+    #.......................................................................................................
+    ads.unshift { adi: 0, gid: null, b: null, x: 0, y: 0, dx: 0, dy: 0, x1: 0, chrs: null, sid: null, \
+      br: 'start', }
     bytes         = Buffer.from text, { encoding: 'utf-8', }
     ced_x         = 0 # cumulative error displacement from missing outlines
     ced_y         = 0 # cumulative error displacement from missing outlines
@@ -199,32 +202,10 @@ SQL                       = String.raw
       ad.dy   = Math.round ad.dy
       ad.x1   = ad.x + ad.dx
     #.......................................................................................................
-    ads.unshift
-      adi:    -1
-      gid:    null
-      b:      null
-      x:      0
-      y:      0
-      dx:     0
-      dy:     0
-      x1:     0
-      chrs:   null
-      sid:    null
-      br:     'start'
     last_adi  = ads.length - 1
     last_ad   = ads[ last_adi ]
-    ads.push
-      adi:    last_adi + 1
-      gid:    null
-      b:      null
-      x:      last_ad.x1
-      y:      last_ad.y
-      dx:     0
-      dy:     0
-      x1:     last_ad.x1
-      chrs:   null
-      sid:    null
-      br:     'end'
+    ads.push { adi: last_adi + 1, gid: null, b: null, x: last_ad.x1, y: last_ad.y, dx: 0, dy: 0, \
+      x1: last_ad.x1, chrs: null, sid: null, br: 'end', }
     #.......................................................................................................
     return ads
 
