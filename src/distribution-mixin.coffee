@@ -72,8 +72,8 @@ jp                        = JSON.parse
         drop table if exists #{schema}.ads;
         drop view if exists #{schema}.brps;
         create table #{schema}.ads (
-            -- pgi     integer generated always as ( #{prefix}vnr_pick( vnr, 1 ) ) virtual not null,
-            -- adi     integer generated always as ( #{prefix}vnr_pick( vnr, 2 ) ) virtual not null,
+            pgi     integer generated always as ( #{prefix}vnr_pick( vnr, 1 ) ) virtual not null,
+            adi     integer generated always as ( #{prefix}vnr_pick( vnr, 2 ) ) virtual not null,
             vnr     json not null primary key,
             gid     integer,
             b       integer,
