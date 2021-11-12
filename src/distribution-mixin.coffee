@@ -118,18 +118,36 @@ jp                        = JSON.parse
       brp_2.vnr         = jp brp_2.vnr
       vnr_1             = @hollerith.advance brp_1.vnr # or use `select from ads`?
       vnr_2             = brp_2.vnr
-      [ pgi_1, adi_1, ] = vnr_1
-      [ pgi_2, adi_2, ] = vnr_2
-      vnr_1_blob        = @hollerith.encode vnr_1
-      vnr_2_blob        = @hollerith.encode vnr_2
-      text              = @db.single_value SQL"select group_concat( chrs, '' ) as chrs from ads where vnr_blob between $vnr_1_blob and $vnr_2_blob;", { vnr_1_blob, vnr_2_blob, }
-      text             += '-' if brp_2.br is 'shy'
-      info '^33209^', text
-      lines.push    { pgi_1, pgi_2, adi_1, adi_2, vnr_1, vnr_2, dx0: @_v.dx0, }
-      @_v.dx0           = brp_2.x1
+      [ pgi, adi_1, ]   = vnr_1
+      [ _,   adi_2, ]   = vnr_2
+      #.....................................................................................................
+      info '^4476^', @_text_from_adis { schema, pgi, adi_1, adi_2, }
+      #.....................................................................................................
+      lines.push { pgi, adi_1, adi_2, vnr_1, vnr_2, dx0: @_v.dx0, }
+      @_v.dx0 = brp_2.x1
     return R
 
-  #-----------------------------------------------------------------------------------------------------------
+  #---------------------------------------------------------------------------------------------------------
+  _text_from_adis: ( cfg ) ->
+    { schema
+      pgi
+      adi_1
+      adi_2  } = cfg
+    ads = @db.all_rows SQL"""
+      select
+          *
+        from #{schema}.ads
+        where true
+          and pgi = $pgi
+          and adi between $adi_1 and $adi_2
+        order by vnr_blob;""", { pgi, adi_1, adi_2, }
+    # console.table ads
+    ad_2  = ads[ ads.length - 1 ]
+    R     = ( ad.chrs for ad in ads ).join ''
+    R    += '-' if ad_2.br is 'shy'
+    return R
+
+  #---------------------------------------------------------------------------------------------------------
   _distribute_v1: ( cfg ) ->
     { ads
       mm_p_u
