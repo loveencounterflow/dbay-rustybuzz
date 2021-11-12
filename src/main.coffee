@@ -134,6 +134,9 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
     @_create_sql_functions()
     @_compile_sql()
     @hollerith = new Hollerith { dba: @db, }
+    @_$outlines_initialize?()
+    @_$distribution_initialize?()
+    @_$codepoints_initialize?()
     @_open_drb_db()
     return undefined
 

@@ -25,16 +25,31 @@ jp                        = JSON.parse
 #-----------------------------------------------------------------------------------------------------------
 @Drb_distribution = ( clasz = Object ) => class extends clasz
 
-  # #---------------------------------------------------------------------------------------------------------
-  # constructor: ->
-  #   super()
-  #   guy.props.hide @, 'state', {} unless @state?
-  #   @state.prv_fontidx            = -1
-  #   @state.font_idx_by_fontnicks  = {}
-  #   #.........................................................................................................
-  #   return undefined
+  #---------------------------------------------------------------------------------------------------------
+  constructor: ->
+    super()
+    @_v ?= {}
+    return undefined
 
-  #-----------------------------------------------------------------------------------------------------------
+  #---------------------------------------------------------------------------------------------------------
+  _$distribution_initialize: ->
+    { schema,
+      prefix  } = @cfg
+    #.......................................................................................................
+    @db.create_function name: prefix + 'get_deviation', deterministic: false, call: ( x1 ) =>
+      ### Essentiall distance of any point in the text from the end of the current line *relative to
+      type size and scaled such that 1em = 1000u. Most favorable break points are the ones closest to
+      zero. ###
+      R   = Math.round ( x1 - @_v.dx0 - @_v.width_u ) / @_v.size_u * 1000
+      R  *= 2 if R > 0 ### penalty for lines that are too long ###
+      return R
+    #.......................................................................................................
+    @db.create_function name: prefix + 'vnr_pick', deterministic: true, call: ( vnr, nr ) =>
+      return ( jp vnr )[ nr - 1 ]
+    #.......................................................................................................
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
   distribute: ( cfg ) -> @_distribute_with_db cfg
   # distribute: ( cfg ) -> @_distribute_v1 cfg
 
