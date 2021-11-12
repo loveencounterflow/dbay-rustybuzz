@@ -171,7 +171,30 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           pd        text generated always as ( #{prefix}unzip( pd_blob ) ) virtual,
           pd_blob   blob    not null,
           primary key ( fontnick, gid ) );
+      -- ...................................................................................................
+      drop table if exists #{schema}.ads;
+      drop view if exists #{schema}.brps;
+      create table #{schema}.ads (
+          pgi     integer generated always as ( #{prefix}vnr_pick( vnr, 1 ) ) virtual not null,
+          adi     integer generated always as ( #{prefix}vnr_pick( vnr, 2 ) ) virtual not null,
+          vnr     json not null primary key,
+          gid     integer,
+          b       integer,
+          x       integer not null,
+          y       integer not null,
+          dx      integer not null,
+          dy      integer not null,
+          x1      integer not null,
+          chrs    text,
+          sid     text,
+          br      text );
+      create view #{schema}.brps as select
+          *,
+          #{prefix}get_deviation( x1 ) as deviation
+        from #{schema}.ads
+        where br is not null;
       """
+    @hollerith.alter_table { schema, table_name: 'ads', }
     return null
 
   #---------------------------------------------------------------------------------------------------------

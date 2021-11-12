@@ -68,32 +68,8 @@ jp                        = JSON.parse
     @_v.dx0       = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
     @db =>
-      @db SQL"""
-        drop table if exists #{schema}.ads;
-        drop view if exists #{schema}.brps;
-        create table #{schema}.ads (
-            pgi     integer generated always as ( #{prefix}vnr_pick( vnr, 1 ) ) virtual not null,
-            adi     integer generated always as ( #{prefix}vnr_pick( vnr, 2 ) ) virtual not null,
-            vnr     json not null primary key,
-            gid     integer,
-            b       integer,
-            x       integer not null,
-            y       integer not null,
-            dx      integer not null,
-            dy      integer not null,
-            x1      integer not null,
-            chrs    text,
-            sid     text,
-            br      text );
-        create view #{schema}.brps as select
-            *,
-            #{prefix}get_deviation( x1 ) as deviation
-          from #{schema}.ads
-          where br is not null;"""
-    @hollerith.alter_table { schema, table_name: 'ads', }
-    insert_into_ads = @db.prepare_insert { schema, into: 'ads', }
-    @db =>
-      insert_into_ads.run { br: null, ad..., vnr: ( jr [ 1, ad.adi, ] ) } for ad in ads
+      insert_ad = @db.prepare @sql.insert_ad ?= @db.create_insert { schema, into: 'ads', }
+      insert_ad.run { br: null, ad..., vnr: ( jr [ 1, ad.adi, ] ) } for ad in ads
     console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br from #{schema}.ads order by vnr_blob;"
     console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by vnr_blob;"
     console.table @db.all_rows SQL"select vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by abs( deviation ) limit 5;"
