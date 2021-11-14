@@ -161,15 +161,16 @@ jp                        = JSON.parse
   _shape_hyphenated: ( cfg ) ->
     { fontnick
       ads
+      shy_segments
       doc
       par
       vrt   } = cfg
     R         = []
     #.......................................................................................................
     texts = []
+    debug '^44554^', shy for shy in shy_segments
     for adi in ( adi for ad, adi in ads when ad.br is 'shy' )
       ad = ads[ adi ]
-      debug '^44554^', ad
     #.......................................................................................................
     return R
 
@@ -177,9 +178,9 @@ jp                        = JSON.parse
   ### 'arrange()' like 'compose()' and 'distribute()' ###
   shape_text: ( cfg ) ->
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
-    { ads, shys, }  = @_shape_text        { cfg..., vrt: 1, }
-    shy_ads         = @_shape_hyphenated  { cfg..., vrt: 2, ads, shys, }
-    return [ ads..., shys..., ]
+    { ads, shy_segments, }  = @_shape_text        { cfg..., vrt: 1, }
+    shy_ads                 = @_shape_hyphenated  { cfg..., vrt: 2, ads, shy_segments, }
+    return [ ads..., shy_segments..., ]
 
   #---------------------------------------------------------------------------------------------------------
   ### 'arrange()' like 'compose()' and 'distribute()' ###
@@ -193,7 +194,7 @@ jp                        = JSON.parse
       missing }   = @constructor.C
     font_idx      = @_font_idx_from_fontnick fontnick
     ads           = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
-    shys          = []
+    shy_segments  = []
     #.......................................................................................................
     ads.unshift { doc, par, adi: 0, vrt, \
       vnr: [ doc, par, 0, vrt, ], \
@@ -259,7 +260,7 @@ jp                        = JSON.parse
       # cadi_1: this_adi, cadi_2: this_adi, \
       nobr: 0, br: 'end', }
     #.......................................................................................................
-    return { ads, shys, }
+    return { ads, shy_segments, }
 
   #---------------------------------------------------------------------------------------------------------
   get_font_metrics: ( cfg ) ->
