@@ -40,6 +40,18 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
     # replacement:  '█'
     last_fontidx:       15
     zlib_zip_cfg:       { level: 1, strategy: ZLIB.constants.Z_HUFFMAN_ONLY, }
+    ### TAINT try to reorder specials for better comprehension ###
+    # special:
+    #   missing:
+    #     gid:    0
+    #   ignored:
+    #     gid:   -1
+    gids:
+      '-2':           'reserved'  # for future purposes
+      '-1':           'ignored'   # for ADs that intentionally have no outline (but may appear in debugging)
+      '0':            'missing'   # font cannot render this codepoint
+    ignored:
+      gid:             -1
     missing:
       gid:              0
     special_chrs:
