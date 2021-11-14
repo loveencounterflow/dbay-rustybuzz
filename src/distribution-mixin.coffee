@@ -122,8 +122,6 @@ jp                        = JSON.parse
           and adi between $adi_1 and $adi_2
           and vrt = $vrt
         order by vnr_blob;""", { doc, par, adi_1, adi_2, vrt, }
-    debug '^870578^', { doc, par, adi_1, adi_2, vrt, }
-    debug '^870578^'; console.table ads
     ad_2  = ads[ ads.length - 1 ]
     R     = ( ad.chrs for ad in ads ).join ''
     R    += '-' if ad_2.br is 'shy'
