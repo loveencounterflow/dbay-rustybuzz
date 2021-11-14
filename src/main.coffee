@@ -177,6 +177,7 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
       -- ...................................................................................................
       drop table if exists #{schema}.ads;
       drop view if exists #{schema}.brps;
+      drop view if exists #{schema}.shy_brps;
       create table #{schema}.ads (
           doc     integer generated always as ( #{prefix}vnr_pick( vnr, 1 ) ) virtual not null, -- document idx
           par     integer generated always as ( #{prefix}vnr_pick( vnr, 2 ) ) virtual not null, -- paragraph idx
