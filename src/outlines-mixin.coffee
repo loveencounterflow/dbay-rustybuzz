@@ -153,7 +153,7 @@ jp                        = JSON.parse
       R.set ad.gid, ad.chrs
     return R
 
-  #-----------------------------------------------------------------------------------------------------------
+  #---------------------------------------------------------------------------------------------------------
   ### 'arrange()' like 'compose()' and 'distribute()' ###
   shape_text: ( cfg ) ->
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
@@ -222,18 +222,18 @@ jp                        = JSON.parse
     #.......................................................................................................
     return ads
 
-  #-----------------------------------------------------------------------------------------------------------
+  #---------------------------------------------------------------------------------------------------------
   get_font_metrics: ( cfg ) ->
     @types.validate.dbr_get_font_metrics_cfg ( cfg = { @constructor.C.defaults.dbr_get_font_metrics_cfg..., cfg..., } )
     { fontnick }  = cfg
     font_idx      = @_font_idx_from_fontnick fontnick
     return JSON.parse @RBW.get_font_metrics font_idx
 
-  #-----------------------------------------------------------------------------------------------------------
+  #---------------------------------------------------------------------------------------------------------
   _zip:   ( txt ) -> ZLIB.deflateRawSync ( Buffer.from txt ), @constructor.C.zlib_zip_cfg
   _unzip: ( bfr ) -> ( ZLIB.inflateRawSync bfr ).toString()
 
-  #-----------------------------------------------------------------------------------------------------------
+  #---------------------------------------------------------------------------------------------------------
   insert_and_walk_outlines: ( cfg ) ->
     ### Given a `cfg.fontnick` and a (list or map of) `cfg.cgid_map`, insert the outlines and bounding
     boxes of the referred glyfs. ###
@@ -265,10 +265,10 @@ jp                        = JSON.parse
     @db.commit_transaction() if @db.within_transaction()
     return null
 
-  #-----------------------------------------------------------------------------------------------------------
+  #---------------------------------------------------------------------------------------------------------
   insert_outlines: ( cfg ) -> null for _ from @insert_and_walk_outlines cfg; null
 
-  #-----------------------------------------------------------------------------------------------------------
+  #---------------------------------------------------------------------------------------------------------
   compose: ( cfg ) ->
     ### Compose (usually up to one paragraph's worth of) text on a single line without line breaks. ###
     @types.validate.dbr_compose_cfg ( cfg = { @constructor.C.defaults.dbr_compose_cfg..., cfg..., } )
