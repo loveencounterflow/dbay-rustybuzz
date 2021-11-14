@@ -311,8 +311,10 @@ jp                        = JSON.parse
     @db =>
       insert_ad = @db.prepare @sql.insert_ad ?= @db.create_insert { schema: @cfg.schema, into: 'ads', }
       for ad in ads
-        vnr = jr ad.vnr
-        insert_ad.run { br: null, ad..., vnr, }
+        vnr       = jr ad.vnr
+        row       = { br: null, ad..., vnr, }
+        row.nobr  = if row.nobr then 1 else 0
+        insert_ad.run row
       return null
     #.......................................................................................................
     missing_ads[ d.sid ]  = d for d in ads
