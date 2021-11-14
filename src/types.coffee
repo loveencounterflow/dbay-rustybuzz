@@ -44,15 +44,19 @@ dbay_types                = require 'dbay/lib/types'
   "@isa_optional.nonempty_text x.fspath":           ( x ) -> @isa_optional.nonempty_text x.fspath
 
 #-----------------------------------------------------------------------------------------------------------
+@declare 'dbr_gid', ( x ) -> ( @isa.integer x ) and ( x >= -2 ) ### TAINT link with `Dbr.C` ###
+
+#-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_get_single_outline_cfg', tests:
   "@isa.object x":                                  ( x ) -> @isa.object x
   "exactly one of x.sid or ( x.fontnick, x.gid ) is set": ( x ) ->
+    ### TAINT when any of the `isa` tests fails, error message is not to the point ###
     if x.sid?
       return false if x.fontnick? or x.gid?
       return @isa.nonempty_text x.sid
     return false unless x.fontnick? and x.gid?
     return false unless @isa.nonempty_text x.fontnick
-    return @isa.cardinal x.gid
+    return @isa.dbr_gid x.gid
 
 #-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_shape_text_cfg', tests:
