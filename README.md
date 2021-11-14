@@ -148,6 +148,8 @@ unless special care is taken.
     which are missing from the current font, and fontmetrics
   * `distribute()`: distributes text over lines
 * **[–]** [icql-dba-hollerith] update & rebrand as `dbay-hollerith`, removing peer dependency on `icql-dba`
+* **[–]** Ensure that entire text gets reflected in SVG comments when so configured, even while omitting
+  refs for whitespace.
 
 
 
