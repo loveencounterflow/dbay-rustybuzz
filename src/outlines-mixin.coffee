@@ -189,11 +189,17 @@ jp                        = JSON.parse
     ads.unshift { doc, par, adi: 0, vrt, \
       vnr: [ doc, par, 0, vrt, ], \
       gid: null, b: null, x: 0, y: 0, dx: 0, dy: 0, x1: 0, chrs: null, sid: null, \
-      br: 'start', }
+      sgi: -1, \
+      # cadi_1: 0, cadi_2: 0, \
+      nobr: 0, br: 'start', }
     bytes         = Buffer.from text, { encoding: 'utf-8', }
     ced_x         = 0 # cumulative error displacement from missing outlines
     ced_y         = 0 # cumulative error displacement from missing outlines
+    sgi           = 0
     for ad, adi in ads
+      continue if adi is 0
+      sgi++ if ( not ad.nobr ) and ( ( ads[ adi + 1 ]?.nobr ) or ( ads[ adi - 1 ]?.nobr ) )
+      ad.sgi    = sgi
       ad.doc    = doc
       ad.par    = par
       ad.adi    = adi
@@ -231,14 +237,20 @@ jp                        = JSON.parse
       ad.dx   = Math.round ad.dx
       ad.dy   = Math.round ad.dy
       ad.x1   = ad.x + ad.dx
+      # debug '^3447^', ( rpr ad.chrs ), to_width ( rpr ad ), 100
     #.......................................................................................................
     last_adi  = ads.length - 1
     last_ad   = ads[ last_adi ]
-    ads.push { doc, par, adi: last_adi + 1, vrt, \
-      vnr: [ doc, par, last_adi + 1, vrt, ], \
+    this_adi  = last_adi + 1
+    ads.push { doc, par, adi: this_adi, vrt, \
+      vnr: [ doc, par, this_adi, vrt, ], \
       gid: null, b: null, x: last_ad.x1, y: last_ad.y, dx: 0, dy: 0, \
-      x1: last_ad.x1, chrs: null, sid: null, br: 'end', }
+      x1: last_ad.x1, chrs: null, sid: null, \
+      sgi: -1, \
+      # cadi_1: this_adi, cadi_2: this_adi, \
+      nobr: 0, br: 'end', }
     #.......................................................................................................
+    # debug '^444869^'; process.exit 19
     return ads
 
   #---------------------------------------------------------------------------------------------------------

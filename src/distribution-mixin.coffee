@@ -67,13 +67,13 @@ jp                        = JSON.parse
     @_v.adi0      = 0                         # index of AD that represents current line start
     @_v.dx0       = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
-    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br from #{schema}.ads order by vnr_blob;"
-    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by vnr_blob;"
-    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by abs( deviation ) limit 5;"
+    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br from #{schema}.ads order by vnr_blob;"
+    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation from #{schema}.brps order by vnr_blob;"
+    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation from #{schema}.brps order by abs( deviation ) limit 5;"
     # console.table @db.all_rows SQL"select * from #{schema}.brps order by vnr_blob;"
     #.......................................................................................................
     @_v.dx0       = 0
-    brp_2         = @db.single_row SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by vnr_blob limit 1;"
+    brp_2         = @db.single_row SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation from #{schema}.brps order by vnr_blob limit 1;"
     console.table [ brp_2, ]
     brp_2.vnr     = jp brp_2.vnr
     brp_1         = null
@@ -87,7 +87,7 @@ jp                        = JSON.parse
         process.exit 119
       break if brp_2.br is 'end'
       brp_1                   = brp_2
-      brp_2                   = @db.single_row SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, br, deviation from #{schema}.brps order by abs( deviation ) limit 1;"
+      brp_2                   = @db.single_row SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation from #{schema}.brps order by abs( deviation ) limit 1;"
       brp_2.vnr               = jp brp_2.vnr
       vnr_1                   = brp_1.vnr # or use `select from ads`?
       ### NOTE move from breakpoint to material ###

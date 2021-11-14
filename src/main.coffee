@@ -197,6 +197,7 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           sid     text,
           -- cadi_1  integer not null, -- first ADI of cluster
           -- cadi_2  integer not null, -- last  ADI of cluster
+          sgi     integer not null, -- segment idx
           nobr    boolean not null,
           br      text
           -- primary key ( doc, par, adi, vrt )
