@@ -7,7 +7,7 @@ specifiers:
   icql-dba: ^10.1.0
   icql-dba-hollerith: 6.0.1
   intertype: 7.7.0
-  rustybuzz-wasm: 4.4.0
+  rustybuzz-wasm: 4.5.0
   to-width: ^1.2.0
 
 dependencies:
@@ -16,7 +16,7 @@ dependencies:
   icql-dba: 10.1.0
   icql-dba-hollerith: 6.0.1_icql-dba@10.1.0
   intertype: 7.7.0
-  rustybuzz-wasm: 4.4.0
+  rustybuzz-wasm: 4.5.0
   to-width: 1.2.0
 
 devDependencies:
@@ -431,8 +431,8 @@ packages:
       queue-microtask: 1.2.3
     dev: false
 
-  /rustybuzz-wasm/4.4.0:
-    resolution: {integrity: sha512-LZClZCqsg1eS64VuVGm0o68c2Rq66NWVCJK8Z6WlDOo49NUYHnusts4hipgNC1F+X1wd51g2K7XjL7NSuw5S0A==}
+  /rustybuzz-wasm/4.5.0:
+    resolution: {integrity: sha512-djPiWsIjNk4qL0MmCbzPK0lCYpgw65d4Ivd5bucrNj9dRtBAL0d008K+8J6+noQuDgGLs26ulq3ShewzSRgb7g==}
     dev: false
 
   /slash/3.0.0:

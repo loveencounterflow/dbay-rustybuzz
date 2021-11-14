@@ -32,7 +32,7 @@
     "icql-dba": "^10.1.0",
     "icql-dba-hollerith": "6.0.1",
     "intertype": "7.7.0",
-    "rustybuzz-wasm": "4.4.0",
+    "rustybuzz-wasm": "4.5.0",
     "to-width": "^1.2.0"
   },
   "devDependencies": {
