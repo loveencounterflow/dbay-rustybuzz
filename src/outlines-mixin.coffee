@@ -167,8 +167,9 @@ jp                        = JSON.parse
     R         = []
     #.......................................................................................................
     texts = []
-    brpis = ( adi for ad, adi in ads when ad.br is 'shy' )
-    debug '^44554^', { brpis, }
+    for adi in ( adi for ad, adi in ads when ad.br is 'shy' )
+      ad = ads[ adi ]
+      debug '^44554^', ad
     #.......................................................................................................
     return R
 
@@ -176,6 +177,13 @@ jp                        = JSON.parse
   ### 'arrange()' like 'compose()' and 'distribute()' ###
   shape_text: ( cfg ) ->
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
+    { ads, shys, }  = @_shape_text        { cfg..., vrt: 1, }
+    shy_ads         = @_shape_hyphenated  { cfg..., vrt: 2, ads, shys, }
+    return [ ads..., shys..., ]
+
+  #---------------------------------------------------------------------------------------------------------
+  ### 'arrange()' like 'compose()' and 'distribute()' ###
+  _shape_text: ( cfg ) ->
     { fontnick
       text
       doc
@@ -185,6 +193,7 @@ jp                        = JSON.parse
       missing }   = @constructor.C
     font_idx      = @_font_idx_from_fontnick fontnick
     ads           = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
+    shys          = []
     #.......................................................................................................
     ads.unshift { doc, par, adi: 0, vrt, \
       vnr: [ doc, par, 0, vrt, ], \
@@ -250,8 +259,7 @@ jp                        = JSON.parse
       # cadi_1: this_adi, cadi_2: this_adi, \
       nobr: 0, br: 'end', }
     #.......................................................................................................
-    # debug '^444869^'; process.exit 19
-    return ads
+    return { ads, shys, }
 
   #---------------------------------------------------------------------------------------------------------
   get_font_metrics: ( cfg ) ->
@@ -318,7 +326,6 @@ jp                        = JSON.parse
     doc                   = 1 ### Document ID ###
     par                   = 1 ### Paragraph ID ###
     ads                   = @shape_text { fontnick, text, doc, par, vrt: 1, }
-    ads                   = [ ads..., ( @_shape_hyphenated { fontnick, ads, doc, par, vrt: 2, } )..., ]
     #.......................................................................................................
     @db =>
       insert_ad = @db.prepare @sql.insert_ad ?= @db.create_insert { schema: @cfg.schema, into: 'ads', }
