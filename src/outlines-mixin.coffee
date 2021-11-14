@@ -158,6 +158,22 @@ jp                        = JSON.parse
 
   #---------------------------------------------------------------------------------------------------------
   ### 'arrange()' like 'compose()' and 'distribute()' ###
+  _shape_hyphenated: ( cfg ) ->
+    { fontnick
+      ads
+      doc
+      par
+      vrt   } = cfg
+    R         = []
+    #.......................................................................................................
+    texts = []
+    brpis = ( adi for ad, adi in ads when ad.br is 'shy' )
+    debug '^44554^', { brpis, }
+    #.......................................................................................................
+    return R
+
+  #---------------------------------------------------------------------------------------------------------
+  ### 'arrange()' like 'compose()' and 'distribute()' ###
   shape_text: ( cfg ) ->
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
     { fontnick
@@ -290,7 +306,7 @@ jp                        = JSON.parse
     doc                   = 1 ### Document ID ###
     par                   = 1 ### Paragraph ID ###
     ads                   = @shape_text { fontnick, text, doc, par, vrt: 1, }
-    # ads                   = [ ads..., ( @shape_text { fontnick, text, doc, par, vrt: 2, } )..., ]
+    ads                   = [ ads..., ( @_shape_hyphenated { fontnick, ads, doc, par, vrt: 2, } )..., ]
     #.......................................................................................................
     @db =>
       insert_ad = @db.prepare @sql.insert_ad ?= @db.create_insert { schema: @cfg.schema, into: 'ads', }
