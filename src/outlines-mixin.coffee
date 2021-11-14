@@ -80,7 +80,10 @@ jp                        = JSON.parse
     throw new E.Dbr_not_implemented '^dbr/outlines@1^', "setting fspath" if fspath?
     return null if @state.font_idx_by_fontnicks[ fontnick ]?
     #.........................................................................................................
-    fspath      = @_fspath_from_fontnick fontnick
+    try fspath = @_fspath_from_fontnick fontnick catch error
+      if ( @types.type_of error ) is 'dbay_expected_single_row'
+        throw new E.Dbr_unknown_or_unprepared_fontnick '^dbr/outlines@1^', fontnick
+      throw error
     font_idx    = ( @state.prv_fontidx += 1 )
     font_bytes  = @_get_font_bytes fspath
     @RBW.register_font font_idx, font_bytes
