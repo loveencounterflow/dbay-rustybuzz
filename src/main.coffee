@@ -98,6 +98,8 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           gi:               PATH.join font_path, 'ebgaramond/EBGaramond12-Italic.otf'
           gr:               PATH.join font_path, 'ebgaramond/EBGaramond12-Regular.otf'
           amr:              PATH.join font_path, 'amiri/Amiri-Regular.ttf'
+          hora:             PATH.join font_path, 'schäffel.ch/2002_horatius.otf'
+          b42:              PATH.join font_path, 'schäffel.ch/1455_gutenberg_b42.otf'
         RBW:              null
 
   #---------------------------------------------------------------------------------------------------------
@@ -193,6 +195,9 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           x1      integer not null,
           chrs    text,
           sid     text,
+          -- cadi_1  integer not null, -- first ADI of cluster
+          -- cadi_2  integer not null, -- last  ADI of cluster
+          nobr    boolean not null,
           br      text
           -- primary key ( doc, par, adi, vrt )
           );
@@ -201,6 +206,11 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           #{prefix}get_deviation( x1 ) as deviation
         from #{schema}.ads
         where br is not null;
+      create view #{schema}.shy_brps as select
+          *,
+          #{prefix}get_deviation( x1 ) as deviation
+        from #{schema}.ads
+        where br is 'shy';
       """
     @hollerith.alter_table { schema, table_name: 'ads', }
     return null
