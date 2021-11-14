@@ -158,6 +158,14 @@ jp                        = JSON.parse
 
   #---------------------------------------------------------------------------------------------------------
   ### 'arrange()' like 'compose()' and 'distribute()' ###
+  shape_text: ( cfg ) ->
+    @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
+    { ads, shy_segments, }  = @_shape_text        { cfg..., vrt: 1, }
+    shy_ads                 = @_shape_hyphenated  { cfg..., vrt: 2, ads, shy_segments, }
+    return [ ads..., shy_ads..., ]
+
+  #---------------------------------------------------------------------------------------------------------
+  ### 'arrange()' like 'compose()' and 'distribute()' ###
   _shape_hyphenated: ( cfg ) ->
     { fontnick
       ads
@@ -168,19 +176,41 @@ jp                        = JSON.parse
     R         = []
     #.......................................................................................................
     texts = []
-    debug '^44554^', shy for shy in shy_segments
-    for adi in ( adi for ad, adi in ads when ad.br is 'shy' )
-      ad = ads[ adi ]
+    for { shy_adi, shy_adi_1, shy_adi_2, } in shy_segments
+      debug '^5006^', { shy_adi, shy_adi_1, shy_adi_2, }
+      urge '^5006^', ( ad.chrs for ad in ads[ shy_adi_1 .. shy_adi ] )
+      if shy_adi < shy_adi_2
+        urge '^5006^', ( ad.chrs for ad in ads[ shy_adi + 1 .. shy_adi_2 ] )
     #.......................................................................................................
     return R
 
   #---------------------------------------------------------------------------------------------------------
-  ### 'arrange()' like 'compose()' and 'distribute()' ###
-  shape_text: ( cfg ) ->
-    @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
-    { ads, shy_segments, }  = @_shape_text        { cfg..., vrt: 1, }
-    shy_ads                 = @_shape_hyphenated  { cfg..., vrt: 2, ads, shy_segments, }
-    return [ ads..., shy_segments..., ]
+  _prepare_ads: ( text, fontnick, ads ) ->
+    ### As it stands `rustybuzz-wasm` will follow `rustybuzz` in that soft hyphens (SHYs) are either tacked
+    onto the following letter (or letters in case of a ligature) or appear in an arrangement data item (AD)
+    by themselves. It is more practical to have them tacked onto the preceding letter(s) though so that's
+    what we're doing here. ###
+    R                 = []
+    { special_chrs }  = @constructor.C
+    bytes             = Buffer.from text, { encoding: 'utf-8', }
+    prv_ad            = null
+    for ad, adi in ads
+      nxt_b     = ads[ adi + 1 ]?.b ? Infinity
+      ad.chrs   = bytes[ ad.b ... nxt_b ].toString()
+      if ad.chrs.startsWith special_chrs.shy
+        ### TAINT insert data about replacement gids, metrics if hyphen instead of soft hyphen should be
+        used at this position ###
+        # ad.sid          = "oshy-#{fontnick}"
+        ad.br           = 'shy'
+        # ads[ adi ]  = [ ad, ]
+      else if ad.chrs.startsWith special_chrs.wbr
+        # ad.sid          = "owbr-#{fontnick}"
+        ad.br           = 'wbr'
+      else if ad.chrs is ' '
+        ad.br           = 'spc'
+      R.push ad
+    prv_ad = ad
+    return R
 
   #---------------------------------------------------------------------------------------------------------
   ### 'arrange()' like 'compose()' and 'distribute()' ###
@@ -190,10 +220,11 @@ jp                        = JSON.parse
       doc
       par
       vrt       } = cfg
-    { special_chrs
-      missing }   = @constructor.C
+    { missing }   = @constructor.C
     font_idx      = @_font_idx_from_fontnick fontnick
-    ads           = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, } # formats: json, rusty, short
+    ads           = @RBW.shape_text { format: 'json', text, font_idx, }
+    ads           = JSON.parse ads
+    ads           = @_prepare_ads text, fontnick, ads
     shy_segments  = []
     #.......................................................................................................
     ads.unshift { doc, par, adi: 0, vrt, \
@@ -202,21 +233,30 @@ jp                        = JSON.parse
       sgi: -1, \
       # cadi_1: 0, cadi_2: 0, \
       nobr: 0, br: 'start', }
-    bytes         = Buffer.from text, { encoding: 'utf-8', }
-    ced_x         = 0 # cumulative error displacement from missing outlines
-    ced_y         = 0 # cumulative error displacement from missing outlines
-    sgi           = 0
+    ced_x           = 0 # cumulative error displacement from missing outlines
+    ced_y           = 0 # cumulative error displacement from missing outlines
+    sgi             = 0
+    ### TAINT will not properly handle multiple SHYs in the same segment (this might happen in ligatures
+    like `ffi`) ###
+    shy_adi         = null # arrangement data item idx of most recently seen soft hyphen
+    shy_adi_1       = 0    # first arrangement data item idx of segment with most recently seen soft hyphen
     for ad, adi in ads
       continue if adi is 0
-      sgi++ if ( not ad.nobr ) and ( ( ads[ adi + 1 ]?.nobr ) or ( ads[ adi - 1 ]?.nobr ) )
+      #.....................................................................................................
+      if ( not ad.nobr )
+        if shy_adi?
+          shy_segments.push { shy_adi, shy_adi_1, shy_adi_2: adi - 1, }
+          shy_adi = null
+        sgi++
+        shy_adi_1 = adi
+      #.....................................................................................................
+      shy_adi   = adi if ad.br is 'shy'
       ad.sgi    = sgi
       ad.doc    = doc
       ad.par    = par
       ad.adi    = adi
       ad.vrt    = vrt
       ad.vnr    = [ doc, par, adi, vrt, ]
-      nxt_b     = ads[ adi + 1 ]?.b ? Infinity
-      ad.chrs   = bytes[ ad.b ... nxt_b ].toString()
       ad.sid    = "o#{ad.gid}#{fontnick}"
       ad.x     += ced_x
       ad.y     += ced_y
@@ -230,17 +270,6 @@ jp                        = JSON.parse
         ed_x    = width - ad.dx
         ced_x  += ed_x
         ad.dx   = width
-      if ad.chrs.startsWith special_chrs.shy
-        ### TAINT insert data about replacement gids, metrics if hyphen instead of soft hyphen should be
-        used at this position ###
-        ad.sid  = "oshy-#{fontnick}"
-        ad.br   = 'shy'
-        # ads[ adi ]  = [ ad, ]
-      else if ad.chrs.startsWith special_chrs.wbr
-        ad.sid  = "owbr-#{fontnick}"
-        ad.br   = 'wbr'
-      else if ad.chrs is ' '
-        ad.br   = 'spc'
       #.....................................................................................................
       ad.x    = Math.round ad.x
       ad.y    = Math.round ad.y

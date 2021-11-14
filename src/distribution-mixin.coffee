@@ -68,7 +68,7 @@ jp                        = JSON.parse
     @_v.dx0       = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
     console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br from #{schema}.ads order by vnr_blob;"
-    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation from #{schema}.brps order by vnr_blob;"
+    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation from #{schema}.brps where br = 'shy' order by vnr_blob;"
     console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation from #{schema}.brps order by abs( deviation ) limit 5;"
     # console.table @db.all_rows SQL"select * from #{schema}.brps order by vnr_blob;"
     #.......................................................................................................
