@@ -186,29 +186,44 @@ jp                        = JSON.parse
 
   #---------------------------------------------------------------------------------------------------------
   _prepare_ads: ( text, fontnick, ads ) ->
-    ### As it stands `rustybuzz-wasm` will follow `rustybuzz` in that soft hyphens (SHYs) are either tacked
-    onto the following letter (or letters in case of a ligature) or appear in an arrangement data item (AD)
-    by themselves. It is more practical to have them tacked onto the preceding letter(s) though so that's
-    what we're doing here. ###
+    ### As it stands `rustybuzz-wasm` will follow `rustybuzz` in that soft hyphens (SHYs) and word break
+    opportunities (WBRs) either get their own arrangement data item (AD) or else are tacked to the *front*
+    of one or more letters when they appear in the middle of a ligature (as in `af&shy;firm` with ligature
+    `ff` or `ffi`). In order to simplify processing and remove the case distinction, we normalize all cases
+    where WBRs and SHYs appear with other material to always make them standalone ADs. ###
     R                 = []
-    { special_chrs }  = @constructor.C
+    { special_chrs
+      ignored       } = @constructor.C
     bytes             = Buffer.from text, { encoding: 'utf-8', }
     prv_ad            = null
     for ad, adi in ads
       nxt_b     = ads[ adi + 1 ]?.b ? Infinity
       ad.chrs   = bytes[ ad.b ... nxt_b ].toString()
+      extra_ad  = null
       if ad.chrs.startsWith special_chrs.shy
         ### TAINT insert data about replacement gids, metrics if hyphen instead of soft hyphen should be
         used at this position ###
         # ad.sid          = "oshy-#{fontnick}"
         ad.br           = 'shy'
-        # ads[ adi ]  = [ ad, ]
+        if ad.chrs.length > 1 ### NOTE safe b/c we know SHY is BMP codepoint ###
+          extra_ad      = { ad..., }
+          extra_ad.chrs = ad.chrs[ 1 .. ]
+          extra_ad.br   = null
+          extra_ad.gid  = ignored.gid
+          extra_ad.sid  = "o#{ignored.gid}#{fontnick}"
+          ad.chrs       = ad.chrs[ 0 ]
+          ad.dx         = 0
+          ad.x1         = ad.x
+          info '^4454^', ad
+          urge '^4454^', extra_ad
       else if ad.chrs.startsWith special_chrs.wbr
-        # ad.sid          = "owbr-#{fontnick}"
         ad.br           = 'wbr'
       else if ad.chrs is ' '
         ad.br           = 'spc'
       R.push ad
+      if extra_ad?
+        R.push extra_ad
+        extra_ad = null
     prv_ad = ad
     return R
 
@@ -319,7 +334,7 @@ jp                        = JSON.parse
     try
       @db.begin_transaction() unless @db.within_transaction()
       for [ gid, chrs, ] from cgid_map
-        continue if gid is missing.gid
+        continue if gid <= missing.gid
         { bbox
           pd    }   = @get_single_outline { gid, fontnick, }
         { x,  y,
