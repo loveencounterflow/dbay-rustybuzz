@@ -140,7 +140,7 @@ jp                        = JSON.parse
     font_idx      = @_font_idx_from_fontnick fontnick
     if @types.isa.list chrs then  text = chrs.join '\n'
     else                          text = chrs
-    sds           = @shape_text { fontnick, text, }
+    sds           = @shape_text { fontnick, text, fm: {}, }
     R             = new Map()
     for sd in sds
       continue if sd.gid is 0
@@ -165,22 +165,33 @@ jp                        = JSON.parse
     return [ ads..., shy_ads..., ]
 
   #---------------------------------------------------------------------------------------------------------
-  ### 'arrange()' like 'compose()' and 'distribute()' ###
   _shape_hyphenated: ( cfg ) ->
     { fontnick
       ads
       shy_segments
       doc
       par
+      fm
       vrt   } = cfg
     R         = []
+    ### TAINT use proper validation ###
+    debug '^3493073^', fm
+    throw new Error "^8490353^ REPLACE WITH PROPER ERROR need fontmetrics" unless fm?
     #.......................................................................................................
-    texts = []
     for { shy_adi, shy_adi_1, shy_adi_2, } in shy_segments
       debug '^5006^', { shy_adi, shy_adi_1, shy_adi_2, }
-      urge '^5006^', ( ad.chrs for ad in ads[ shy_adi_1 .. shy_adi ] )
+      urge '^5006^', ( ad.chrs for ad in ads[ shy_adi_1 ... shy_adi ] )
       if shy_adi < shy_adi_2
         urge '^5006^', ( ad.chrs for ad in ads[ shy_adi + 1 .. shy_adi_2 ] )
+      shy_ad        = ads[ shy_adi ]
+      hyphen_ad     = { shy_ad..., }
+      hyphen_ad.vrt = vrt
+      hyphen_ad.gid = fm.hyphen_ad.gid
+      hyphen_ad.sid = fm.hyphen_ad.sid
+      hyphen_ad.vnr = [ shy_ad.doc, shy_ad.par, shy_ad.adi, hyphen_ad.vrt, ]
+      ads.push hyphen_ad
+      if shy_adi_1 is shy_adi is shy_adi_2
+        null
     #.......................................................................................................
     return R
 
@@ -311,7 +322,17 @@ jp                        = JSON.parse
     @types.validate.dbr_get_font_metrics_cfg ( cfg = { @constructor.C.defaults.dbr_get_font_metrics_cfg..., cfg..., } )
     { fontnick }  = cfg
     font_idx      = @_font_idx_from_fontnick fontnick
-    return JSON.parse @RBW.get_font_metrics font_idx
+    R             = JSON.parse @RBW.get_font_metrics font_idx
+    hyphen_ad     = ( @_shape_text { fontnick, text: '-', } ).ads[ 1 ]
+    R.hyphen_ad   =
+      gid:  hyphen_ad.gid
+      sid:  hyphen_ad.sid
+      x:    hyphen_ad.x
+      y:    hyphen_ad.y
+      dx:   hyphen_ad.dx
+      dy:   hyphen_ad.dy
+      x1:   hyphen_ad.x1
+    return R
 
   #---------------------------------------------------------------------------------------------------------
   _zip:   ( txt ) -> ZLIB.deflateRawSync ( Buffer.from txt ), @constructor.C.zlib_zip_cfg
@@ -370,7 +391,7 @@ jp                        = JSON.parse
     ### TAINt return standard glyph for all missing outlines ###
     doc                   = 1 ### Document ID ###
     par                   = 1 ### Paragraph ID ###
-    ads                   = @shape_text { fontnick, text, doc, par, vrt: 1, }
+    ads                   = @shape_text { fontnick, text, fm, doc, par, vrt: 1, }
     #.......................................................................................................
     @db =>
       insert_ad = @db.prepare @sql.insert_ad ?= @db.create_insert { schema: @cfg.schema, into: 'ads', }
