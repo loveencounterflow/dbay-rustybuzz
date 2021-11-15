@@ -208,11 +208,10 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           x1      integer not null,
           chrs    text,
           sid     text,
-          -- cadi_1  integer not null, -- first ADI of cluster
-          -- cadi_2  integer not null, -- last  ADI of cluster
-          sgi     integer not null, -- segment idx
+          sgi     integer not null, -- segment idx, a segment being a suite of ADs that must be reshaped if broken
           nobr    boolean not null,
-          br      text
+          br      text,
+          lnr     integer not null default 0 -- line number
           -- primary key ( doc, par, adi, vrt )
           );
       create view #{schema}.brps as select

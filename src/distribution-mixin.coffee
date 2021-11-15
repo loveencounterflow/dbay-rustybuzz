@@ -67,8 +67,8 @@ jp                        = JSON.parse
     @_v.adi0      = 0                         # index of AD that represents current line start
     @_v.dx0       = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
-    console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br from #{schema}.ads order by vnr_blob;"
-    # console.table @db.all_rows SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation from #{schema}.brps where br = 'shy' order by vnr_blob;"
+    console.table @db.all_rows SQL"select doc, par, adi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, lnr from #{schema}.ads order by vnr_blob;"
+    # console.table @db.all_rows SQL"select doc, par, adi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation from #{schema}.brps where br = 'shy' order by vnr_blob;"
     # console.table @db.all_rows SQL"select * from #{schema}.brps order by vnr_blob;"
     #.......................................................................................................
     @_v.dx0       = 0
@@ -97,7 +97,7 @@ jp                        = JSON.parse
       #.....................................................................................................
       console.table @db.all_rows SQL"""
         select
-            doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation
+            doc, par, adi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, lnr, deviation
           from #{schema}.brps
           where br != 'shy' -- A SHY is never a valid line break, the corresponding HHY is
           order by abs( deviation )
