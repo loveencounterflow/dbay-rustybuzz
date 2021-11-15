@@ -390,7 +390,7 @@ jp                        = JSON.parse
     @db =>
       ### TAINT put this into proper place eg `_compile_sql()` ###
       insert_ad = @db.prepare @sql.insert_ad ?= \
-        @db.create_insert { schema: @cfg.schema, into: 'ads', exclude: [ 'lnr', ], }
+        @db.create_insert { schema: @cfg.schema, into: 'ads', exclude: [ 'id', 'lnr', 'rnr', ], }
       for ad in ads
         vnr       = jr ad.vnr
         row       = { br: null, ad..., vnr, }
