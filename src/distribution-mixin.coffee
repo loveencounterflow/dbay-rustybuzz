@@ -86,6 +86,7 @@ jp                        = JSON.parse
         process.exit 119
       break if brp_2.br is 'end'
       brp_1                   = brp_2
+      ### TAINT make this a view 'lbo_shortlist' or similar ###
       brp_2                   = @db.single_row SQL"""
         select
             doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation
