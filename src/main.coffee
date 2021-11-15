@@ -224,6 +224,7 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
         where ( br is not null ) and ( br != 'shy' )
         order by abs( deviation ) asc;
       -- ...................................................................................................
+      create view #{schema}.current_brp as select * from #{schema}.current_brps limit 1;
       """
     @hollerith.alter_table { schema, table_name: 'ads', }
     return null
