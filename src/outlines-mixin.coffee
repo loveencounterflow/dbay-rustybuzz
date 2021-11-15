@@ -251,11 +251,9 @@ jp                        = JSON.parse
     ads           = @_prepare_ads text, fontnick, ads
     shy_segments  = []
     #.......................................................................................................
-    ads.unshift { doc, par, adi: 0, vrt, \
+    ads.unshift { doc, par, adi: 0, sgi: 0, vrt, \
       vnr: [ doc, par, 0, vrt, ], \
       gid: null, b: null, x: 0, y: 0, dx: 0, dy: 0, x1: 0, chrs: null, sid: null, \
-      sgi: -1, \
-      # cadi_1: 0, cadi_2: 0, \
       nobr: 0, br: 'start', }
     ced_x           = 0 # cumulative error displacement from missing outlines
     ced_y           = 0 # cumulative error displacement from missing outlines
@@ -305,12 +303,10 @@ jp                        = JSON.parse
     last_adi  = ads.length - 1
     last_ad   = ads[ last_adi ]
     this_adi  = last_adi + 1
-    ads.push { doc, par, adi: this_adi, vrt, \
+    ads.push { doc, par, adi: this_adi, sgi: last_ad.sgi, vrt, \
       vnr: [ doc, par, this_adi, vrt, ], \
       gid: null, b: null, x: last_ad.x1, y: last_ad.y, dx: 0, dy: 0, \
       x1: last_ad.x1, chrs: null, sid: null, \
-      sgi: -1, \
-      # cadi_1: this_adi, cadi_2: this_adi, \
       nobr: 0, br: 'end', }
     #.......................................................................................................
     return { ads, shy_segments, }
