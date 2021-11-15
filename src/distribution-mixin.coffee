@@ -96,24 +96,30 @@ jp                        = JSON.parse
       #.....................................................................................................
       urge '^5850^', "current BRPs"; console.table @db.all_rows SQL"""
         select
-            doc, par, adi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, lnr, deviation
-          from #{schema}.brps
-          where br != 'shy' -- A SHY is never a valid line break, the corresponding HHY is
-          order by abs( deviation )
-          limit 5;"""
+            doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr, deviation
+          from #{schema}.current_brps limit 3;"""
+      urge '^5850^', "current ADs"; console.table @db.all_rows SQL"""
+        select
+            doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr
+          from #{schema}.ads
+          where true
+            and ( sgi = $brp_2_sgi )
+            and ( vrt = $brp_2_vrt )
+        union all
+        select
+            doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr
+          from #{schema}.ads
+          where true
+            and ( doc = $doc )
+            and ( par = $par )
+            and ( adi > $brp_1_adi )
+            and ( sgi < $brp_2_sgi )
+            and ( vrt = 1 )
+          order by doc, par, adi, sgi, vrt;""",
+            { doc, par, brp_1_adi: brp_1.adi, brp_2_sgi: brp_2.sgi, brp_2_vrt: brp_2.vrt, }
+      # info '^4476^', rpr @_text_from_adis { schema, doc, par, adi_1, adi_2, vrt: 1, }
       #.....................................................................................................
-      brp_2.vnr               = jp brp_2.vnr
-      vnr_1                   = brp_1.vnr # or use `select from ads`?
-      ### NOTE move from breakpoint to material ###
-      ### TAINT doesn't honor multiple consecutive breakpoints ###
-      vnr_1[ 2 ]++
-      vnr_2                       = brp_2.vnr
-      [ doc, par, adi_1, vrt_1, ] = vnr_1
-      [ _,   _,   adi_2, vrt_2, ] = vnr_2
-      #.....................................................................................................
-      ### TAINT use `stamped` boolean column to select variant ###
-      info '^4476^', rpr @_text_from_adis { schema, doc, par, adi_1, adi_2, vrt: 1, }
-      #.....................................................................................................
+      # lines.push { doc, par, adi_1, adi_2, vrt_1, vrt_2, vnr_1, vnr_2, dx0: @_v.dx0, }
     return R
 
   #---------------------------------------------------------------------------------------------------------
