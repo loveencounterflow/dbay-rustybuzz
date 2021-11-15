@@ -239,7 +239,6 @@ jp                        = JSON.parse
     return R
 
   #---------------------------------------------------------------------------------------------------------
-  ### 'arrange()' like 'compose()' and 'distribute()' ###
   _shape_text: ( cfg ) ->
     { fontnick
       text
