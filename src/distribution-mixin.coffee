@@ -61,6 +61,9 @@ jp                        = JSON.parse
 
   #---------------------------------------------------------------------------------------------------------
   _distribute_with_db: ( cfg ) ->
+    # { Tbl, }    = require '../../icql-dba-tabulate'
+    # dtab        = new Tbl { db: @db, }
+    #.......................................................................................................
     { ads     } = cfg
     { schema,
       prefix  } = @cfg
@@ -150,6 +153,8 @@ jp                        = JSON.parse
       # info '^4476^', rpr @_text_from_adis { schema, doc, par, adi_1, adi_2, vrt: 1, }
       #.....................................................................................................
       # lines.push { doc, par, adi_1, adi_2, vrt_1, vrt_2, vnr_1, vnr_2, dx0: @_v.dx0, }
+    # urge '^4875^', 'ads'; echo dtab._tabulate @db SQL"select id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr from #{schema}.ads order by vnr_blob;"
+    urge '^4875^', 'ads';          console.table @db.all_rows SQL"select id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr from #{schema}.ads order by vnr_blob;"
     return R
 
   #---------------------------------------------------------------------------------------------------------
