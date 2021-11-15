@@ -214,7 +214,8 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           sid     text,
           nobr    boolean not null,
           br      text,
-          lnr     integer not null default 0 -- line number
+          lnr     integer default null, -- line number (from the left)
+          rnr     integer default null  -- line number (from the right)
           -- primary key ( doc, par, adi, vrt )
           );
       -- ...................................................................................................
