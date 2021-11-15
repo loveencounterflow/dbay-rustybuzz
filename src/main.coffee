@@ -166,6 +166,9 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
     @db.execute SQL"""
       drop table if exists #{schema}.outlines;
       drop table if exists #{schema}.fontnicks;
+      drop table if exists #{schema}.ads;
+      drop view  if exists #{schema}.current_brp;
+      drop view  if exists #{schema}.current_brps;
       -- ...................................................................................................
       vacuum #{schema};
       -- ...................................................................................................
@@ -190,9 +193,6 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           pd_blob   blob    not null,
           primary key ( fontnick, gid ) );
       -- ...................................................................................................
-      drop table if exists #{schema}.ads;
-      drop view if exists #{schema}.brps;
-      drop view if exists #{schema}.shy_brps;
       create table #{schema}.ads (
           doc     integer generated always as ( #{prefix}vnr_pick( vnr, 1 ) ) virtual not null, -- document idx
           par     integer generated always as ( #{prefix}vnr_pick( vnr, 2 ) ) virtual not null, -- paragraph idx

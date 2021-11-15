@@ -94,7 +94,7 @@ jp                        = JSON.parse
       { doc
         par } = brp_2
       #.....................................................................................................
-      console.table @db.all_rows SQL"""
+      urge '^5850^', "current BRPs"; console.table @db.all_rows SQL"""
         select
             doc, par, adi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, lnr, deviation
           from #{schema}.brps
@@ -114,8 +114,6 @@ jp                        = JSON.parse
       ### TAINT use `stamped` boolean column to select variant ###
       info '^4476^', rpr @_text_from_adis { schema, doc, par, adi_1, adi_2, vrt: 1, }
       #.....................................................................................................
-      lines.push { doc, par, adi_1, adi_2, vrt_1, vrt_2, vnr_1, vnr_2, dx0: @_v.dx0, }
-      @_v.dx0 = brp_2.x1
     return R
 
   #---------------------------------------------------------------------------------------------------------
