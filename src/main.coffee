@@ -196,12 +196,13 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           primary key ( fontnick, gid ) );
       -- ...................................................................................................
       create table #{schema}.ads (
+          id      integer not null primary key,
           doc     integer generated always as ( #{prefix}vnr_pick( vnr, 1 ) ) virtual not null, -- document idx
           par     integer generated always as ( #{prefix}vnr_pick( vnr, 2 ) ) virtual not null, -- paragraph idx
           adi     integer generated always as ( #{prefix}vnr_pick( vnr, 3 ) ) virtual not null, -- arr. dat. idx
           sgi     integer not null, -- segment idx, a segment being a suite of ADs that must be reshaped if broken
           vrt     integer generated always as ( #{prefix}vnr_pick( vnr, 4 ) ) virtual not null, -- variant idx
-          vnr     json not null primary key,
+          vnr     json not null, -- primary key,
           gid     integer,
           b       integer,
           x       integer not null,
