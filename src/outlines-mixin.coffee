@@ -211,11 +211,12 @@ jp                        = JSON.parse
       nxt_b     = ads[ adi + 1 ]?.b ? Infinity
       ad.chrs   = bytes[ ad.b ... nxt_b ].toString()
       extra_ad  = null
-      if ad.chrs.startsWith special_chrs.shy
-        ### TAINT insert data about replacement gids, metrics if hyphen instead of soft hyphen should be
-        used at this position ###
-        # ad.sid          = "oshy-#{fontnick}"
-        ad.br           = 'shy'
+      has_shy   = false
+      has_wbr   = false
+      if      ad.chrs.startsWith special_chrs.shy then has_shy = true
+      else if ad.chrs.startsWith special_chrs.wbr then has_wbr = true
+      if has_shy or has_wbr
+        ad.br           = if has_shy then 'shy' else 'wbr'
         if ad.chrs.length > 1 ### NOTE safe b/c we know SHY is BMP codepoint ###
           extra_ad      = { ad..., }
           extra_ad.chrs = ad.chrs[ 1 .. ]
@@ -225,10 +226,6 @@ jp                        = JSON.parse
           ad.chrs       = ad.chrs[ 0 ]
           ad.dx         = 0
           ad.x1         = ad.x
-          info '^4454^', ad
-          urge '^4454^', extra_ad
-      else if ad.chrs.startsWith special_chrs.wbr
-        ad.br           = 'wbr'
       else if ad.chrs is ' '
         ad.br           = 'spc'
       R.push ad
