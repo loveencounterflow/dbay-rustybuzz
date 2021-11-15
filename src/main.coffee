@@ -47,6 +47,8 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
     #   ignored:
     #     gid:   -1
     gids:
+      # '-4':           'sop'       # start of paragraph
+      # '-3':           'eop'       # end of paragraph
       '-2':           'reserved'  # for future purposes
       '-1':           'ignored'   # for ADs that intentionally have no outline (but may appear in debugging)
       '0':            'missing'   # font cannot render this codepoint
