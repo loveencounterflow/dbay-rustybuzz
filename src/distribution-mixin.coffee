@@ -54,6 +54,12 @@ jp                        = JSON.parse
   # distribute: ( cfg ) -> @_distribute_v1 cfg
 
   #---------------------------------------------------------------------------------------------------------
+  get_current_brp: ( cfg ) ->
+    { schema, dx0, brp_1, } = cfg
+    @_v.dx0 = brp_1.x1 ### NOTE this value must be set before using the below select ###
+    return @db.single_row SQL"select * from #{schema}.current_brp;" ### TAINT use API (?) ###
+
+  #---------------------------------------------------------------------------------------------------------
   _distribute_with_db: ( cfg ) ->
     { ads     } = cfg
     { schema,
@@ -85,15 +91,10 @@ jp                        = JSON.parse
         warn "infinite loop"
         process.exit 119
       break if brp_2.br is 'end'
-      brp_1                   = brp_2
-      ### TAINT make this a view 'lbo_shortlist' or similar ###
-      brp_2                   = @db.single_row SQL"""
-        select
-            doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation
-          from #{schema}.brps
-          where br != 'shy' -- A SHY is never a valid line break, the corresponding HHY is
-          order by abs( deviation )
-          limit 1;"""
+      brp_1   = brp_2
+      brp_2   = @get_current_brp { schema, dx0: @_v.dx0, brp_1, }
+      { doc
+        par } = brp_2
       #.....................................................................................................
       console.table @db.all_rows SQL"""
         select
