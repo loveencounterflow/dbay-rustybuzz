@@ -73,14 +73,12 @@ jp                        = JSON.parse
     @_v.adi0      = 0                         # index of AD that represents current line start
     @_v.dx0       = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
-    console.table @db.all_rows SQL"select doc, par, adi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, lnr from #{schema}.ads order by vnr_blob;"
-    # console.table @db.all_rows SQL"select doc, par, adi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation from #{schema}.brps where br = 'shy' order by vnr_blob;"
+    urge '^4875^', 'ads';          console.table @db.all_rows SQL"select doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr from #{schema}.ads order by vnr_blob;"
+    urge '^4875^', 'current_brps'; console.table @db.all_rows SQL"select doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr, deviation from #{schema}.current_brps;"
     # console.table @db.all_rows SQL"select * from #{schema}.brps order by vnr_blob;"
     #.......................................................................................................
-    @_v.dx0       = 0
-    brp_2         = @db.single_row SQL"select doc, par, adi, vrt, vnr, gid, b, x, y, dx, dy, x1, chrs, sid, sgi, nobr, br, deviation from #{schema}.brps order by vnr_blob limit 1;"
-    console.table [ brp_2, ]
-    brp_2.vnr     = jp brp_2.vnr
+    brp_2         = @db.single_row SQL"select * from #{schema}.current_brps where br = 'start' limit 1;"
+    delete brp_2.vnr; delete brp_2.vnr_blob; console.table [ brp_2, ]
     brp_1         = null
     lines         = []
     R             = { lines, }
