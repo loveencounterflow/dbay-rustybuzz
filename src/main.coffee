@@ -216,16 +216,14 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           lnr     integer not null default 0 -- line number
           -- primary key ( doc, par, adi, vrt )
           );
-      create view #{schema}.brps as select
+      -- ...................................................................................................
+      create view #{schema}.current_brps as select
           *,
           #{prefix}get_deviation( x1 ) as deviation
         from #{schema}.ads
-        where br is not null;
-      create view #{schema}.shy_brps as select
-          *,
-          #{prefix}get_deviation( x1 ) as deviation
-        from #{schema}.ads
-        where br is 'shy';
+        where ( br is not null ) and ( br != 'shy' )
+        order by abs( deviation ) asc;
+      -- ...................................................................................................
       """
     @hollerith.alter_table { schema, table_name: 'ads', }
     return null
