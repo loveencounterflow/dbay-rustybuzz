@@ -83,9 +83,10 @@ jp                        = JSON.parse
     brp_2         = @db.single_row SQL"select * from #{schema}.current_brps where br = 'start' limit 1;"
     delete brp_2.vnr; delete brp_2.vnr_blob; console.table [ brp_2, ]
     brp_1         = null
-    lines         = []
     lnr           = 0
-    R             = { lines, }
+    # lines         = []
+    # R             = { lines, }
+    R             = null ### NOTE result via DB for the time being ###
     count         = -1
     loop
       count++
