@@ -55,8 +55,9 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
     missing:
       gid:              0
     special_chrs:
-      shy:              '\u{00ad}'
-      wbr:              '\u{200b}'
+      hhy:              '\u{002d}' # hard hyphen
+      shy:              '\u{00ad}' # soft hyphen
+      wbr:              '\u{200b}' # word break opportunity (as in `foo/bar` with a WBR after the slash)
     defaults:
       #.....................................................................................................
       dbr_register_fontnick_cfg:

@@ -183,12 +183,14 @@ jp                        = JSON.parse
       urge '^5006^', ( ad.chrs for ad in ads[ shy_adi_1 ... shy_adi ] )
       if shy_adi < shy_adi_2
         urge '^5006^', ( ad.chrs for ad in ads[ shy_adi + 1 .. shy_adi_2 ] )
-      shy_ad        = ads[ shy_adi ]
-      hyphen_ad     = { shy_ad..., }
-      hyphen_ad.vrt = vrt
-      hyphen_ad.gid = fm.hyphen_ad.gid
-      hyphen_ad.sid = fm.hyphen_ad.sid
-      hyphen_ad.vnr = [ shy_ad.doc, shy_ad.par, shy_ad.adi, hyphen_ad.vrt, ]
+      shy_ad          = ads[ shy_adi ]
+      hyphen_ad       = { shy_ad..., }
+      hyphen_ad.br    = 'hhy'
+      hyphen_ad.vrt   = vrt
+      hyphen_ad.gid   = fm.hyphen_ad.gid
+      hyphen_ad.sid   = fm.hyphen_ad.sid
+      hyphen_ad.chrs  = '-'
+      hyphen_ad.vnr   = [ shy_ad.doc, shy_ad.par, shy_ad.adi, hyphen_ad.vrt, ]
       ads.push hyphen_ad
       if shy_adi_1 is shy_adi is shy_adi_2
         null
