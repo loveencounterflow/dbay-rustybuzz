@@ -167,6 +167,7 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
     @db.execute SQL"""
       drop table if exists #{schema}.outlines;
       drop table if exists #{schema}.fontnicks;
+      drop index if exists #{schema}.ads_location_idx;
       drop table if exists #{schema}.ads;
       drop view  if exists #{schema}.current_brp;
       drop view  if exists #{schema}.current_brps;
@@ -217,6 +218,8 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           rnr     integer default null  -- line number (from the right)
           -- primary key ( doc, par, adi, vrt )
           );
+      -- ...................................................................................................
+      create unique index #{schema}.ads_location_idx on ads ( doc, par, adi, sgi, vrt );
       -- ...................................................................................................
       create view #{schema}.current_brps as select
           *,
