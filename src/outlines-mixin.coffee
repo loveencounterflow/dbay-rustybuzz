@@ -320,6 +320,16 @@ jp                        = JSON.parse
       x1: last_ad.x1, chrs: null, sid: null, \
       nobr: 0, br: 'end', }
     #.......................................................................................................
+    @db =>
+      ### TAINT put this into proper place eg `_compile_sql()` ###
+      insert_ad = @db.prepare @sql.insert_ad ?= \
+        @db.create_insert { schema: @cfg.schema, into: 'ads', exclude: [ 'id', 'lnr', 'rnr', ], }
+      for ad in ads
+        row       = { br: null, ad..., }
+        row.nobr  = if row.nobr then 1 else 0
+        insert_ad.run row
+      return null
+    #.......................................................................................................
     return { ads, shy_segments, }
 
   #---------------------------------------------------------------------------------------------------------
@@ -397,17 +407,6 @@ jp                        = JSON.parse
     doc                   = 1 ### Document ID ###
     par                   = 1 ### Paragraph ID ###
     ads                   = @shape_text { fontnick, text, fm, doc, par, vrt: 1, }
-    #.......................................................................................................
-    @db =>
-      ### TAINT put this into proper place eg `_compile_sql()` ###
-      insert_ad = @db.prepare @sql.insert_ad ?= \
-        @db.create_insert { schema: @cfg.schema, into: 'ads', exclude: [ 'id', 'lnr', 'rnr', ], }
-      for ad in ads
-        vnr       = jr ad.vnr
-        row       = { br: null, ad..., vnr, }
-        row.nobr  = if row.nobr then 1 else 0
-        insert_ad.run row
-      return null
     #.......................................................................................................
     missing_ads[ d.sid ]  = d for d in ads
     fm                    = @get_font_metrics { fontnick, }
