@@ -29,7 +29,6 @@ home                      = PATH.resolve PATH.join __dirname, '..'
 { Drb_distribution }      = require './distribution-mixin'
 font_path                 = PATH.resolve PATH.join __dirname, '../fonts'
 ZLIB                      = require 'zlib'
-{ Hollerith, }            = require 'icql-dba-hollerith'
 
 
 #===========================================================================================================
@@ -154,7 +153,6 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
     guy.cfg.configure_with_types @, cfg, types
     @_create_sql_functions()
     @_compile_sql()
-    @hollerith = new Hollerith { dba: @db, }
     @_$outlines_initialize?()
     @_$distribution_initialize?()
     @_$codepoints_initialize?()
@@ -198,12 +196,11 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
       -- ...................................................................................................
       create table #{schema}.ads (
           id      integer not null primary key,
-          doc     integer generated always as ( #{prefix}vnr_pick( vnr, 1 ) ) virtual not null, -- document idx
-          par     integer generated always as ( #{prefix}vnr_pick( vnr, 2 ) ) virtual not null, -- paragraph idx
-          adi     integer generated always as ( #{prefix}vnr_pick( vnr, 3 ) ) virtual not null, -- arr. dat. idx
+          doc     integer not null, -- document idx
+          par     integer not null, -- paragraph idx
+          adi     integer not null, -- arr. dat. idx
           sgi     integer not null, -- segment idx, a segment being a suite of ADs that must be reshaped if broken
-          vrt     integer generated always as ( #{prefix}vnr_pick( vnr, 4 ) ) virtual not null, -- variant idx
-          vnr     json not null, -- primary key,
+          vrt     integer not null, -- variant idx
           gid     integer,
           b       integer,
           x       integer not null,
@@ -230,7 +227,6 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
       -- ...................................................................................................
       create view #{schema}.current_brp as select * from #{schema}.current_brps limit 1;
       """
-    @hollerith.alter_table { schema, table_name: 'ads', }
     return null
 
   #---------------------------------------------------------------------------------------------------------

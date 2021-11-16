@@ -140,7 +140,7 @@ jp                        = JSON.parse
     font_idx      = @_font_idx_from_fontnick fontnick
     if @types.isa.list chrs then  text = chrs.join '\n'
     else                          text = chrs
-    sds           = @shape_text { fontnick, text, fm: {}, }
+    sds           = @shape_text { fontnick, text, fm: {}, doc: 0, par: 0, }
     R             = new Map()
     for sd in sds
       continue if sd.gid is 0
@@ -189,7 +189,6 @@ jp                        = JSON.parse
     #   hyphen_ad.gid   = fm.hyphen_ad.gid
     #   hyphen_ad.sid   = fm.hyphen_ad.sid
     #   hyphen_ad.chrs  = '-'
-    #   hyphen_ad.vnr   = [ shy_ad.doc, shy_ad.par, shy_ad.adi, hyphen_ad.vrt, ]
     #   ads.push hyphen_ad
     #   if shy_adi_1 is shy_adi is shy_adi_2
     #     null
@@ -263,7 +262,6 @@ jp                        = JSON.parse
     shy_segments  = []
     #.......................................................................................................
     ads.unshift { doc, par, adi: 0, sgi: 0, vrt, \
-      vnr: [ doc, par, 0, vrt, ], \
       gid: null, b: null, x: 0, y: 0, dx: 0, dy: 0, x1: 0, chrs: null, sid: null, \
       nobr: 0, br: 'start', }
     ced_x           = 0 # cumulative error displacement from missing outlines
@@ -289,7 +287,6 @@ jp                        = JSON.parse
       ad.par    = par
       ad.adi    = adi
       ad.vrt    = vrt
-      ad.vnr    = [ doc, par, adi, vrt, ]
       ad.sid    = "o#{ad.gid}#{fontnick}"
       ad.x     += ced_x
       ad.y     += ced_y
@@ -315,7 +312,6 @@ jp                        = JSON.parse
     last_ad   = ads[ last_adi ]
     this_adi  = last_adi + 1
     ads.push { doc, par, adi: this_adi, sgi: last_ad.sgi, vrt, \
-      vnr: [ doc, par, this_adi, vrt, ], \
       gid: null, b: null, x: last_ad.x1, y: last_ad.y, dx: 0, dy: 0, \
       x1: last_ad.x1, chrs: null, sid: null, \
       nobr: 0, br: 'end', }

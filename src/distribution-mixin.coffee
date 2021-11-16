@@ -44,9 +44,6 @@ jp                        = JSON.parse
       R  *= 2 if R > 0 ### penalty for lines that are too long ###
       return R
     #.......................................................................................................
-    @db.create_function name: prefix + 'vnr_pick', deterministic: true, call: ( vnr, nr ) =>
-      return ( jp vnr )[ nr - 1 ]
-    #.......................................................................................................
     return null
 
   #---------------------------------------------------------------------------------------------------------
@@ -76,12 +73,11 @@ jp                        = JSON.parse
     @_v.adi0      = 0                         # index of AD that represents current line start
     @_v.dx0       = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
-    urge '^4875^', 'ads';          console.table @db.all_rows SQL"select id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr from #{schema}.ads order by vnr_blob;"
+    urge '^4875^', 'ads';          console.table @db.all_rows SQL"select id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr from #{schema}.ads order by doc, par, adi, sgi, vrt;"
     urge '^4875^', 'current_brps'; console.table @db.all_rows SQL"select id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr, deviation from #{schema}.current_brps;"
-    # console.table @db.all_rows SQL"select * from #{schema}.brps order by vnr_blob;"
+    # console.table @db.all_rows SQL"select * from #{schema}.brps order by doc, par, adi, sgi, vrt;"
     #.......................................................................................................
     brp_2         = @db.single_row SQL"select * from #{schema}.current_brps where br = 'start' limit 1;"
-    delete brp_2.vnr; delete brp_2.vnr_blob; console.table [ brp_2, ]
     brp_1         = null
     lnr           = 0
     # lines         = []
@@ -153,9 +149,7 @@ jp                        = JSON.parse
       #.....................................................................................................
       # info '^4476^', rpr @_text_from_adis { schema, doc, par, adi_1, adi_2, vrt: 1, }
       #.....................................................................................................
-      # lines.push { doc, par, adi_1, adi_2, vrt_1, vrt_2, vnr_1, vnr_2, dx0: @_v.dx0, }
-    # urge '^4875^', 'ads'; echo dtab._tabulate @db SQL"select id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr from #{schema}.ads order by vnr_blob;"
-    urge '^4875^', 'ads';          console.table @db.all_rows SQL"select id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr from #{schema}.ads order by vnr_blob;"
+    urge '^4875^', 'ads'; console.table @db.all_rows SQL"select id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr from #{schema}.ads order by doc, par, adi, sgi, vrt;"
     return R
 
   #---------------------------------------------------------------------------------------------------------
@@ -175,7 +169,7 @@ jp                        = JSON.parse
           and par = $par
           and adi between $adi_1 and $adi_2
           and vrt = $vrt
-        order by vnr_blob;""", { doc, par, adi_1, adi_2, vrt, }
+        order by doc, par, adi, sgi, vrt;""", { doc, par, adi_1, adi_2, vrt, }
     ad_2  = ads[ ads.length - 1 ]
     R     = ( ad.chrs for ad in ads ).join ''
     R    += '-' if ad_2.br is 'shy'
