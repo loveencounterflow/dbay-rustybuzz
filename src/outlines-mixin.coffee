@@ -161,39 +161,50 @@ jp                        = JSON.parse
   shape_text: ( cfg ) ->
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
     { ads, shy_segments, }  = @_shape_text        { cfg..., vrt: 1, }
-    shy_ads                 = @_shape_hyphenated  { cfg..., vrt: 2, ads, shy_segments, }
+    shy_ads                 = @_shape_hyphenated  { cfg..., old_vrt: 1, new_vrt: 2, ads, shy_segments, }
     return [ ads..., shy_ads..., ]
 
   #---------------------------------------------------------------------------------------------------------
   _shape_hyphenated: ( cfg ) ->
+    ### TAINT use proper validation ###
     { fontnick
       ads
       shy_segments
       doc
       par
-      fm
-      vrt   } = cfg
-    R         = []
-    ### TAINT use proper validation ###
-    debug '^3493073^', fm
-    throw new Error "^8490353^ REPLACE WITH PROPER ERROR need fontmetrics" unless fm?
-    #.......................................................................................................
-    for { shy_adi, shy_adi_1, shy_adi_2, } in shy_segments
-      debug '^5006^', { shy_adi, shy_adi_1, shy_adi_2, }
-      urge '^5006^', ( ad.chrs for ad in ads[ shy_adi_1 ... shy_adi ] )
-      if shy_adi < shy_adi_2
-        urge '^5006^', ( ad.chrs for ad in ads[ shy_adi + 1 .. shy_adi_2 ] )
-      shy_ad          = ads[ shy_adi ]
-      hyphen_ad       = { shy_ad..., }
-      hyphen_ad.br    = 'hhy'
-      hyphen_ad.vrt   = vrt
-      hyphen_ad.gid   = fm.hyphen_ad.gid
-      hyphen_ad.sid   = fm.hyphen_ad.sid
-      hyphen_ad.chrs  = '-'
-      hyphen_ad.vnr   = [ shy_ad.doc, shy_ad.par, shy_ad.adi, hyphen_ad.vrt, ]
-      ads.push hyphen_ad
-      if shy_adi_1 is shy_adi is shy_adi_2
-        null
+      # fm
+      old_vrt
+      new_vrt   } = cfg
+    { schema    } = @cfg
+    { V, I, L,  } = @sql
+    R             = []
+    # #.......................................................................................................
+    # ### NOTE the quick and easy method (which is incomplete)
+    # throw new Error "^8490353^ REPLACE WITH PROPER ERROR need fontmetrics" unless fm?
+    # for { shy_adi, shy_adi_1, shy_adi_2, } in shy_segments
+    #   shy_ad          = ads[ shy_adi ]
+    #   hyphen_ad       = { shy_ad..., }
+    #   hyphen_ad.br    = 'hhy'
+    #   hyphen_ad.vrt   = vrt
+    #   hyphen_ad.gid   = fm.hyphen_ad.gid
+    #   hyphen_ad.sid   = fm.hyphen_ad.sid
+    #   hyphen_ad.chrs  = '-'
+    #   hyphen_ad.vnr   = [ shy_ad.doc, shy_ad.par, shy_ad.adi, hyphen_ad.vrt, ]
+    #   ads.push hyphen_ad
+    #   if shy_adi_1 is shy_adi is shy_adi_2
+    #     null
+    # #.......................................................................................................
+    # sgis = [ ( new Set ( ad.vrt ) )..., ]
+    # #.......................................................................................................
+    # console.table @db SQL"""
+    #   select * from #{schema}.ads
+    #     where true
+    #       and ( doc = $doc )
+    #       and ( par = $par )
+    #       and ( sgi in #{V sgis} )
+    #       and ( vrt = $old_vrt )
+    #      vrt = $ sgi in
+    #   """
     #.......................................................................................................
     return R
 
