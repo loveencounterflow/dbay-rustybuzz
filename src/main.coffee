@@ -115,6 +115,7 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           amr:              PATH.join font_path, 'amiri/Amiri-Regular.ttf'
           hora:             PATH.join font_path, 'schäffel.ch/2002_horatius.otf'
           b42:              PATH.join font_path, 'schäffel.ch/1455_gutenberg_b42.otf'
+          b36:              PATH.join font_path, 'schäffel.ch/1458_gutenberg_b36.otf'
         RBW:              null
 
   #---------------------------------------------------------------------------------------------------------
