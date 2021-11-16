@@ -338,15 +338,15 @@ jp                        = JSON.parse
     { fontnick }  = cfg
     font_idx      = @_font_idx_from_fontnick fontnick
     R             = JSON.parse @RBW.get_font_metrics font_idx
-    hyphen_ad     = ( @_shape_text { fontnick, text: '-', } ).ads[ 1 ]
-    R.hyphen_ad   =
-      gid:  hyphen_ad.gid
-      sid:  hyphen_ad.sid
-      x:    hyphen_ad.x
-      y:    hyphen_ad.y
-      dx:   hyphen_ad.dx
-      dy:   hyphen_ad.dy
-      x1:   hyphen_ad.x1
+    # hyphen_ad     = ( @_shape_text { fontnick, text: '-', } ).ads[ 1 ]
+    # R.hyphen_ad   =
+    #   gid:  hyphen_ad.gid
+    #   sid:  hyphen_ad.sid
+    #   x:    hyphen_ad.x
+    #   y:    hyphen_ad.y
+    #   dx:   hyphen_ad.dx
+    #   dy:   hyphen_ad.dy
+    #   x1:   hyphen_ad.x1
     return R
 
   #---------------------------------------------------------------------------------------------------------
