@@ -95,13 +95,13 @@ jp                        = JSON.parse
       { doc
         par } = brp_2
       #.....................................................................................................
-      urge '^5850^', "current BRPs"; console.table @db.all_rows SQL"""
-        select
-            id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr, deviation
-          from #{schema}.current_brps limit 3;"""
-      debug '^347446^', {
-              dx0: @_v.dx0, lnr,
-              doc, par, brp_1_adi: brp_1.adi, brp_2_sgi: brp_2.sgi, brp_2_vrt: brp_2.vrt, }
+      # urge '^5850^', "current BRPs"; console.table @db.all_rows SQL"""
+      #   select
+      #       *
+      #     from #{schema}.current_brps limit 3;"""
+      # debug '^347446^', {
+      #         dx0: @_v.dx0, lnr,
+      #         doc, par, brp_1_adi: brp_1.adi, brp_2_sgi: brp_2.sgi, brp_2_vrt: brp_2.vrt, }
       @db SQL"""
         update #{schema}.ads set
             x   = x - $dx0,
@@ -122,32 +122,32 @@ jp                        = JSON.parse
               -- and ( vrt = 1 )
               and ( sgi < $brp_2_sgi ) );""", {
               dx0: @_v.dx0, lnr,
-              doc, par, brp_1_adi: brp_1.adi, brp_2_sgi: brp_2.sgi, brp_2_vrt: brp_2.vrt, }
-      #.....................................................................................................
-      urge '^5850^', "current ADs"; console.table @db.all_rows SQL"""
-        select
-            id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr
-          from #{schema}.ads
-          where true
-            and ( doc = $doc )
-            and ( par = $par )
-            and ( sgi = $brp_2_sgi )
-            and ( vrt = $brp_2_vrt )
-        union all
-        select
-            id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr
-          from #{schema}.ads
-          where true
-            and ( doc = $doc )
-            and ( par = $par )
-            and ( adi > $brp_1_adi )
-            and ( sgi < $brp_2_sgi )
-            and ( vrt = 1 )
-          order by doc, par, adi, sgi, vrt;""",
-            { doc, par, brp_1_adi: brp_1.adi, brp_2_sgi: brp_2.sgi, brp_2_vrt: brp_2.vrt, }
-      #.....................................................................................................
-      # info '^4476^', rpr @_text_from_adis { schema, doc, par, adi_1, adi_2, vrt: 1, }
-      #.....................................................................................................
+              doc, par, brp_1_adi: brp_1.adi, brp_2_vrt: brp_2.vrt, brp_2_sgi: brp_2.sgi, }
+    #   #.....................................................................................................
+    #   urge '^5850^', "current ADs"; console.table @db.all_rows SQL"""
+    #     select
+    #         *
+    #       from #{schema}.ads
+    #       where true
+    #         and ( doc = $doc )
+    #         and ( par = $par )
+    #         and ( sgi = $brp_2_sgi )
+    #         and ( vrt = $brp_2_vrt )
+    #     union all
+    #     select
+    #         *
+    #       from #{schema}.ads
+    #       where true
+    #         and ( doc = $doc )
+    #         and ( par = $par )
+    #         and ( adi > $brp_1_adi )
+    #         and ( sgi < $brp_2_sgi )
+    #         and ( vrt = 1 )
+    #       order by doc, par, adi, vrt, sgi;""",
+    #         { doc, par, brp_1_adi: brp_1.adi, brp_2_sgi: brp_2.sgi, brp_2_vrt: brp_2.vrt, }
+    #   #.....................................................................................................
+    #   # info '^4476^', rpr @_text_from_adis { schema, doc, par, adi_1, adi_2, vrt: 1, }
+    #   #.....................................................................................................
     urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, vrt, adi, sgi;"
     return R
 
