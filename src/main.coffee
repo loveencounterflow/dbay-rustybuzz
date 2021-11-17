@@ -24,6 +24,7 @@ SQL                       = String.raw
 guy                       = require 'guy'
 home                      = PATH.resolve PATH.join __dirname, '..'
 # data_path                 = PATH.join home, 'data'
+{ Drb_preparation }       = require './preparation-mixin'
 { Drb_outlines }          = require './outlines-mixin'
 { Drb_codepoints }        = require './codepoints-mixin'
 { Drb_distribution }      = require './distribution-mixin'
@@ -32,7 +33,7 @@ ZLIB                      = require 'zlib'
 
 
 #===========================================================================================================
-class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
+class @Drb extends Drb_outlines Drb_distribution Drb_codepoints Drb_preparation()
 
   #---------------------------------------------------------------------------------------------------------
   @C: guy.lft.freeze
@@ -153,6 +154,7 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
     guy.cfg.configure_with_types @, cfg, types
     @_create_sql_functions()
     @_compile_sql()
+    @_$preparation_initialize?()
     @_$outlines_initialize?()
     @_$distribution_initialize?()
     @_$codepoints_initialize?()
