@@ -24,16 +24,22 @@ SQL                       = String.raw
 guy                       = require 'guy'
 home                      = PATH.resolve PATH.join __dirname, '..'
 # data_path                 = PATH.join home, 'data'
-{ Drb_preparation }       = require './preparation-mixin'
-{ Drb_outlines }          = require './outlines-mixin'
-{ Drb_codepoints }        = require './codepoints-mixin'
-{ Drb_distribution }      = require './distribution-mixin'
+{ Drb_preparation       } = require './preparation-mixin'
+{ Drb_outlines          } = require './outlines-mixin'
+{ Drb_arrangement       } = require './arrangement-mixin'
+{ Drb_codepoints        } = require './codepoints-mixin'
+{ Drb_distribution      } = require './distribution-mixin'
 font_path                 = PATH.resolve PATH.join __dirname, '../fonts'
 ZLIB                      = require 'zlib'
 
 
 #===========================================================================================================
-class @Drb extends Drb_outlines Drb_distribution Drb_codepoints Drb_preparation()
+class @Drb extends  \
+  Drb_outlines      \
+  Drb_arrangement   \
+  Drb_distribution  \
+  Drb_codepoints    \
+  Drb_preparation()
 
   #---------------------------------------------------------------------------------------------------------
   @C: guy.lft.freeze
@@ -156,6 +162,7 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints Drb_preparation(
     @_compile_sql()
     @_$preparation_initialize?()
     @_$outlines_initialize?()
+    @_$arrangement_initialize?()
     @_$distribution_initialize?()
     @_$codepoints_initialize?()
     @_open_drb_db()
