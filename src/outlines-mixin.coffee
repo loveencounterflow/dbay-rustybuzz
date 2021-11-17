@@ -263,10 +263,15 @@ jp                        = JSON.parse
   _shape_text: ( cfg ) ->
     { fontnick
       text
+      adi_0 ### NOTE optional first AD index ###
+      dx0   ### NOTE optional x reference coordinate ###
       doc
       par
       vrt       } = cfg
     { missing }   = @constructor.C
+    adi_0_given   = adi_0?
+    adi_0        ?= 0 ### TAINT use validation, defaults ###
+    dx0          ?= 0 ### TAINT use validation, defaults ###
     font_idx      = @_font_idx_from_fontnick fontnick
     ads           = @RBW.shape_text { format: 'json', text, font_idx, }
     ads           = JSON.parse ads
@@ -282,17 +287,9 @@ jp                        = JSON.parse
     sgi             = 0
     ### TAINT will not properly handle multiple SHYs in the same segment (this might happen in ligatures
     like `ffi`) ###
-    shy_adi         = null # arrangement data item idx of most recently seen soft hyphen
-    shy_adi_1       = 0    # first arrangement data item idx of segment with most recently seen soft hyphen
-    for ad, adi in ads
-      continue if adi is 0
-      #.....................................................................................................
-      if ( not ad.nobr )
-        if shy_adi?
-          shy_segments.push { shy_adi, shy_adi_1, shy_adi_2: adi - 1, }
-          shy_adi = null
-        sgi++
-        shy_adi_1 = adi
+    for ad, idx in ads
+      continue if ( not adi_0_given ) and ( idx is 0 )
+      adi       = adi_0 + idx
       #.....................................................................................................
       shy_adi   = adi if ad.br is 'shy'
       ad.sgi    = sgi
@@ -314,7 +311,7 @@ jp                        = JSON.parse
         ced_x  += ed_x
         ad.dx   = width
       #.....................................................................................................
-      ad.x    = Math.round ad.x
+      ad.x    = Math.round ad.x + dx0
       ad.y    = Math.round ad.y
       ad.dx   = Math.round ad.dx
       ad.dy   = Math.round ad.dy
