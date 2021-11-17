@@ -216,7 +216,6 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           br      text,
           lnr     integer default null, -- line number (from the left)
           rnr     integer default null  -- line number (from the right)
-          -- primary key ( doc, par, adi, vrt )
           );
       -- ...................................................................................................
       create unique index #{schema}.ads_location_idx on ads ( doc, par, adi, vrt, sgi );

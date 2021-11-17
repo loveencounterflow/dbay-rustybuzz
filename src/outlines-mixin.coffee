@@ -252,6 +252,8 @@ jp                        = JSON.parse
           ad.x1         = ad.x
       else if ad.chrs is ' '
         ad.br           = 'spc'
+      else if ad.chrs is '-'
+        ad.br           = 'hhy'
       R.push ad
       if extra_ad?
         R.push extra_ad
@@ -276,7 +278,7 @@ jp                        = JSON.parse
     ads           = @RBW.shape_text { format: 'json', text, font_idx, }
     ads           = JSON.parse ads
     ads           = @_prepare_ads text, fontnick, ads
-    shy_segments  = []
+    shy_data  = []
     #.......................................................................................................
     unless adi_0_given
       ads.unshift { doc, par, adi: 0, vrt, sgi: 0, \
@@ -291,7 +293,7 @@ jp                        = JSON.parse
       continue if ( not adi_0_given ) and ( idx is 0 )
       adi       = adi_0 + idx
       #.....................................................................................................
-      shy_adi   = adi if ad.br is 'shy'
+      sgi++ unless ad.nobr
       ad.sgi    = sgi
       ad.doc    = doc
       ad.par    = par
@@ -300,6 +302,7 @@ jp                        = JSON.parse
       ad.sid    = "o#{ad.gid}#{fontnick}"
       ad.x     += ced_x
       ad.y     += ced_y
+      shy_data.push { doc, par, adi, vrt, } if ad.br is 'shy'
       #.....................................................................................................
       # Replace original metrics with those of missing outline:
       if ad.gid is missing.gid
@@ -335,7 +338,7 @@ jp                        = JSON.parse
         ads[ idx ]  = @db.first_row insert_ad, row
       return null
     #.......................................................................................................
-    return { ads, shy_segments, }
+    return { ads, shy_data, }
 
   #---------------------------------------------------------------------------------------------------------
   get_font_metrics: ( cfg ) ->
@@ -403,6 +406,7 @@ jp                        = JSON.parse
     doc                   = 1 ### Document ID ###
     par                   = 1 ### Paragraph ID ###
     ads                   = @shape_text { fontnick, text, fm, doc, par, vrt: 1, }
+    debug '^3494746^'; console.table ads
     #.......................................................................................................
     missing_ads[ d.sid ]  = d for d in ads
     #.......................................................................................................
