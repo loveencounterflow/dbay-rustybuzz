@@ -73,9 +73,8 @@ jp                        = JSON.parse
     @_v.adi0      = 0                         # index of AD that represents current line start
     @_v.dx0       = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
-    urge '^4875^', 'ads';          console.table @db.all_rows SQL"select id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr from #{schema}.ads order by doc, par, adi, sgi, vrt;"
-    urge '^4875^', 'current_brps'; console.table @db.all_rows SQL"select id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr, deviation from #{schema}.current_brps;"
-    # console.table @db.all_rows SQL"select * from #{schema}.brps order by doc, par, adi, sgi, vrt;"
+    urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, vrt, adi, sgi;"
+    # urge '^4875^', 'current_brps'; console.table @db.all_rows SQL"select * from #{schema}.current_brps;"
     #.......................................................................................................
     brp_2         = @db.single_row SQL"select * from #{schema}.current_brps where br = 'start' limit 1;"
     brp_1         = null
@@ -112,16 +111,16 @@ jp                        = JSON.parse
             where true
               and ( doc = $doc )
               and ( par = $par )
-              and ( sgi = $brp_2_sgi )
               and ( vrt = $brp_2_vrt )
+              and ( sgi = $brp_2_sgi )
           union all select id
             from #{schema}.ads
             where true
               and ( doc = $doc )
               and ( par = $par )
               and ( adi > $brp_1_adi )
-              and ( sgi < $brp_2_sgi )
-              and ( vrt = 1 ) );""", {
+              -- and ( vrt = 1 )
+              and ( sgi < $brp_2_sgi ) );""", {
               dx0: @_v.dx0, lnr,
               doc, par, brp_1_adi: brp_1.adi, brp_2_sgi: brp_2.sgi, brp_2_vrt: brp_2.vrt, }
       #.....................................................................................................
@@ -149,7 +148,7 @@ jp                        = JSON.parse
       #.....................................................................................................
       # info '^4476^', rpr @_text_from_adis { schema, doc, par, adi_1, adi_2, vrt: 1, }
       #.....................................................................................................
-    urge '^4875^', 'ads'; console.table @db.all_rows SQL"select id, doc, par, adi, sgi, vrt, gid, b, x, y, dx, dy, x1, chrs, sid, nobr, br, lnr from #{schema}.ads order by doc, par, adi, sgi, vrt;"
+    urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, vrt, adi, sgi;"
     return R
 
   #---------------------------------------------------------------------------------------------------------
@@ -169,7 +168,7 @@ jp                        = JSON.parse
           and par = $par
           and adi between $adi_1 and $adi_2
           and vrt = $vrt
-        order by doc, par, adi, sgi, vrt;""", { doc, par, adi_1, adi_2, vrt, }
+        order by doc, par, adi, vrt, sgi;""", { doc, par, adi_1, adi_2, vrt, }
     ad_2  = ads[ ads.length - 1 ]
     R     = ( ad.chrs for ad in ads ).join ''
     R    += '-' if ad_2.br is 'shy'

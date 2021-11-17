@@ -200,8 +200,8 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           doc     integer not null, -- document idx
           par     integer not null, -- paragraph idx
           adi     integer not null, -- arr. dat. idx
-          sgi     integer not null, -- segment idx, a segment being a suite of ADs that must be reshaped if broken
           vrt     integer not null, -- variant idx
+          sgi     integer not null, -- segment idx, a segment being a suite of ADs that must be reshaped if broken
           gid     integer,
           b       integer,
           x       integer not null,
@@ -219,7 +219,7 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
           -- primary key ( doc, par, adi, vrt )
           );
       -- ...................................................................................................
-      create unique index #{schema}.ads_location_idx on ads ( doc, par, adi, sgi, vrt );
+      create unique index #{schema}.ads_location_idx on ads ( doc, par, adi, vrt, sgi );
       -- ...................................................................................................
       create view #{schema}.current_brps as select
           *,
