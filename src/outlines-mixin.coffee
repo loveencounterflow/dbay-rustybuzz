@@ -396,7 +396,6 @@ jp                        = JSON.parse
     ads                   = @shape_text { fontnick, text, fm, doc, par, vrt: 1, }
     #.......................................................................................................
     missing_ads[ d.sid ]  = d for d in ads
-    fm                    = @get_font_metrics { fontnick, }
     #.......................................................................................................
     required_sids = Object.keys missing_ads
     for od from @db SQL"""
