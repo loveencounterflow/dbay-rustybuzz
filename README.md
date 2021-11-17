@@ -9,6 +9,7 @@
 
 - [𓆤DBay 𓏞RustyBuzz](#%F0%93%86%A4dbay-%F0%93%8F%9Erustybuzz)
   - [Notes](#notes)
+    - [General Procedure](#general-procedure)
     - [IDs of SVG Paths / Glyf Outlines](#ids-of-svg-paths--glyf-outlines)
     - [Selectable Text](#selectable-text)
   - [To Do](#to-do)
@@ -23,6 +24,39 @@ benchmarks,](https://github.com/loveencounterflow/hengist/tree/master/dev/dbay-r
 scattered notes*
 
 ## Notes
+
+### General Procedure
+
+* **Stage I**
+  * Initialize
+  * Normalize text (replacing e.g. symbols like `&shy;`, `&wbr;` with their Unicode equivalents etc.)
+  * Split into paragraphs
+  * Hyphenate paragraphs
+  * Register fonts in DB and in `rustybuzz-wasm`
+
+* **Stage II**
+
+  * **Arrange** (`shape_text()`). Translates text (a string of charaters or, quivalently, a ist of Character
+    IDs (CIDs, a.k.a. code points)) to a series of `( x, y )`-positioned glyfs (a.k.a. shapes or outlines,
+    identified by numerical Glyf IDs (GIDs)). Input is (possibly hyphenated) text, output is a series of
+    positioned Arrangement Data items (ADs) *on a single, long line*.
+
+  * **Compose** (`compose()`). Retrieve path data for all glyfs (outlines) from font(s) and feed them to the
+    DB.
+
+  * **Distribute** (`distribute()`). Given the metrics of a paragraph (i.e. line lengths) and shaped text
+    (in the form of ADs), break text into individual lines by looking for good points in the ADs (spaces,
+    hyphens, WBRs) where line wrapping may occur. Input is ADs and shape of paragraph, output is in ADs
+    updated with corrected coordinates and line numbers.
+
+  * Composition and distribution are independent and can happen in any order (conceivably even in parallel).
+
+* **Stage III**
+
+  * **Output** write HTML+SVG
+
+
+
 
 ### IDs of SVG Paths / Glyf Outlines
 
