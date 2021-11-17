@@ -254,6 +254,14 @@ class @Drb extends Drb_outlines Drb_distribution Drb_codepoints()
         returning:  '*',
         on_conflict: { update: true, }, }
       #.....................................................................................................
+      insert_ad: @db.create_insert {
+        schema,
+        into:       'ads',
+        # exclude:    [ 'id', 'lnr', 'rnr', ],
+        fields:     [ 'doc', 'par', 'adi', 'vrt', 'sgi', 'gid', 'b',
+                      'x', 'y', 'dx', 'dy', 'chrs', 'sid', 'nobr', 'br', ]
+        returning:  '*', }
+      #.....................................................................................................
       fspath_from_fontnick: SQL"select fspath from fontnicks where fontnick = $fontnick;"
     #.......................................................................................................
     return null

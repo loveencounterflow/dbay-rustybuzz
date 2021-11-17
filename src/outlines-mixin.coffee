@@ -317,13 +317,11 @@ jp                        = JSON.parse
       nobr: 0, br: 'end', }
     #.......................................................................................................
     @db =>
-      ### TAINT put this into proper place eg `_compile_sql()` ###
-      insert_ad = @db.prepare @sql.insert_ad ?= \
-        @db.create_insert { schema: @cfg.schema, into: 'ads', exclude: [ 'id', 'lnr', 'rnr', ], }
-      for ad in ads
-        row       = { br: null, ad..., }
-        row.nobr  = if row.nobr then 1 else 0
-        insert_ad.run row
+      insert_ad = @db.prepare @sql.insert_ad
+      for ad, idx in ads
+        row         = { br: null, ad..., }
+        row.nobr    = if row.nobr then 1 else 0
+        ads[ idx ]  = @db.first_row insert_ad, row
       return null
     #.......................................................................................................
     return { ads, shy_segments, }
