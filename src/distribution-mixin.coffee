@@ -170,7 +170,7 @@ jp                        = JSON.parse
           and vrt = $vrt
         order by doc, par, adi, vrt, sgi;""", { doc, par, adi_1, adi_2, vrt, }
     ad_2  = ads[ ads.length - 1 ]
-    R     = ( ad.chrs for ad in ads ).join ''
+    R     = ( ad.chrs ? '' for ad in ads ).join ''
     R    += '-' if ad_2.br is 'shy'
     return R
 
