@@ -160,51 +160,63 @@ jp                        = JSON.parse
   ### 'arrange()' like 'compose()' and 'distribute()' ###
   shape_text: ( cfg ) ->
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
-    { ads, shy_segments, }  = @_shape_text        { cfg..., vrt: 1, }
-    shy_ads                 = @_shape_hyphenated  { cfg..., old_vrt: 1, new_vrt: 2, ads, shy_segments, }
+    { ads, shy_data, }  = @_shape_text        { cfg..., vrt: 1, }
+    shy_ads             = @_shape_hyphenated  { cfg..., ads, shy_data, }
     return [ ads..., shy_ads..., ]
 
   #---------------------------------------------------------------------------------------------------------
   _shape_hyphenated: ( cfg ) ->
     ### TAINT use proper validation ###
     { fontnick
-      ads
-      shy_segments
       doc
       par
-      # fm
-      old_vrt
-      new_vrt   } = cfg
-    { schema    } = @cfg
-    { V, I, L,  } = @sql
-    R             = []
-    # #.......................................................................................................
-    # ### NOTE the quick and easy method (which is incomplete)
-    # throw new Error "^8490353^ REPLACE WITH PROPER ERROR need fontmetrics" unless fm?
-    # for { shy_adi, shy_adi_1, shy_adi_2, } in shy_segments
-    #   shy_ad          = ads[ shy_adi ]
-    #   hyphen_ad       = { shy_ad..., }
-    #   hyphen_ad.br    = 'hhy'
-    #   hyphen_ad.vrt   = vrt
-    #   hyphen_ad.gid   = fm.hyphen_ad.gid
-    #   hyphen_ad.sid   = fm.hyphen_ad.sid
-    #   hyphen_ad.chrs  = '-'
-    #   ads.push hyphen_ad
-    #   if shy_adi_1 is shy_adi is shy_adi_2
-    #     null
-    # #.......................................................................................................
-    # sgis = [ ( new Set ( ad.vrt ) )..., ]
-    # #.......................................................................................................
-    # console.table @db SQL"""
-    #   select * from #{schema}.ads
-    #     where true
-    #       and ( doc = $doc )
-    #       and ( par = $par )
-    #       and ( sgi in #{V sgis} )
-    #       and ( vrt = $old_vrt )
-    #      vrt = $ sgi in
-    #   """
+      ads
+      shy_data    } = cfg
+    { schema      } = @cfg
+    { V, I, L,    } = @sql
+    { shy         } = @constructor.C.special_chrs
+    R               = []
+    # return R # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     #.......................................................................................................
+    { vrt_max, } = @db.single_row SQL"""
+      select max( vrt ) as vrt_max
+      from #{schema}.ads where ( doc = $doc ) and ( par = $par );""", { doc, par, }
+    new_vrt = vrt_max
+    #.......................................................................................................
+    for { doc, par, adi, vrt, } in shy_data
+      ads = @db.all_rows SQL"""
+        select
+            *
+          from #{schema}.ads
+          where true
+            and ( doc = $doc )
+            and ( par = $par )
+            and ( vrt = $vrt )
+            and ( sgi in ( select
+              distinct sgi
+            from #{schema}.ads
+            where true
+              and ( doc = $doc )
+              and ( par = $par )
+              and ( adi in ( $adi - 1, $adi, $adi + 1 ) ) )
+              and ( vrt = $vrt ) );""", { doc, par, adi, vrt, }
+      dx0       = ads[ 0 ].x
+      # urge "^4084^ segments for SHY", { doc, par, adi, vrt, dx0, }; console.table ads
+      shy_idxs  = ( idx for ad, idx in ads when ad.br is 'shy' )
+      for shy_idx, vrt_delta in shy_idxs
+        new_vrt++
+        ### TAINT wrong if there's more than one hyphen ###
+        text      = ( ( if ad.chrs is shy then '-' else ad.chrs ) for ad in ads ).join ''
+        # ### TAINT wrong if there's more than one hyphen ###
+        # ad.br     = 'hhy' if ad.br is 'shy'
+        adi_0     = ads[ 0 ].adi
+        # debug '^4084^', rpr text
+        { ads: hhy_ads, } = @_shape_text { cfg..., text, adi_0, dx0, vrt: new_vrt, }
+        R = [ R..., hhy_ads..., ]
+        # debug '^3345345^', hhy_ads
+    # urge "^4084^ segments for HHY"; console.table @db.all_rows SQL"""
+    #   select * from ads where vrt > 1 order by doc, par, vrt, adi;"""
+    # #.......................................................................................................
     return R
 
   #---------------------------------------------------------------------------------------------------------
