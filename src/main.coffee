@@ -29,6 +29,7 @@ home                      = PATH.resolve PATH.join __dirname, '..'
 { Drb_arrangement       } = require './arrangement-mixin'
 { Drb_codepoints        } = require './codepoints-mixin'
 { Drb_distribution      } = require './distribution-mixin'
+{ Drb_sundry            } = require './sundry-mixin'
 font_path                 = PATH.resolve PATH.join __dirname, '../fonts'
 ZLIB                      = require 'zlib'
 
@@ -39,7 +40,8 @@ class @Drb extends  \
   Drb_arrangement   \
   Drb_distribution  \
   Drb_codepoints    \
-  Drb_preparation()
+  Drb_preparation   \
+  Drb_sundry()
 
   #---------------------------------------------------------------------------------------------------------
   @C: guy.lft.freeze
@@ -108,6 +110,20 @@ class @Drb extends  \
         fontnick:         null
         text:             null
         known_ods:        null
+      #.....................................................................................................
+      dbr_prepare_text_cfg:
+        text:             null
+        entities:         true
+        ncrs:             true
+        hyphenate:        true
+        newlines:         true
+        uax14:            true
+        trim:             true
+        chomp:            true
+      #.....................................................................................................
+      dbr_decode_entities_cfg:
+        text:             null
+        ncrs:             true
       #.....................................................................................................
       constructor_cfg:
         db:               null
