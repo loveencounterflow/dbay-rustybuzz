@@ -39,7 +39,7 @@ jp                        = JSON.parse
   ### 'arrange()' like 'compose()' and 'distribute()' ###
   shape_text: ( cfg ) ->
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
-    { ads, shy_data, }  = @_shape_text        { cfg..., vrt: 1, }
+    { ads, shy_data, }  = @_shape_text        { cfg..., alt: 1, }
     shy_ads             = @_shape_hyphenated  { cfg..., ads, shy_data, }
     return [ ads..., shy_ads..., ]
 
@@ -57,12 +57,12 @@ jp                        = JSON.parse
     R               = []
     # return R # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     #.......................................................................................................
-    { vrt_max, } = @db.single_row SQL"""
-      select max( vrt ) as vrt_max
+    { alt_max, } = @db.single_row SQL"""
+      select max( alt ) as alt_max
       from #{schema}.ads where ( doc = $doc ) and ( par = $par );""", { doc, par, }
-    new_vrt = vrt_max
+    new_alt = alt_max
     #.......................................................................................................
-    for { doc, par, adi, vrt, } in shy_data
+    for { doc, par, adi, alt, } in shy_data
       ads = @db.all_rows SQL"""
         select
             *
@@ -70,7 +70,7 @@ jp                        = JSON.parse
           where true
             and ( doc = $doc )
             and ( par = $par )
-            and ( vrt = $vrt )
+            and ( alt = $alt )
             and ( sgi in ( select
               distinct sgi
             from #{schema}.ads
@@ -78,23 +78,23 @@ jp                        = JSON.parse
               and ( doc = $doc )
               and ( par = $par )
               and ( adi in ( $adi - 1, $adi, $adi + 1 ) ) )
-              and ( vrt = $vrt ) );""", { doc, par, adi, vrt, }
+              and ( alt = $alt ) );""", { doc, par, adi, alt, }
       dx0       = ads[ 0 ].x
-      # urge "^4084^ segments for SHY", { doc, par, adi, vrt, dx0, }; console.table ads
+      # urge "^4084^ segments for SHY", { doc, par, adi, alt, dx0, }; console.table ads
       shy_idxs  = ( idx for ad, idx in ads when ad.br is 'shy' )
-      for shy_idx, vrt_delta in shy_idxs
-        new_vrt++
+      for shy_idx, alt_delta in shy_idxs
+        new_alt++
         ### TAINT wrong if there's more than one hyphen ###
         text      = ( ( if ad.chrs is shy then '-' else ad.chrs ) for ad in ads ).join ''
         # ### TAINT wrong if there's more than one hyphen ###
         # ad.br     = 'hhy' if ad.br is 'shy'
         adi_0     = ads[ 0 ].adi
         # debug '^4084^', rpr text
-        { ads: hhy_ads, } = @_shape_text { cfg..., text, adi_0, dx0, vrt: new_vrt, }
+        { ads: hhy_ads, } = @_shape_text { cfg..., text, adi_0, dx0, alt: new_alt, }
         R = [ R..., hhy_ads..., ]
         # debug '^3345345^', hhy_ads
     # urge "^4084^ segments for HHY"; console.table @db.all_rows SQL"""
-    #   select * from ads where vrt > 1 order by doc, par, vrt, adi;"""
+    #   select * from ads where alt > 1 order by doc, par, alt, adi;"""
     # #.......................................................................................................
     return R
 
@@ -148,7 +148,7 @@ jp                        = JSON.parse
       dx0   ### NOTE optional x reference coordinate ###
       doc
       par
-      vrt       } = cfg
+      alt       } = cfg
     { missing }   = @constructor.C
     adi_0_given   = adi_0?
     adi_0        ?= 0 ### TAINT use validation, defaults ###
@@ -160,7 +160,7 @@ jp                        = JSON.parse
     shy_data  = []
     #.......................................................................................................
     unless adi_0_given
-      ads.unshift { doc, par, adi: 0, vrt, sgi: 0, \
+      ads.unshift { doc, par, adi: 0, alt, sgi: 0, \
         gid: null, b: null, x: 0, y: 0, dx: 0, dy: 0, x1: 0, chrs: null, sid: null, \
         nobr: 0, br: 'start', }
     ced_x           = 0 # cumulative error displacement from missing outlines
@@ -177,11 +177,11 @@ jp                        = JSON.parse
       ad.doc    = doc
       ad.par    = par
       ad.adi    = adi
-      ad.vrt    = vrt
+      ad.alt    = alt
       ad.sid    = "o#{ad.gid}#{fontnick}"
       ad.x     += ced_x
       ad.y     += ced_y
-      shy_data.push { doc, par, adi, vrt, } if ad.br is 'shy'
+      shy_data.push { doc, par, adi, alt, } if ad.br is 'shy'
       #.....................................................................................................
       # Replace original metrics with those of missing outline:
       if ad.gid is missing.gid
@@ -204,7 +204,7 @@ jp                        = JSON.parse
       last_adi  = ads.length - 1
       last_ad   = ads[ last_adi ]
       this_adi  = last_adi + 1
-      ads.push { doc, par, adi: this_adi, vrt, sgi: last_ad.sgi + 1, \
+      ads.push { doc, par, adi: this_adi, alt, sgi: last_ad.sgi + 1, \
         gid: null, b: null, x: last_ad.x1, y: last_ad.y, dx: 0, dy: 0, \
         x1: last_ad.x1, chrs: null, sid: null, \
         nobr: 0, br: 'end', }

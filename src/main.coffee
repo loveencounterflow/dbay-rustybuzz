@@ -101,7 +101,7 @@ class @Drb extends  \
         text:             null
         doc:              null
         par:              null
-        vrt:              null
+        alt:              null
       #.....................................................................................................
       dbr_get_font_metrics_cfg:
         fontnick:         null
@@ -225,8 +225,8 @@ class @Drb extends  \
           doc     integer not null, -- document idx
           par     integer not null, -- paragraph idx
           adi     integer not null, -- arr. dat. idx
-          vrt     integer not null, -- variant idx
-          sgi     integer not null, -- segment idx, a segment being a suite of ADs that must be reshaped if broken
+          sgi     integer not null, -- shape group idx, being a suite of ADs that must be reshaped if broken
+          alt     integer not null, -- variant idx
           gid     integer,
           b       integer,
           x       integer not null,
@@ -243,7 +243,7 @@ class @Drb extends  \
           rnr     integer default null  -- line number (from the right)
           );
       -- ...................................................................................................
-      create unique index #{schema}.ads_location_idx on ads ( doc, par, adi, vrt, sgi );
+      create unique index #{schema}.ads_location_idx on ads ( doc, par, adi, sgi, alt );
       -- ...................................................................................................
       create view #{schema}.current_brps as select
           *,
@@ -282,7 +282,7 @@ class @Drb extends  \
         schema,
         into:       'ads',
         # exclude:    [ 'id', 'lnr', 'rnr', ],
-        fields:     [ 'doc', 'par', 'adi', 'vrt', 'sgi', 'gid', 'b',
+        fields:     [ 'doc', 'par', 'adi', 'alt', 'sgi', 'gid', 'b',
                       'x', 'y', 'dx', 'dy', 'chrs', 'sid', 'nobr', 'br', ]
         returning:  '*', }
       #.....................................................................................................
