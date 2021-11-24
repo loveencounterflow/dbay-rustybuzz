@@ -193,9 +193,9 @@ class @Drb extends  \
       drop table if exists #{schema}.outlines;
       drop table if exists #{schema}.fontnicks;
       drop index if exists #{schema}.ads_location_idx;
+      drop table if exists #{schema}.line_ads;
       drop table if exists #{schema}.ads;
-      drop view  if exists #{schema}.current_brp;
-      drop view  if exists #{schema}.current_brps;
+      drop table if exists #{schema}.lines;
       -- ...................................................................................................
       vacuum #{schema};
       -- ...................................................................................................
@@ -229,6 +229,7 @@ class @Drb extends  \
           alt     integer not null, -- variant idx
           gid     integer,
           b       integer,
+          -- ### TAINT should be x1 + dx = x2, y1 + dy = y2
           x       integer not null,
           y       integer not null,
           dx      integer not null,
@@ -236,23 +237,34 @@ class @Drb extends  \
           x1      integer generated always as ( x + dx ) virtual not null,
           -- y1      integer generated always as ( y + dy ) virtual not null,
           chrs    text,
-          sid     text,
-          nobr    boolean not null,
-          br      text,
-          lnr     integer default null, -- line number (from the left)
-          rnr     integer default null  -- line number (from the right)
-          );
+          sid     text, -- references #{schema}.outlines ( sid ) ??
+          nobr    boolean not null, -- if true, must re-shape when separated from previous outline
+          br      text );
       -- ...................................................................................................
       create unique index #{schema}.ads_location_idx on ads ( doc, par, adi, sgi, alt );
       -- ...................................................................................................
-      create view #{schema}.current_brps as select
-          *,
-          #{prefix}get_deviation( x1 ) as deviation
-        from #{schema}.ads
-        where ( br is not null ) and ( br != 'shy' )
-        order by abs( deviation ) asc;
+      create table #{schema}.line_ads (
+          doc     integer not null, -- document idx  ### TAINT should be FK
+          par     integer not null, -- paragraph idx ### TAINT should be FK
+          lnr     integer not null,
+          ads_id  integer not null references ads ( id ),
+          -- ### TAINT should be x1, y1
+          x       integer not null, -- actual x coordinate for the `<use/>` element
+          y       integer not null, -- actual y coordinate for the `<use/>` element
+          primary key ( doc, par, lnr, ads_id ) );
       -- ...................................................................................................
-      create view #{schema}.current_brp as select * from #{schema}.current_brps limit 1;
+      create table #{schema}.lines (
+          -- id      integer not null primary key,
+          doc     integer not null, -- document idx  ### TAINT should be FK
+          par     integer not null, -- paragraph idx ### TAINT should be FK
+          lnr     integer default null, -- line number (from the left)
+          rnr     integer default null, -- line number (from the right)
+          -- ### TAINT should be x1, x2
+          x0      integer not null, -- left  x coord. of first glyf in this line (rel. to single line set by `shape_text()`)
+          x1      integer not null, -- right x coord. of last  glyf in this line (rel. to single line set by `shape_text()`)
+          -- y0      integer not null,
+          -- y1      integer not null,
+          primary key ( doc, par, lnr ) );
       """
     return null
 
