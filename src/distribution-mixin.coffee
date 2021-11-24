@@ -99,7 +99,7 @@ jp                        = JSON.parse
     count         = 0
     loop
       count++
-      if count > 100
+      if count > 2
         warn "infinite loop"
         process.exit 119
       break if brp_2.br is 'end'
@@ -111,6 +111,24 @@ jp                        = JSON.parse
         par } = brp_2
       info '^5850^', brp_1
       info '^5850^', brp_2
+      if brp_2.alt is 1 ### non-shy BRP ###
+        throw new Error "not yet implemented"
+      else
+        brp_2.adi
+        brp_2.sgi
+        ### TAINT use join? ###
+        ads_replaced_by_brp_2 = @db.all_rows SQL"""
+          select * from #{schema}.ads
+            where true
+              and ( doc = $doc )
+              and ( par = $par )
+              and ( sgi = $sgi )
+              and ( alt = 1 )
+            order by doc, par, adi;""", { doc, par, sgi: brp_2.sgi, }
+        urge '^5851^', "ads_replaced_by_brp_2"; console.table ads_replaced_by_brp_2
+        ### at his point we know that the material to be typeset on the current line
+        starts with BRP 1 and extends to the SG of BRP 2 using the ALT of that break point;
+        it excludes the SG of BRP 2 with ALT = 1 (that is the one with a SHY). ###
       # @db SQL"""
       #   update #{schema}.ads set lnr = $lnr
       #     where id in ( select id
