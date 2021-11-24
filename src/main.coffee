@@ -225,6 +225,7 @@ class @Drb extends  \
           doc     integer not null, -- document idx
           par     integer not null, -- paragraph idx
           adi     integer not null, -- arr. dat. idx
+          osgi    integer, -- when alt > 1, the original SG that this SG replaces
           sgi     integer not null, -- shape group idx, being a suite of ADs that must be reshaped if broken
           alt     integer not null, -- variant idx
           gid     integer,
