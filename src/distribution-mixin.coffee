@@ -87,7 +87,7 @@ jp                        = JSON.parse
     adi0      = 0                         # index of AD that represents current line start
     dx0       = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
-    urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, adi, sgi, alt;"
+    urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, alt, adi, sgi;"
     # urge '^4875^', 'current_brps'; console.table @db.all_rows SQL"select * from #{schema}.current_brps;"
     #.......................................................................................................
     brp_2         = @db.single_row SQL"select * from #{schema}.ads where br = 'start' limit 1;"
