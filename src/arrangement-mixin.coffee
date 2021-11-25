@@ -40,7 +40,7 @@ jp                        = JSON.parse
   shape_text: ( cfg ) ->
     @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
     ads     = @_shape_text        { cfg..., alt: 1, }
-    shy_ads = @_shape_hyphenated  { cfg..., ads, alt: 1, }
+    shy_ads = @_shape_hyphenated  { cfg..., ads, }
     return [ ads..., shy_ads..., ]
 
   #---------------------------------------------------------------------------------------------------------
@@ -49,8 +49,7 @@ jp                        = JSON.parse
     { fontnick
       doc
       par
-      ads
-      alt         } = cfg
+      ads         } = cfg
     { schema      } = @cfg
     { V, I, L,    } = @sql
     { shy         } = @constructor.C.special_chrs
@@ -142,8 +141,9 @@ jp                        = JSON.parse
       dx0   ### NOTE optional x reference coordinate ###
       doc
       par
-      alt       } = cfg
-    { missing }   = @constructor.C
+      alt
+      osgi      } = cfg
+    { missing   } = @constructor.C
     adi_0_given   = adi_0?
     adi_0        ?= 0 ### TAINT use validation, defaults ###
     dx0          ?= 0 ### TAINT use validation, defaults ###
@@ -174,6 +174,7 @@ jp                        = JSON.parse
     #.......................................................................................................
     ced_x           = 0 # cumulative error displacement from missing outlines
     ced_y           = 0 # cumulative error displacement from missing outlines
+    osgi           ?= null
     sgi             = 0
     ### TAINT will not properly handle multiple SHYs in the same segment (this might happen in ligatures
     like `ffi`) ###
@@ -182,11 +183,12 @@ jp                        = JSON.parse
       adi       = adi_0 + idx
       #.....................................................................................................
       sgi++ unless ad.nobr
-      ad.sgi    = sgi
       ad.doc    = doc
       ad.par    = par
-      ad.adi    = adi
       ad.alt    = alt
+      ad.adi    = adi
+      ad.sgi    = sgi
+      ad.osgi   = osgi
       ad.sid    = "o#{ad.gid}#{fontnick}"
       ad.x     += ced_x
       ad.y     += ced_y
