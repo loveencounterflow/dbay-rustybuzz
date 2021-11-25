@@ -224,10 +224,10 @@ class @Drb extends  \
           id      integer not null primary key,
           doc     integer not null, -- document idx
           par     integer not null, -- paragraph idx
-          adi     integer not null, -- arr. dat. idx
-          osgi    integer, -- when alt > 1, the original SG that this SG replaces
-          sgi     integer not null, -- shape group idx, being a suite of ADs that must be reshaped if broken
           alt     integer not null, -- variant idx
+          adi     integer not null, -- arr. dat. idx
+          sgi     integer not null, -- shape group idx, being a suite of ADs that must be reshaped if broken
+          osgi    integer, -- when alt > 1, the original SG that this SG replaces
           gid     integer,
           b       integer,
           -- ### TAINT should be x1 + dx = x2, y1 + dy = y2
@@ -295,7 +295,7 @@ class @Drb extends  \
         schema,
         into:       'ads',
         # exclude:    [ 'id', 'lnr', 'rnr', ],
-        fields:     [ 'doc', 'par', 'adi', 'alt', 'sgi', 'gid', 'b',
+        fields:     [ 'doc', 'par', 'alt', 'adi', 'sgi', 'osgi', 'gid', 'b',
                       'x', 'y', 'dx', 'dy', 'chrs', 'sid', 'nobr', 'br', ]
         returning:  '*', }
       #.....................................................................................................
