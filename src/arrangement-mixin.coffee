@@ -53,7 +53,6 @@ jp                        = JSON.parse
     { schema      } = @cfg
     { V, I, L,    } = @sql
     { shy         } = @constructor.C.special_chrs
-    R               = []
     #.......................................................................................................
     { alt_max, } = @db.single_row SQL"""
       select max( alt ) as alt_max
@@ -62,34 +61,56 @@ jp                        = JSON.parse
     #.......................................................................................................
     # urge '^7875^', {  fontnick, doc, par, alt,         }
     # urge '^7875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, adi, sgi, alt;"
-    for shy_row in @db.all_rows SQL"""
-      select adi, sgi from #{schema}.ads
+    for { shy_adi, shy_sgi, } in @db.all_rows SQL"""
+      select adi as shy_adi, sgi as shy_sgi from #{schema}.ads
         where true
           and ( doc = $doc )
           and ( par = $par )
           and ( br  = 'shy' )
-          and ( alt = $alt );""", { doc, par, alt, }
-      ### NOTE `sg_ads`: *S*hape *G*roup *A*rrangement *D*ata item*S* ###
-      sg_ads = @db.all_rows SQL"""
-        select * from ads
+          and ( alt = 1 );""", { doc, par, }
+      #.....................................................................................................
+      # First batch: Chracters in same shape group as SHY, up to the shy, with an added hyphen:
+      { text, dx0, } = @db.first_row SQL"""
+        select
+            coalesce(
+              group_concat( case when br = 'shy' then '' else chrs end, '' ),
+              '' ) || '-'             as text,
+            min( x )                  as dx0
+          from ads
           where true
             and ( doc = $doc )
             and ( par = $par )
-            and ( sgi = $sgi )
-            and ( alt = $alt )
-          order by doc, par, adi;""", { doc, par, sgi: shy_row.sgi, alt, }
+            and ( sgi = $shy_sgi )
+            and ( adi <= $shy_adi )
+            and ( alt = 1 )
+          order by adi;""", { doc, par, shy_adi, shy_sgi, }
+      urge '^460971^', { shy_adi, shy_sgi, dx0, text, new_alt, }
       new_alt++
-      ### TAINT wrong if there's more than one hyphen ###
-      text      = ( ( if ad.adi is shy_row.adi then '- ' else ad.chrs ) for ad in sg_ads ).join ''
-      adi_0     = sg_ads[ 0 ].adi
-      dx0       = sg_ads[ 0 ].x
-      debug '^4874^', shy_row, { adi_0, dx0, }, rpr text
-      @_shape_text { cfg..., text, adi_0, dx0, alt: new_alt, }
-        # R = [ R..., hhy_ads..., ]
-        # # debug '^3345345^', hhy_ads
+      left_ads      = @_shape_text { cfg..., text, adi_0: 1, dx0, alt: new_alt, osgi: shy_sgi, }
+      # last_left_ad  = left_ads[ left_ads.length - 1 ]
+      #.....................................................................................................
+      { text, dx0, } = @db.first_row SQL"""
+        select
+            coalesce(
+              group_concat( case when br = 'shy' then '' else chrs end, '' ),
+              '' )                    as text,
+            min( x )                  as dx0
+          from ads
+          where true
+            and ( doc = $doc )
+            and ( par = $par )
+            and ( sgi = $shy_sgi )
+            and ( adi > $shy_adi )
+            and ( alt = 1 )
+          order by adi;""", { doc, par, shy_adi, shy_sgi, }
+      # info '^460971^', dx0 = last_left_ad.x1
+      if text isnt ''
+        urge '^460971^', { shy_adi, shy_sgi, dx0, text, new_alt, }
+        new_alt++
+        right_ads = @_shape_text { cfg..., text, adi_0: 1, dx0, alt: new_alt, osgi: shy_sgi, }
+      urge '^460971^'
     #.......................................................................................................
-    # urge '^7875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, adi, sgi, alt;"
-    return R
+    return [ left_ads..., right_ads..., ]
 
   #---------------------------------------------------------------------------------------------------------
   _prepare_ads: ( text, fontnick, ads ) ->
