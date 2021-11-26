@@ -244,21 +244,11 @@ class @Drb extends  \
       -- ...................................................................................................
       create unique index #{schema}.ads_location_idx on ads ( doc, par, adi, sgi, alt );
       -- ...................................................................................................
-      create table #{schema}.line_ads (
-          doc     integer not null, -- document idx  ### TAINT should be FK
-          par     integer not null, -- paragraph idx ### TAINT should be FK
-          lnr     integer not null,
-          ads_id  integer not null references ads ( id ),
-          -- ### TAINT should be x1, y1
-          x       integer not null, -- actual x coordinate for the `<use/>` element
-          y       integer not null, -- actual y coordinate for the `<use/>` element
-          primary key ( doc, par, lnr, ads_id ) );
-      -- ...................................................................................................
       create table #{schema}.lines (
           -- id      integer not null primary key,
           doc     integer not null, -- document idx  ### TAINT should be FK
           par     integer not null, -- paragraph idx ### TAINT should be FK
-          lnr     integer default null, -- line number (from the left)
+          lnr     integer not null, -- line number (from the left)
           rnr     integer default null, -- line number (from the right)
           -- ### TAINT should be x1, x2
           x0      integer not null, -- left  x coord. of first glyf in this line (rel. to single line set by `shape_text()`)
@@ -266,6 +256,18 @@ class @Drb extends  \
           -- y0      integer not null,
           -- y1      integer not null,
           primary key ( doc, par, lnr ) );
+      -- ...................................................................................................
+      create table #{schema}.line_ads (
+          doc     integer not null, -- document idx  ### TAINT should be FK
+          par     integer not null, -- paragraph idx ### TAINT should be FK
+          lnr     integer not null,
+          ads_id  integer not null,
+          -- ### TAINT should be x1, y1
+          x       integer not null, -- actual x coordinate for the `<use/>` element
+          y       integer not null, -- actual y coordinate for the `<use/>` element
+          primary key ( doc, par, lnr, ads_id ),
+          foreign key ( doc, par, lnr ) references lines,
+          foreign key ( ads_id )        references ads ( id ) );
       """
     return null
 
