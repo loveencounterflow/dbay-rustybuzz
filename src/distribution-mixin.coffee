@@ -102,7 +102,7 @@ jp                        = JSON.parse
       count++
       if count > 2
         warn "infinite loop"
-        process.exit 119
+        break
       break if brp_2.br is 'end'
       lnr++
       brp_1   = brp_2
