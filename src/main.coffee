@@ -300,6 +300,18 @@ class @Drb extends  \
                       'x', 'y', 'dx', 'dy', 'chrs', 'sid', 'nobr', 'br', ]
         returning:  '*', }
       #.....................................................................................................
+      insert_line: @db.create_insert {
+        schema,
+        into:       'lines',
+        fields:     [ 'doc', 'par', 'lnr', 'x0', 'x1', ]
+        returning:  '*', }
+      #.....................................................................................................
+      insert_line_ad: @db.create_insert {
+        schema,
+        into:       'line_ads',
+        fields:     [ 'doc', 'par', 'lnr', 'ads_id', 'x', 'y', ]
+        ### returning:  '*', ### }
+      #.....................................................................................................
       fspath_from_fontnick: SQL"select fspath from fontnicks where fontnick = $fontnick;"
     #.......................................................................................................
     return null
