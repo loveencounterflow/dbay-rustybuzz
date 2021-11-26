@@ -115,52 +115,54 @@ jp                        = JSON.parse
       if brp_2.alt is 1 ### non-shy BRP ###
         throw new Error "not yet implemented"
       else
-        brp_2.adi
-        brp_2.sgi
+        # brp_2.adi
+        # brp_2.sgi
         ### TAINT use join? ###
-        ads_replaced_by_brp_2 = @db.all_rows SQL"""
+        first_replaced_ad = @db.first_row SQL"""
           select * from #{schema}.ads
             where true
               and ( doc = $doc )
               and ( par = $par )
-              and ( sgi = $sgi )
+              and ( sgi = $osgi )
               and ( alt = 1 )
-            order by doc, par, adi;""", { doc, par, sgi: brp_2.sgi, }
-        urge '^5851^', "ads_replaced_by_brp_2"; console.table ads_replaced_by_brp_2
+            order by doc, par, adi;""", { doc, par, osgi: brp_2.osgi, }
+        urge '^5851^', "first_replaced_ad"; console.table [ first_replaced_ad, ]
+        line_ads_alt_1 = @db.all_rows SQL"""
+          select * from #{schema}.ads
+            where true
+              and ( doc = $doc )
+              and ( par = $par )
+              and ( adi >= $brp_1_adi )
+              and ( adi < $first_replaced_adi )
+              and ( alt = 1 )
+            order by doc, par, adi;""", {
+              doc, par, brp_1_adi: brp_1.adi, first_replaced_adi: first_replaced_ad.adi, }
+        urge '^5851^', "line_ads_alt_1"; console.table line_ads_alt_1
+        line_ads_brp_2 = @db.all_rows SQL"""
+          select * from #{schema}.ads
+            where true
+              and ( doc = $doc )
+              and ( par = $par )
+              and ( alt = $brp_2_alt )
+            order by doc, par, adi;""", {
+              doc, par, brp_2_alt: brp_2.alt, }
+        urge '^5851^', "line_ads_brp_2"; console.table line_ads_brp_2
         ### at his point we know that the material to be typeset on the current line
         starts with BRP 1 and extends to the SG of BRP 2 using the ALT of that break point;
         it excludes the SG of BRP 2 with ALT = 1 (that is the one with a SHY). ###
-      # @db SQL"""
-      #   update #{schema}.ads set lnr = $lnr
-      #     where id in ( select id
-      #       from #{schema}.ads
-      #       where false -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      #         and ( doc = $doc )
-      #         and ( par = $par )
-      #         -- and ( alt = $brp_2_alt )
-      #         -- and ( sgi = $brp_2_sgi )
-      #     union all select id
-      #       from #{schema}.ads
-      #       where true
-      #         and ( doc = $doc )
-      #         and ( par = $par )
-      #         and ( x > $brp_1_x )
-      #         and ( x <= $brp_2_x )
-      #         -- and ( adi > $brp_1_adi )
-      #         -- and ( alt = 1 )
-      #         -- and ( adi <= $brp_2_sgi )
-      #       );""", {
-      #   dx0:        dx0,
-      #   lnr,
-      #   doc,
-      #   par,
-      #   brp_1_adi:  brp_1.adi,
-      #   brp_1_x:    brp_1.x,
-      #   brp_2_alt:  brp_2.alt,
-      #   brp_2_adi:  brp_2.adi,
-      #   brp_2_sgi:  brp_2.sgi,
-      #   brp_2_x:    brp_2.x, }
-    # urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, adi, sgi, alt;"
+        debug '^33876^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
+        @db =>
+          for ad in line_ads_alt_1
+            x = ad.x - dx0
+            y = ad.y
+            @db @sql.insert_line_ad, { doc, par, lnr, ads_id: ad.id, x, y, }
+          for ad in line_ads_brp_2
+            x = ad.x - dx0
+            y = ad.y
+            @db @sql.insert_line_ad, { doc, par, lnr, ads_id: ad.id, x, y, }
+          return null
+        debug '^33876^'; console.table @db.all_rows SQL"select * from #{schema}.line_ads order by 1, 2, 3;"
+    #.......................................................................................................
     return R
 
   #---------------------------------------------------------------------------------------------------------
