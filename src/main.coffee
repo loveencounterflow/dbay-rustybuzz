@@ -294,7 +294,6 @@ class @Drb extends  \
       insert_ad: @db.create_insert {
         schema,
         into:       'ads',
-        # exclude:    [ 'id', 'lnr', 'rnr', ],
         fields:     [ 'doc', 'par', 'alt', 'adi', 'sgi', 'osgi', 'gid', 'b',
                       'x', 'y', 'dx', 'dy', 'chrs', 'sid', 'nobr', 'br', ]
         returning:  '*', }

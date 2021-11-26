@@ -90,6 +90,7 @@ jp                        = JSON.parse
     urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, alt, adi, sgi;"
     # urge '^4875^', 'current_brps'; console.table @db.all_rows SQL"select * from #{schema}.current_brps;"
     #.......................................................................................................
+    # select last AD: SQL"select * from ads where alt = 1 and adi = ( select max( adi ) from ads where alt = 1 );"
     brp_2         = @db.single_row SQL"select * from #{schema}.ads where br = 'start' limit 1;"
     brp_1         = null
     lnr           = 0
