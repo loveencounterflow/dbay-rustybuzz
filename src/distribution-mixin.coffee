@@ -100,25 +100,26 @@ jp                        = JSON.parse
     count         = 0
     loop
       count++
-      if count > 2
+      if count > 10
         warn "infinite loop"
         break
       break if brp_2.br is 'end'
       lnr++
+      info '^5850-1^', '███████████████████████████████████████████████████ line:', lnr
       brp_1   = brp_2
-      urge '^5850^', "current BRPs"; console.table @get_current_brp { dx0, size_u, width_u, limit: 5, }
+      urge '^5850-2^', "current BRPs"; console.table @get_current_brp { dx0, size_u, width_u, limit: 5, }
       brp_2   = @get_current_brp { dx0, size_u, width_u, }
       { doc
         par } = brp_2
-      info '^5850^', brp_1
-      info '^5850^', brp_2
+      urge '^5850-3^ brp_1 and brp_2'; console.table [ brp_1, brp_2, ]
+      #.....................................................................................................
       if brp_2.alt is 1 ### non-shy BRP ###
-        throw new Error "not yet implemented"
+        warn '^5850-3^', "not yet implemented"
+        continue
+      #.....................................................................................................
       else
-        # brp_2.adi
-        # brp_2.sgi
-        ### TAINT use join? ###
-        first_replaced_ad = @db.first_row SQL"""
+        ### TAINT how to handle case when shapegroup has elements on right hand side of HHY? ###
+        original_shapegroup = @db.all_rows SQL"""
           select * from #{schema}.ads
             where true
               and ( doc = $doc )
@@ -126,7 +127,7 @@ jp                        = JSON.parse
               and ( sgi = $osgi )
               and ( alt = 1 )
             order by doc, par, adi;""", { doc, par, osgi: brp_2.osgi, }
-        urge '^5851^', "first_replaced_ad"; console.table [ first_replaced_ad, ]
+        urge '^5850-5^', "original_shapegroup"; console.table original_shapegroup
         line_ads_alt_1 = @db.all_rows SQL"""
           select * from #{schema}.ads
             where true
@@ -136,8 +137,8 @@ jp                        = JSON.parse
               and ( adi < $first_replaced_adi )
               and ( alt = 1 )
             order by doc, par, adi;""", {
-              doc, par, brp_1_adi: brp_1.adi, first_replaced_adi: first_replaced_ad.adi, }
-        urge '^5851^', "line_ads_alt_1"; console.table line_ads_alt_1
+              doc, par, brp_1_adi: brp_1.adi, first_replaced_adi: original_shapegroup[ 0 ].adi, }
+        urge '^5850-6^', "line_ads_alt_1"; console.table line_ads_alt_1
         line_ads_brp_2 = @db.all_rows SQL"""
           select * from #{schema}.ads
             where true
@@ -146,11 +147,11 @@ jp                        = JSON.parse
               and ( alt = $brp_2_alt )
             order by doc, par, adi;""", {
               doc, par, brp_2_alt: brp_2.alt, }
-        urge '^5851^', "line_ads_brp_2"; console.table line_ads_brp_2
+        urge '^5850-7^', "line_ads_brp_2"; console.table line_ads_brp_2
         ### at his point we know that the material to be typeset on the current line
         starts with BRP 1 and extends to the SG of BRP 2 using the ALT of that break point;
         it excludes the SG of BRP 2 with ALT = 1 (that is the one with a SHY). ###
-        debug '^33876^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
+        debug '^5850-8^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
         @db =>
           for ad in line_ads_alt_1
             x = ad.x - dx0
@@ -161,7 +162,20 @@ jp                        = JSON.parse
             y = ad.y
             @db @sql.insert_line_ad, { doc, par, lnr, ads_id: ad.id, x, y, }
           return null
-        debug '^33876^'; console.table @db.all_rows SQL"select * from #{schema}.line_ads order by 1, 2, 3;"
+        # debug '^5850-9^ line_ads'; console.table @db.all_rows SQL"select * from #{schema}.line_ads order by 1, 2, 3;"
+        ### TAINT does not correctly handle case when shapegroup has elements on right hand side of HHY ###
+        debug '^5850-10^', original_shapegroup[ original_shapegroup.length - 1 ]
+        debug '^5850-11^', last_osg_adi = original_shapegroup[ original_shapegroup.length - 1 ].adi
+        brp_2 = @db.single_row SQL"""
+          select * from #{schema}.ads
+            where true
+              and ( doc = $doc )
+              and ( par = $par )
+              and ( adi = $last_osg_adi + 1 )
+              and ( alt = 1 )
+            limit 1;""", { doc, par, last_osg_adi, }
+        urge '^5850-12^', "brp_2"; console.table [ brp_2, ]
+        dx0 = brp_2.x
     #.......................................................................................................
     return R
 
