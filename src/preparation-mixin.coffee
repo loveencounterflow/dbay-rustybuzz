@@ -63,25 +63,25 @@ jp                        = JSON.parse
   _font_idx_from_fontnick: ( fontnick )->
     ### TAINT use fallback to configure behavior in case of failure ###
     unless ( R = @state.font_idx_by_fontnicks[ fontnick ] )?
-      throw new E.Dbr_unknown_or_unprepared_fontnick '^dbr/outlines@1^', fontnick
+      throw new E.Dbr_unknown_or_unprepared_fontnick '^dbr/preparation@1^', fontnick
     return R
 
   #---------------------------------------------------------------------------------------------------------
   prepare_font: ( cfg ) ->
     clasz = @constructor
     unless @state.prv_fontidx < clasz.C.last_fontidx
-      throw new E.Dbr_font_capacity_exceeded '^dbr/outlines@1^', clasz.C.last_fontidx + 1
+      throw new E.Dbr_font_capacity_exceeded '^dbr/preparation@2^', clasz.C.last_fontidx + 1
     #.........................................................................................................
     @types.validate.dbr_prepare_font_cfg ( cfg = { @constructor.C.defaults.dbr_prepare_font_cfg..., cfg..., } )
     { fontnick
       fspath  } = cfg
     #.........................................................................................................
-    throw new E.Dbr_not_implemented '^dbr/outlines@1^', "setting fspath" if fspath?
+    throw new E.Dbr_not_implemented '^dbr/preparation@3^', "setting fspath" if fspath?
     return null if @state.font_idx_by_fontnicks[ fontnick ]?
     #.........................................................................................................
     try fspath = @_fspath_from_fontnick fontnick catch error
       if ( @types.type_of error ) is 'dbay_expected_single_row'
-        throw new E.Dbr_unknown_or_unprepared_fontnick '^dbr/outlines@1^', fontnick
+        throw new E.Dbr_unknown_or_unprepared_fontnick '^dbr/preparation@4^', fontnick
       throw error
     font_idx    = ( @state.prv_fontidx += 1 )
     font_bytes  = @_get_font_bytes fspath
