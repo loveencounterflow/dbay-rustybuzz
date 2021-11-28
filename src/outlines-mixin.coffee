@@ -154,7 +154,10 @@ jp                        = JSON.parse
 
   #---------------------------------------------------------------------------------------------------------
   compose: ( cfg ) ->
-    ### Compose (usually up to one paragraph's worth of) text on a single line without line breaks. ###
+    ###
+    * **XXX** Update table `outlines` with the outlines of all glyfs needed for composition
+    * **YYY** write HTML+SVG
+    ###
     @types.validate.dbr_compose_cfg ( cfg = { @constructor.C.defaults.dbr_compose_cfg..., cfg..., } )
     { fontnick
       text
@@ -167,7 +170,7 @@ jp                        = JSON.parse
     #.......................................................................................................
     ### Shape text, which gives us positions, GIDs/SIDs, and the characters corresponding to each outline.
     The `required_ads` maps from SIDs to arrangement data items (ADs): ###
-    ### TAINt return standard glyph for all missing outlines ###
+    ### TAINT return standard glyph for all missing outlines ###
     doc                   = 1 ### Document ID ###
     par                   = 1 ### Paragraph ID ###
     ads                   = @shape_text { fontnick, text, fm, doc, par, alt: 1, }
