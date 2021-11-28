@@ -191,11 +191,11 @@ jp                        = JSON.parse
             y = ad.y
             @db @sql.insert_line_ad, { doc, par, lnr, ads_id: ad.id, x, y, }
           return null
-        # debug '^5850-9^ line_ads'; console.table @db.all_rows SQL"select * from #{schema}.line_ads order by 1, 2, 3;"
+        # debug '^5850-12^ line_ads'; console.table @db.all_rows SQL"select * from #{schema}.line_ads order by 1, 2, 3;"
         ### TAINT does not correctly handle case when shapegroup has elements on right hand side of HHY ###
-        debug '^5850-10^', original_shapegroup[ original_shapegroup.length - 1 ]
-        debug '^5850-11^', last_osg_adi = original_shapegroup[ original_shapegroup.length - 1 ].adi
-        brp_2 = @db.single_row SQL"""
+        debug '^5850-13^', original_shapegroup[ original_shapegroup.length - 1 ]
+        debug '^5850-14^', last_osg_adi = original_shapegroup[ original_shapegroup.length - 1 ].adi
+        brp_2 = @db.first_row SQL"""
           select * from #{schema}.ads
             where true
               and ( doc = $doc )
@@ -203,9 +203,13 @@ jp                        = JSON.parse
               and ( adi = $last_osg_adi + 1 )
               and ( alt = 1 )
             limit 1;""", { doc, par, last_osg_adi, }
-        urge '^5850-12^', "brp_2"; console.table [ brp_2, ]
+        unless brp_2?
+          warn '^5850-15^', "did not find `end` element"
+          break
+        # urge '^5850-16^', "brp_2"; console.table [ brp_2, ]
         dx0 = brp_2.x
     #.......................................................................................................
+    # urge '^5850-17^', "line_ads", { lnr, }; console.table @db.all_rows SQL"select * from #{schema}.line_ads order by 1, 2, 3, 4;"
     return R
 
   #---------------------------------------------------------------------------------------------------------
