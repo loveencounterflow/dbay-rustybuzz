@@ -27,35 +27,38 @@ scattered notes*
 
 ### General Procedure
 
-* **Stage I**
+
+* **Prepare**
   * Initialize
   * Normalize text (replacing e.g. symbols like `&shy;`, `&wbr;` with their Unicode equivalents etc.)
   * Split into paragraphs
-  * Hyphenate paragraphs
+  * Hyphenate
   * Register fonts in DB and in `rustybuzz-wasm`
 
-* **Stage II**
+* **Arrange** (`shape_text()`). Translate text to a series of `( x, y )`-positioned glyfs (a.k.a. shapes
+  or outlines, identified by numerical Glyf IDs (GIDs)). Input is (possibly hyphenated) text, output is a
+  series of positioned Arrangement Data items (ADs) *on a single, long line*.
 
-  * **Arrange** (`shape_text()`). Translates text (a string of charaters or, quivalently, a ist of Character
-    IDs (CIDs, a.k.a. code points)) to a series of `( x, y )`-positioned glyfs (a.k.a. shapes or outlines,
-    identified by numerical Glyf IDs (GIDs)). Input is (possibly hyphenated) text, output is a series of
-    positioned Arrangement Data items (ADs) *on a single, long line*.
+* **Distribute** (`distribute()`). Given the metrics of a paragraph (i.e. line lengths) and shaped text
+  (in the form of ADs), break text into individual lines by looking for good points in the ADs (spaces,
+  hyphens, WBRs) where line wrapping may occur. Input is ADs and shape of paragraph, output is in tables
+  `lines`, `line_ads` with line numbers and corrected coordinates.
 
-  * **Compose** (`compose()`). Retrieve path data for all glyfs (outlines) from font(s) and feed them to the
-    DB.
+* **Compose** (`compose()`)
+  * **XXX** Update table `outlines` with the outlines of all glyfs needed for composition
+  * **YYY** write HTML+SVG
 
-  * **Distribute** (`distribute()`). Given the metrics of a paragraph (i.e. line lengths) and shaped text
-    (in the form of ADs), break text into individual lines by looking for good points in the ADs (spaces,
-    hyphens, WBRs) where line wrapping may occur. Input is ADs and shape of paragraph, output is in ADs
-    updated with corrected coordinates and line numbers.
-
-  * Composition and distribution are independent and can happen in any order (conceivably even in parallel).
-
-* **Stage III**
-
-  * **Output** write HTML+SVG
-
-
+* Arrangement and composition is currently done per glyf / outline /
+  ['sort'](https://en.wikipedia.org/wiki/Sort_(typesetting)) (German, interestingly:
+  ['Letter'](https://de.wikipedia.org/wiki/Letter)) but it could conceivably also be done per word, per
+  shape group (SG), or per 'syllable'. Using a bigger unit than the glyf for composition allows to reduce
+  the number of `<use/>` tags needed, at the cost of having intermediary `<use/>` tags. Where we now have
+  `<use/>` tags that refer directly to outlines defined as `<path/>` elements, we'd then build lines with
+  `<use/>` tags that represent entire (parts of) words; words and parts thereof are in turn defined as
+  series of relatively positioned `<use/>` tags that themselves refer to `<path/>`s. Given a long enough
+  text in a uniform font, `arrange()`/`shape_text()` would only have to be called for the ever decreasing
+  portions of text that have not yet been arranged; whether this would lead to a more efficient / faster /
+  space-saving process is an open question.
 
 
 ### IDs of SVG Paths / Glyf Outlines
