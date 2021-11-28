@@ -114,8 +114,38 @@ jp                        = JSON.parse
       urge '^5850-3^ brp_1 and brp_2'; console.table [ brp_1, brp_2, ]
       #.....................................................................................................
       if brp_2.alt is 1 ### non-shy BRP ###
-        warn '^5850-3^', "not yet implemented"
-        continue
+        line_ads = @db.all_rows SQL"""
+          select * from #{schema}.ads
+            where true
+              and ( doc = $doc )
+              and ( par = $par )
+              and ( adi >= $brp_1_adi )
+              and ( adi <= $brp_2_adi )
+              and ( alt = 1 )
+              -- and ( br != 'shy' )
+            order by doc, par, adi;""", {
+              doc, par, brp_1_adi: brp_1.adi, brp_2_adi: brp_2.adi, }
+        urge '^5850-4^', "line_ads", { lnr, }; console.table line_ads
+        @db =>
+          debug '^5850-5^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
+          for ad in line_ads
+            x = ad.x - dx0
+            y = ad.y
+            @db @sql.insert_line_ad, { doc, par, lnr, ads_id: ad.id, x, y, }
+          return null
+        brp_2 = @db.first_row SQL"""
+          select * from #{schema}.ads
+            where true
+              and ( doc = $doc )
+              and ( par = $par )
+              and ( adi = $brp_2_adi + 1 )
+              and ( alt = 1 )
+            limit 1;""", { doc, par, brp_2_adi: brp_2.adi, }
+        unless brp_2?
+          warn '^5850-6^', "did not find `end` element"
+          break
+        urge '^5850-7^', "brp_2"; console.table [ brp_2, ]
+        dx0 = brp_2.x
       #.....................................................................................................
       else
         ### TAINT how to handle case when shapegroup has elements on right hand side of HHY? ###
