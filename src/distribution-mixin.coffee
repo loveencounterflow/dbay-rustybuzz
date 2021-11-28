@@ -157,8 +157,8 @@ jp                        = JSON.parse
               and ( sgi = $osgi )
               and ( alt = 1 )
             order by doc, par, adi;""", { doc, par, osgi: brp_2.osgi, }
-        urge '^5850-5^', "original_shapegroup"; console.table original_shapegroup
-        line_ads_alt_1 = @db.all_rows SQL"""
+        urge '^5850-8^', "original_shapegroup"; console.table original_shapegroup
+        line_ads = @db.all_rows SQL"""
           select * from #{schema}.ads
             where true
               and ( doc = $doc )
@@ -166,28 +166,27 @@ jp                        = JSON.parse
               and ( adi >= $brp_1_adi )
               and ( adi < $first_replaced_adi )
               and ( alt = 1 )
-            order by doc, par, adi;""", {
-              doc, par, brp_1_adi: brp_1.adi, first_replaced_adi: original_shapegroup[ 0 ].adi, }
-        urge '^5850-6^', "line_ads_alt_1"; console.table line_ads_alt_1
-        line_ads_brp_2 = @db.all_rows SQL"""
+              -- and ( br != 'shy' )
+          union all
           select * from #{schema}.ads
             where true
               and ( doc = $doc )
               and ( par = $par )
               and ( alt = $brp_2_alt )
+              -- and ( br != 'shy' )
             order by doc, par, adi;""", {
-              doc, par, brp_2_alt: brp_2.alt, }
-        urge '^5850-7^', "line_ads_brp_2"; console.table line_ads_brp_2
+              doc,
+              par,
+              brp_2_alt: brp_2.alt,
+              brp_1_adi: brp_1.adi,
+              first_replaced_adi: original_shapegroup[ 0 ].adi, }
+        urge '^5850-10^', "line_ads", { lnr, }; console.table line_ads
         ### at his point we know that the material to be typeset on the current line
         starts with BRP 1 and extends to the SG of BRP 2 using the ALT of that break point;
         it excludes the SG of BRP 2 with ALT = 1 (that is the one with a SHY). ###
-        debug '^5850-8^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
         @db =>
-          for ad in line_ads_alt_1
-            x = ad.x - dx0
-            y = ad.y
-            @db @sql.insert_line_ad, { doc, par, lnr, ads_id: ad.id, x, y, }
-          for ad in line_ads_brp_2
+          debug '^5850-11^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
+          for ad in line_ads
             x = ad.x - dx0
             y = ad.y
             @db @sql.insert_line_ad, { doc, par, lnr, ads_id: ad.id, x, y, }
