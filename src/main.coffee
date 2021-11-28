@@ -96,7 +96,7 @@ class @Drb extends  \
         gid:              null
         sid:              null
       #.....................................................................................................
-      dbr_shape_text_cfg:
+      dbr_arrange_cfg:
         fontnick:         null
         text:             null
         doc:              null
@@ -251,8 +251,8 @@ class @Drb extends  \
           lnr     integer not null, -- line number (from the left)
           rnr     integer default null, -- line number (from the right)
           -- ### TAINT should be x1, x2
-          x0      integer not null, -- left  x coord. of first glyf in this line (rel. to single line set by `shape_text()`)
-          x1      integer not null, -- right x coord. of last  glyf in this line (rel. to single line set by `shape_text()`)
+          x0      integer not null, -- left  x coord. of first glyf in this line (rel. to single line set by `arrange()`)
+          x1      integer not null, -- right x coord. of last  glyf in this line (rel. to single line set by `arrange()`)
           -- y0      integer not null,
           -- y1      integer not null,
           primary key ( doc, par, lnr ) );

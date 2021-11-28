@@ -59,7 +59,7 @@ dbay_types                = require 'dbay/lib/types'
     return @isa.dbr_gid x.gid
 
 #-----------------------------------------------------------------------------------------------------------
-@declare 'dbr_shape_text_cfg', tests:
+@declare 'dbr_arrange_cfg', tests:
   "@isa.object x":                                  ( x ) -> @isa.object x
   "@isa.nonempty_text x.fontnick":                  ( x ) -> @isa.nonempty_text x.fontnick
   "@isa.text x.text":                               ( x ) -> @isa.text x.text

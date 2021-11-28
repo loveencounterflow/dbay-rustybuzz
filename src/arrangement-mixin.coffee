@@ -37,8 +37,8 @@ jp                        = JSON.parse
 
   #---------------------------------------------------------------------------------------------------------
   ### 'arrange()' like 'compose()' and 'distribute()' ###
-  shape_text: ( cfg ) ->
-    @types.validate.dbr_shape_text_cfg ( cfg = { @constructor.C.defaults.dbr_shape_text_cfg..., cfg..., } )
+  arrange: ( cfg ) ->
+    @types.validate.dbr_arrange_cfg ( cfg = { @constructor.C.defaults.dbr_arrange_cfg..., cfg..., } )
     ads     = @_shape_text        { cfg..., alt: 1, }
     shy_ads = @_shape_hyphenated  { cfg..., ads, }
     return [ ads..., shy_ads..., ]

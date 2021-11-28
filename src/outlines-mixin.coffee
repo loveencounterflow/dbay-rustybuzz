@@ -89,7 +89,7 @@ jp                        = JSON.parse
     font_idx      = @_font_idx_from_fontnick fontnick
     if @types.isa.list chrs then  text = chrs.join '\n'
     else                          text = chrs
-    sds           = @shape_text { fontnick, text, fm: {}, doc: 0, par: 0, alt: 1, }
+    sds           = @arrange { fontnick, text, fm: {}, doc: 0, par: 0, alt: 1, }
     R             = new Map()
     for sd in sds
       continue if sd.gid is 0
@@ -173,7 +173,7 @@ jp                        = JSON.parse
     ### TAINT return standard glyph for all missing outlines ###
     doc                   = 1 ### Document ID ###
     par                   = 1 ### Paragraph ID ###
-    ads                   = @shape_text { fontnick, text, fm, doc, par, alt: 1, }
+    ads                   = @arrange { fontnick, text, fm, doc, par, alt: 1, }
     debug '^3494746^'; console.table ads
     #.......................................................................................................
     missing_ads[ d.sid ]  = d for d in ads
