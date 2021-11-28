@@ -106,14 +106,6 @@ jp                        = JSON.parse
     return R
 
   #---------------------------------------------------------------------------------------------------------
-  get_font_metrics: ( cfg ) ->
-    @types.validate.dbr_get_font_metrics_cfg ( cfg = { @constructor.C.defaults.dbr_get_font_metrics_cfg..., cfg..., } )
-    { fontnick }  = cfg
-    font_idx      = @_font_idx_from_fontnick fontnick
-    R             = JSON.parse @RBW.get_font_metrics font_idx
-    return R
-
-  #---------------------------------------------------------------------------------------------------------
   _zip:   ( txt ) -> ZLIB.deflateRawSync ( Buffer.from txt ), @constructor.C.zlib_zip_cfg
   _unzip: ( bfr ) -> ( ZLIB.inflateRawSync bfr ).toString()
 

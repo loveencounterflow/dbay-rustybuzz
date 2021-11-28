@@ -191,6 +191,7 @@ class @Drb extends  \
     #.......................................................................................................
     @db.execute SQL"""
       drop table if exists #{schema}.outlines;
+      drop table if exists #{schema}.fontmetrics;
       drop table if exists #{schema}.fontnicks;
       drop index if exists #{schema}.ads_location_idx;
       drop table if exists #{schema}.line_ads;
@@ -203,6 +204,16 @@ class @Drb extends  \
           fontnick    text    not null,
           fspath      text    not null,
         primary key ( fontnick ) );
+      -- ...................................................................................................
+      create table #{schema}.fontmetrics (
+          fontnick        text    not null primary key references fontnicks,
+          ascender        integer not null,
+          descender       integer not null,
+          x_height        integer not null,
+          capital_height  integer not null,
+          units_per_em    integer not null,
+          scale           integer not null,
+          angle           integer not null );
       -- ...................................................................................................
       create table #{schema}.outlines (
           fontnick  text    not null references fontnicks ( fontnick ),
@@ -284,6 +295,12 @@ class @Drb extends  \
         schema,
         into:   'fontnicks',
         fields: [ 'fontnick', 'fspath', ],
+        on_conflict: { update: true, }, }
+      #.....................................................................................................
+      insert_fontmetric: @db.create_insert {
+        schema,
+        into:       'fontmetrics',
+        fields:     [ 'fontnick', 'ascender', 'descender', 'x_height', 'capital_height', 'units_per_em', 'scale', 'angle', ],
         on_conflict: { update: true, }, }
       #.....................................................................................................
       insert_outline: @db.create_insert {
