@@ -99,17 +99,18 @@ class @Drb extends  \
       dbr_arrange_cfg:
         fontnick:         null
         text:             null
-        doc:              null
-        par:              null
-        alt:              null
+        doc:              1
+        par:              1
+        alt:              1
       #.....................................................................................................
-      dbr_get_font_metrics_cfg:
+      dbr_get_fontmetrics_cfg:
         fontnick:         null
       #.....................................................................................................
       dbr_compose_cfg:
         fontnick:         null
         text:             null
-        known_ods:        null
+        doc:              1
+        par:              1
       #.....................................................................................................
       dbr_prepare_text_cfg:
         text:             null
