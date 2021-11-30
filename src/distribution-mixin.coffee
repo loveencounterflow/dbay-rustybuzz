@@ -72,20 +72,16 @@ jp                        = JSON.parse
 
   #---------------------------------------------------------------------------------------------------------
   _distribute_with_db: ( cfg ) ->
-    # { Tbl, }    = require '../../icql-dba-tabulate'
-    # dtab        = new Tbl { db: @db, }
-    #.......................................................................................................
-    { ads     } = cfg
     { schema,
       prefix  } = @cfg
     #.......................................................................................................
-    mm_p_u    = cfg.mm_p_u
-    width_mm  = cfg.width_mm
-    width_u   = cfg.width_mm / cfg.mm_p_u # line width in glyf design unites (1000 per em)
-    size_mm   = cfg.size_mm               # nominal type size (1em)
-    size_u    = cfg.size_mm  / cfg.mm_p_u
-    adi0      = 0                         # index of AD that represents current line start
-    dx0       = 0                         # extraneous width (b/c paragraph was set in single long line)
+    { mm_p_u
+      width_mm
+      size_mm } = cfg                       # nominal type size (1em)
+    width_u     = width_mm / mm_p_u         # line width in glyf design units (1000 per em)
+    size_u      = size_mm  / mm_p_u
+    adi0        = 0                         # index of AD that represents current line start
+    dx0         = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
     urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, alt, adi, sgi;"
     # urge '^4875^', 'current_brps'; console.table @db.all_rows SQL"select * from #{schema}.current_brps;"

@@ -259,6 +259,7 @@ jp                        = JSON.parse
       for ad, idx in ads
         row         = { br: null, ad..., }
         row.nobr    = if row.nobr then 1 else 0
+        # debug '^545456^', row
         ads[ idx ]  = @db.first_row insert_ad, row
       return null
     #.......................................................................................................
