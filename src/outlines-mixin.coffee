@@ -151,42 +151,22 @@ jp                        = JSON.parse
     * **YYY** write HTML+SVG
     ###
     @types.validate.dbr_compose_cfg ( cfg = { @constructor.C.defaults.dbr_compose_cfg..., cfg..., } )
-    { fontnick
+    { doc
+      par
       text
-      known_ods         } = cfg
-    known_ods            ?= {}
-    new_ods               = {}
-    missing_ads           = {}
-    { missing, }          = @constructor.C
-    fm                    = @get_font_metrics { fontnick, }
+      fontnick } = cfg
     #.......................................................................................................
-    ### Shape text, which gives us positions, GIDs/SIDs, and the characters corresponding to each outline.
-    The `required_ads` maps from SIDs to arrangement data items (ADs): ###
-    ### TAINT return standard glyph for all missing outlines ###
-    doc                   = 1 ### Document ID ###
-    par                   = 1 ### Paragraph ID ###
-    ads                   = @arrange { fontnick, text, fm, doc, par, alt: 1, }
-    debug '^3494746^'; console.table ads
-    #.......................................................................................................
-    missing_ads[ d.sid ]  = d for d in ads
-    #.......................................................................................................
-    required_sids = Object.keys missing_ads
-    for od from @db SQL"""
+    ads = @db.all_rows SQL"""
       select
-          fontnick, gid, sid, chrs, x, y, x1, y1, pd
-      from outlines
-      where ( gid != 0 ) and ( sid in #{@db.sql.V required_sids} );"""
-      known_ods[ od.sid ] = od
-      delete missing_ads[ od.sid ]
-    #.......................................................................................................
-    ### Retrieve (from font) and insert (into DB) missing outline data (ODs) items: ###
-    for od from @insert_and_walk_outlines { fontnick, ads, }
-      delete missing_ads[ od.sid ]
-      known_ods[  od.sid ]  = od
-      new_ods[    od.sid ]  = od
-    #.......................................................................................................
-    missing_chrs = ( ad for ad in ads when ad.gid is missing.gid )
-    #.......................................................................................................
-    return { known_ods, new_ods, missing_chrs, ads, fm, }
+          gid,
+          chrs
+        from ads
+        where true
+          and ( doc = $doc )
+          and ( par = $par )
+          and gid not in ( select gid from outlines where fontnick = $fontnick )
+        order by 1, 2;""", { doc, par, fontnick, }
+    @insert_outlines { fontnick, ads, }
+    return null
 
 
