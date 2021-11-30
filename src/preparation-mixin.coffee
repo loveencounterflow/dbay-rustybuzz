@@ -87,19 +87,19 @@ jp                        = JSON.parse
     font_bytes  = @_get_font_bytes fspath
     @RBW.register_font font_idx, font_bytes
     @state.font_idx_by_fontnicks[ fontnick ] = font_idx
-    @_add_font_metrics fontnick, font_idx
+    @_add_fontmetrics fontnick, font_idx
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  _add_font_metrics: ( fontnick, font_idx ) ->
+  _add_fontmetrics: ( fontnick, font_idx ) ->
     fm          = JSON.parse @RBW.get_font_metrics font_idx
     fm.fontnick = fontnick
     @db @sql.insert_fontmetric, fm
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  get_font_metrics: ( cfg ) ->
-    @types.validate.dbr_get_font_metrics_cfg ( cfg = { @constructor.C.defaults.dbr_get_font_metrics_cfg..., cfg..., } )
+  get_fontmetrics: ( cfg ) ->
+    @types.validate.dbr_get_fontmetrics_cfg ( cfg = { @constructor.C.defaults.dbr_get_fontmetrics_cfg..., cfg..., } )
     { fontnick }  = cfg
     try
       return @db.single_row SQL"""
