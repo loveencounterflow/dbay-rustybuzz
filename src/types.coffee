@@ -106,7 +106,8 @@ dbay_types                = require 'dbay/lib/types'
   "@isa.object x":                                    ( x ) -> @isa.object x
   "@isa.nonempty_text x.fontnick":                    ( x ) -> @isa.nonempty_text x.fontnick
   "@isa.text x.text":                                 ( x ) -> @isa.text x.text
-  "@isa_optional.object x.known_ods":                 ( x ) -> @isa_optional.object x.known_ods
+  "@isa.integer x.doc":                               ( x ) -> @isa.integer x.doc
+  "@isa.integer x.par":                               ( x ) -> @isa.integer x.par
 
 #-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_prepare_text_cfg', tests:
