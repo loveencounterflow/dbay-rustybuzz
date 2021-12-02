@@ -88,15 +88,15 @@ jp                        = JSON.parse
           order by adi;""", { doc, par, shy_adi, shy_sgi, }
       urge '^460971^', { shy_adi, shy_sgi, dx0, text, new_alt, }
       new_alt++
-      left_ads      = @_shape_text { cfg..., text, adi_0: 1, dx0, alt: new_alt, osgi: shy_sgi, }
+      left_ads      = @_shape_text { cfg..., text, dx0, alt: new_alt, osgi: shy_sgi, }
       # last_left_ad  = left_ads[ left_ads.length - 1 ]
       #.....................................................................................................
-      { text, dx0, } = @db.first_row SQL"""
+      { text, dx2, } = @db.first_row SQL"""
         select
             coalesce(
               group_concat( case when br = 'shy' then '' else chrs end, '' ),
               '' )                    as text,
-            min( x )                  as dx0
+            max( x1 )                 as dx2
           from ads
           where true
             and ( doc = $doc )
@@ -105,11 +105,10 @@ jp                        = JSON.parse
             and ( adi > $shy_adi )
             and ( alt = 1 )
           order by adi;""", { doc, par, shy_adi, shy_sgi, }
-      # info '^460971^', dx0 = last_left_ad.x1
+      info '^460971^', { text, dx2, }
       if text isnt ''
-        urge '^460971^', { shy_adi, shy_sgi, dx0, text, new_alt, }
-        new_alt++
-        right_ads = @_shape_text { cfg..., text, adi_0: 1, dx0, alt: new_alt, osgi: shy_sgi, }
+        urge '^460971^', { shy_adi, shy_sgi, dx2, text, new_alt, }
+        right_ads = @_shape_text { cfg..., text, dx2, alt: new_alt, osgi: shy_sgi, }
       urge '^460971^'
     #.......................................................................................................
     return [ left_ads..., right_ads..., ]
@@ -160,16 +159,16 @@ jp                        = JSON.parse
   _shape_text: ( cfg ) ->
     { fontnick
       text
-      adi_0 ### NOTE optional first AD index ###
-      dx0   ### NOTE optional x reference coordinate ###
+      dx0   ### NOTE optional leftmost  x reference coordinate ###
+      dx2   ### NOTE optional rightmost x reference coordinate ###
       doc
       par
       alt
       osgi      } = cfg
     { missing   } = @constructor.C
-    adi_0_given   = adi_0?
-    adi_0        ?= 0 ### TAINT use validation, defaults ###
+    skip_ends     = dx0? or dx2? ### TAINT will probably be removed ###
     dx0          ?= 0 ### TAINT use validation, defaults ###
+    dx2          ?= null
     font_idx      = @_font_idx_from_fontnick fontnick
     ads           = @RBW.shape_text { format: 'json', text, font_idx, }
     ads           = JSON.parse ads
@@ -236,13 +235,18 @@ jp                        = JSON.parse
     #     nobr: 0
     #     br:   'end' }
     #.......................................................................................................
+    if dx2? then  delta_x = dx2 - ads[ ads.length - 1 ].x1
+    else          delta_x = 0
+    #.......................................................................................................
     @db =>
       insert_ad = @db.prepare @sql.insert_ad
-      for ad, idx in ads
+      for ad, adi in ads
+        ad.x       += delta_x
+        ad.x1      += delta_x
         row         = { br: null, ad..., }
         row.nobr    = if row.nobr then 1 else 0
         # debug '^545456^', row
-        ads[ idx ]  = @db.first_row insert_ad, row
+        ads[ adi ]  = @db.first_row insert_ad, row
       return null
     #.......................................................................................................
     return ads
