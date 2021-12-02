@@ -107,7 +107,7 @@ jp                        = JSON.parse
       brp_2   = @get_current_brp { dx0, size_u, width_u, }
       { doc
         par } = brp_2
-      urge '^5850-3^ brp_1 and brp_2'; console.table [ brp_1, brp_2, ]
+      urge '^5850-4^ brp_1 and brp_2'; console.table [ brp_1, brp_2, ]
       #.....................................................................................................
       if brp_2.alt is 1 ### non-shy BRP ###
         line_ads = @db.all_rows SQL"""
@@ -121,9 +121,9 @@ jp                        = JSON.parse
               -- and ( br != 'shy' )
             order by doc, par, adi;""", {
               doc, par, brp_1_adi: brp_1.adi, brp_2_adi: brp_2.adi, }
-        urge '^5850-4^', "line_ads", { lnr, }; console.table line_ads
+        urge '^5850-5^', "line_ads", { lnr, }; console.table line_ads
         @db =>
-          debug '^5850-5^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
+          debug '^5850-6^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
           for ad in line_ads
             x = ad.x - dx0
             y = ad.y
@@ -138,9 +138,9 @@ jp                        = JSON.parse
               and ( alt = 1 )
             limit 1;""", { doc, par, brp_2_adi: brp_2.adi, }
         unless brp_2?
-          warn '^5850-6^', "did not find `end` element"
+          warn '^5850-7^', "did not find `end` element"
           break
-        urge '^5850-7^', "brp_2"; console.table [ brp_2, ]
+        urge '^5850-8^', "brp_2"; console.table [ brp_2, ]
         dx0 = brp_2.x
       #.....................................................................................................
       else
@@ -153,7 +153,7 @@ jp                        = JSON.parse
               and ( sgi = $osgi )
               and ( alt = 1 )
             order by doc, par, adi;""", { doc, par, osgi: brp_2.osgi, }
-        urge '^5850-8^', "original_shapegroup"; console.table original_shapegroup
+        urge '^5850-9^', "original_shapegroup"; console.table original_shapegroup
         line_ads = @db.all_rows SQL"""
           select * from #{schema}.ads
             where true
@@ -200,12 +200,12 @@ jp                        = JSON.parse
               and ( alt = 1 )
             limit 1;""", { doc, par, last_osg_adi, }
         unless brp_2?
-          warn '^5850-15^', "did not find `end` element"
+          warn '^5850-17^', "did not find `end` element"
           break
-        # urge '^5850-16^', "brp_2"; console.table [ brp_2, ]
+        # urge '^5850-18^', "brp_2"; console.table [ brp_2, ]
         dx0 = brp_2.x
     #.......................................................................................................
-    # urge '^5850-17^', "line_ads", { lnr, }; console.table @db.all_rows SQL"select * from #{schema}.line_ads order by 1, 2, 3, 4;"
+    # urge '^5850-19^', "line_ads", { lnr, }; console.table @db.all_rows SQL"select * from #{schema}.line_ads order by 1, 2, 3, 4;"
     return R
 
   #---------------------------------------------------------------------------------------------------------
