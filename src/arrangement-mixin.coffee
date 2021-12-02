@@ -53,6 +53,8 @@ jp                        = JSON.parse
     { schema      } = @cfg
     { V, I, L,    } = @sql
     { shy         } = @constructor.C.special_chrs
+    left_ads        = []
+    right_ads       = []
     #.......................................................................................................
     { alt_max, } = @db.single_row SQL"""
       select max( alt ) as alt_max
