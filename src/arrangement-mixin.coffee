@@ -173,7 +173,37 @@ jp                        = JSON.parse
     ads           = @RBW.shape_text { format: 'json', text, font_idx, }
     ads           = JSON.parse ads
     ads           = @_prepare_ads text, fontnick, ads
+    { schema, }   = @cfg
     #.......................................................................................................
+    { current_adi, } = @db.first_row SQL"""
+      select
+          max( adi ) as current_adi
+        from #{schema}.ads
+        where true
+          and ( doc = $doc )
+          and ( par = $par )
+          and ( alt = $alt );""", { doc, par, alt, }
+    current_adi ?= 0
+    #.......................................................................................................
+    # if false # unless skip_ends
+    #   ads.unshift {
+    #     doc
+    #     par
+    #     alt
+    #     adi:    current_adi
+    #     sgi:    0
+    #     osgi:   null
+    #     gid:    null
+    #     b:      null
+    #     x:      0
+    #     y:      0
+    #     dx:     0
+    #     dy:     0
+    #     x1:     0
+    #     chrs:   null
+    #     sid:    null
+    #     nobr:   0
+    #     br:     'start' }
     #.......................................................................................................
     ced_x           = 0 # cumulative error displacement from missing outlines
     ced_y           = 0 # cumulative error displacement from missing outlines
@@ -182,14 +212,14 @@ jp                        = JSON.parse
     ### TAINT will not properly handle multiple SHYs in the same segment (this might happen in ligatures
     like `ffi`) ###
     for ad, idx in ads
-      continue if ( not adi_0_given ) and ( idx is 0 )
-      adi       = adi_0 + idx
+      # continue if ( not skip_ends ) and ( idx is 0 )
+      current_adi++
       #.....................................................................................................
       sgi++ unless ad.nobr
       ad.doc    = doc
       ad.par    = par
       ad.alt    = alt
-      ad.adi    = adi
+      ad.adi    = current_adi
       ad.sgi    = sgi
       ad.osgi   = osgi
       ad.sid    = "o#{ad.gid}#{fontnick}"
