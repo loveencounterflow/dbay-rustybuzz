@@ -96,10 +96,10 @@ jp                        = JSON.parse
     count         = 0
     loop
       count++
-      if count > 10
+      if count > 3
         warn "infinite loop"
         break
-      break if brp_2.br is 'end'
+      # break if brp_2.br is 'end'
       lnr++
       info '^5850-1^', '███████████████████████████████████████████████████ line:', lnr
       brp_1   = brp_2
