@@ -175,25 +175,6 @@ jp                        = JSON.parse
     ads           = JSON.parse ads
     ads           = @_prepare_ads text, fontnick, ads
     #.......................................................................................................
-    unless adi_0_given
-      ads.unshift {
-        doc
-        par
-        alt
-        adi:    0
-        sgi:    0
-        osgi:   null
-        gid:    null
-        b:      null
-        x:      0
-        y:      0
-        dx:     0
-        dy:     0
-        x1:     0
-        chrs:   null
-        sid:    null
-        nobr:   0
-        br:     'start' }
     #.......................................................................................................
     ced_x           = 0 # cumulative error displacement from missing outlines
     ced_y           = 0 # cumulative error displacement from missing outlines
@@ -233,28 +214,27 @@ jp                        = JSON.parse
       ad.x1   = ad.x + ad.dx
       # debug '^3447^', ( rpr ad.chrs ), to_width ( rpr ad ), 100
     #.......................................................................................................
-    unless adi_0_given
-      last_adi  = ads.length - 1
-      last_ad   = ads[ last_adi ]
-      this_adi  = last_adi + 1
-      ads.push {
-        doc
-        par
-        alt
-        adi:  this_adi
-        sgi:  last_ad.sgi + 1
-        osgi
-        gid:  null
-        b:    null
-        x:    last_ad.x1
-        y:    last_ad.y
-        dx:   0
-        dy:   0
-        x1:   last_ad.x1
-        chrs: null
-        sid:  null
-        nobr: 0
-        br:   'end' }
+    # if false # unless skip_ends
+    #   current_adi++
+    #   last_ad   = ads[ ads.length - 1 ]
+    #   ads.push {
+    #     doc
+    #     par
+    #     alt
+    #     adi:  current_adi
+    #     sgi:  last_ad.sgi + 1
+    #     osgi
+    #     gid:  null
+    #     b:    null
+    #     x:    last_ad.x1
+    #     y:    last_ad.y
+    #     dx:   0
+    #     dy:   0
+    #     x1:   last_ad.x1
+    #     chrs: null
+    #     sid:  null
+    #     nobr: 0
+    #     br:   'end' }
     #.......................................................................................................
     @db =>
       insert_ad = @db.prepare @sql.insert_ad
