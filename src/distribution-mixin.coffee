@@ -184,13 +184,15 @@ jp                        = JSON.parse
               and ( doc = $doc )
               and ( par = $par )
               and ( alt = $brp_2_alt )
+              and ( adi <= $brp_2_adi )
               -- and ( br != 'shy' )
-            order by doc, par, adi;""", {
+            order by doc, par, x, adi;""", {
               doc,
               par,
-              brp_2_alt: brp_2.alt,
-              brp_1_adi: brp_1.adi,
-              first_replaced_adi: original_shapegroup[ 0 ].adi, }
+              brp_2_alt:            brp_2.alt,
+              brp_1_adi:            brp_1.adi,
+              first_replaced_adi:   original_shapegroup[ 0 ].adi,
+              brp_2_adi:            brp_2.adi, }
         urge '^5850-10^', "line_ads", { lnr, }; console.table line_ads
         ### at his point we know that the material to be typeset on the current line
         starts with BRP 1 and extends to the SG of BRP 2 using the ALT of that break point;
@@ -206,14 +208,37 @@ jp                        = JSON.parse
         ### TAINT does not correctly handle case when shapegroup has elements on right hand side of HHY ###
         debug '^5850-13^', original_shapegroup[ original_shapegroup.length - 1 ]
         debug '^5850-14^', last_osg_adi = original_shapegroup[ original_shapegroup.length - 1 ].adi
-        brp_2 = @db.first_row SQL"""
+        urge '^5850-15^', "brp_2"; console.table [ brp_2, ]
+        urge '^5850-16^', "next brp_2"; console.table @db.all_rows SQL"""
+          select * from #{schema}.ads
+            where true
+              and ( doc = $doc )
+              and ( par = $par )
+              and ( adi = $brp_2_adi + 1 )
+              and ( alt = $brp_2_alt )
+            union all
           select * from #{schema}.ads
             where true
               and ( doc = $doc )
               and ( par = $par )
               and ( adi = $last_osg_adi + 1 )
-              and ( alt = 1 )
-            limit 1;""", { doc, par, last_osg_adi, }
+              and ( alt = 1 );""", {
+                doc, par, last_osg_adi, brp_2_adi: brp_2.adi, brp_2_alt: brp_2.alt, }
+        brp_2 = @db.first_row SQL"""
+          select * from #{schema}.ads
+            where true
+              and ( doc = $doc )
+              and ( par = $par )
+              and ( adi = $brp_2_adi + 1 )
+              and ( alt = $brp_2_alt )
+            union all
+          select * from #{schema}.ads
+            where true
+              and ( doc = $doc )
+              and ( par = $par )
+              and ( adi = $last_osg_adi + 1 )
+              and ( alt = 1 );""", {
+                doc, par, last_osg_adi, brp_2_adi: brp_2.adi, brp_2_alt: brp_2.alt, }
         unless brp_2?
           warn '^5850-17^', "did not find `end` element"
           break
