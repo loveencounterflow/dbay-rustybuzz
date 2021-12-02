@@ -105,6 +105,9 @@ jp                        = JSON.parse
       brp_1   = brp_2
       urge '^5850-2^', "current BRPs"; console.table @get_current_brp { dx0, size_u, width_u, limit: 5, }
       brp_2   = @get_current_brp { dx0, size_u, width_u, }
+      unless brp_2?
+        warn '^5850-3^', "did not find `end` element"
+        break
       { doc
         par } = brp_2
       urge '^5850-4^ brp_1 and brp_2'; console.table [ brp_1, brp_2, ]
