@@ -75,7 +75,9 @@ jp                        = JSON.parse
     { schema,
       prefix  } = @cfg
     #.......................................................................................................
-    { mm_p_u
+    { doc
+      par
+      mm_p_u
       width_mm
       size_mm } = cfg                       # nominal type size (1em)
     width_u     = width_mm / mm_p_u         # line width in glyf design units (1000 per em)
