@@ -87,7 +87,17 @@ jp                        = JSON.parse
     # urge '^4875^', 'current_brps'; console.table @db.all_rows SQL"select * from #{schema}.current_brps;"
     #.......................................................................................................
     # select last AD: SQL"select * from ads where alt = 1 and adi = ( select max( adi ) from ads where alt = 1 );"
-    brp_2         = @db.single_row SQL"select * from #{schema}.ads where br = 'start' limit 1;"
+    # brp_2         = @db.single_row SQL"select * from #{schema}.ads where br = 'start' limit 1;"
+    brp_2         = @db.single_row SQL"""
+      select
+          *
+        from #{schema}.ads
+        where true
+          and ( doc = $doc )
+          and ( par = $par )
+          -- and ( br = 'start' )
+        order by adi asc
+        limit 1;""", { doc, par, }
     brp_1         = null
     lnr           = 0
     # lines         = []
