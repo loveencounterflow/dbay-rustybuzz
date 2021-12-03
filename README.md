@@ -156,9 +156,9 @@ unless special care is taken.
       the byte length of the source text without a successor).
     * These constraints mean that fields `b1` and `b2` can be interpreted as implementing a doubly linked
       list; this is a simple ('single-track') linked list when only looking at layer `alt: 1` and a
-    * The pair `( b1, b2 )` can not only be used to sort ADs such that they are in *logical order* (for
-      which see *Chapter 2.2: Unicode Design Principles* in *The Unicode Standard (v14)*,
-      p19)[https://www.unicode.org/versions/Unicode14.0.0/ch02.pdf#G128].
+    * The pair `( b1, b2 )` can not only be used to sort ADs such that they are in *logical order* ([for
+          which see *Chapter 2.2: Unicode Design Principles* in *The Unicode Standard (v14)*,
+          p19](https://www.unicode.org/versions/Unicode14.0.0/ch02.pdf#G128)).
     * Since `byte_range := ( b1, b2 )` refers to a range of contiguous bytes in the source text, one can, by
       preserving the two fields across transformations, pinpoint, for any outline in the resulting output
       (HTML or PDF), the *exact location in the source text* that is responsible for the outline in
@@ -169,7 +169,7 @@ unless special care is taken.
 ```
 
 ( x1, x2 )            ┌ 6110 ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄ 6874 ┐
-
+                      │                                      │
 gid          23         85          3         -1         176        40         180         3
           ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐
 alt: 1  ──┼─> a <─┼─┬┼─> f <─┼──┼─> ¬ <─┼──┼─> f <─┼──┼─> i <─┼┬─┼─> r <─┼──┼─> m <─┼──┼─> ␣ <─┼──
@@ -182,7 +182,7 @@ gid                 ┆   28         50         28         176   ┆
 alt: > 1            └┼─> f <─┼──┼─> - <─┼──┼─> f <─┼──┼─> i <─┼┘
                      └───────┘  └───────┘  └───────┘  └───────┘
 b1, b2                 11, 12     12, 14     14, 15     15, 16
-
+                      │                │    │                │
 ( x1, x2 )            └ 6110 ┄┄┄┄ 6711 ┘    └ 6359 ┄┄┄┄ 6874 ┘
 
 ```
