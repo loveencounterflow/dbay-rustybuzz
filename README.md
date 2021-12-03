@@ -264,6 +264,9 @@ excerpt of table `ads` with `alt` track 1:               .. and with `alt` track
 * **[–]** Ensure that entire text gets reflected in SVG comments when so configured, even while omitting
   refs for whitespace.
 * **[+]** [hengist] Implement a 'Glyf Grid' to see which outlines are mapped to which GIDs
+* **[–]** Rename field `ads.alt` to `ads.trk` ('track', as used in this README)
+* **[–]** Remove field `ads.adi` (or rename `ads.id` -> `ads.adi`) if possible since fields `id` and `b1`
+  are better fits for the same puproses (identifying an AD, logical ordering of ADs).
 
 
 
