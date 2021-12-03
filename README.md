@@ -164,6 +164,8 @@ unless special care is taken.
           between `ff` and `i`) on track `alt: 1` and an alternative track `alt: > 1` (an arbitrary but
           locally unique number greater than 1), and
         * a Hard Hyphen (HHY) between the two `f`s of `affirm` (i.e. `af-`, `firm`).
+        * Observe that some GIDs differ between the two tracks, that's because one track uses a ligature
+          where the other track uses two (identical) outlines for the same portion of the source text.
     * The pair `( b1, b2 )` can not only be used to sort ADs such that they are in *logical order* ([for
           which see *Chapter 2.2: Unicode Design Principles* in *The Unicode Standard (v14)*,
           p19](https://www.unicode.org/versions/Unicode14.0.0/ch02.pdf#G128)).
