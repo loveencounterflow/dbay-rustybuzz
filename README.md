@@ -12,6 +12,7 @@
     - [General Procedure](#general-procedure)
     - [IDs of SVG Paths / Glyf Outlines](#ids-of-svg-paths--glyf-outlines)
     - [Selectable Text](#selectable-text)
+  - [DB Structure](#db-structure)
   - [To Do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -139,6 +140,67 @@ unless special care is taken.
 --><span style='left:50mm;top:50mm;'>fourth line</span>
 <!--?textcontainer-end?--></textcontainer>
 ```
+
+## DB Structure
+
+* **table `ads`**:
+  * **fields `b1`, `b2`**: The indexes of the respective first bytes that correspond to the respective
+    *current* and *next* ADs in the source text.
+    * The `b1` value of an AD always equals the `b2` value of the preceding AD (except for the first AD in a
+      paragraph, whose `b1` is always `0` without a predecessor); conversely, the `b2` value of AD always
+      equals the `b1` of the succeeding AD (except for the last AD in a paragraph, whose `b2` always equals
+      the byte length of the source text without a successor).
+    * These constraints mean that fields `b1` and `b2` can be interpreted as implementing a doubly linked
+      list; this is a simple ('single-track') linked list when only looking at layer `alt: 1` and a
+    * The pair `( b1, b2 )` can not only be used to sort ADs such that they are in *logical order* (for
+      which see *Chapter 2.2: Unicode Design Principles* in *The Unicode Standard (v14)*,
+      p19)[https://www.unicode.org/versions/Unicode14.0.0/ch02.pdf#G128].
+    * Since `byte_range := ( b1, b2 )` refers to a range of contiguous bytes in the source text, one can, by
+      preserving the two fields across transformations, pinpoint, for any outline in the resulting output
+      (HTML or PDF), the *exact location in the source text* that is responsible for the outline in
+      question.
+
+```
+
+
+
+
+  ┌───────┐    ┌───────┐    ┌───────┐    ┌───────┐    ┌───────┐    ┌───────┐    ┌───────┐    ┌───────┐
+──┼─> a <─┼────┼─> f <─┼────┼─> ¬ <─┼────┼─> f <─┼────┼─> i <─┼────┼─> r <─┼────┼─> m <─┼────┼─> ␣ <─┼──
+  └───────┘    └───────┘    └───────┘    └───────┘    └───────┘    └───────┘    └───────┘    └───────┘
+
+
+
+
+
+
+```
+
+```
+excerpt of table `ads` with `alt` layer 1:        excerpt of table `ads` with `alt` layer ≠ 1:
+┌─────┬────┬────┬─────┬──────┬──────┬──────┐      ┌─────┬────┬────┬─────┬──────┬──────┬──────┐
+│ adi │ b1 │ b2 │ sgi │ osgi │ chrs │  x   │      │ adi │ b1 │ b2 │ sgi │ osgi │ chrs │  x   │
+├─────┼────┼────┼─────┼──────┼──────┼──────┤      ├─────┼────┼────┼─────┼──────┼──────┼──────┤
+│     │    │    │     │      │      │      │      │     │    │    │     │      │      │      │
+│  10 │ 10 │ 11 │ 11  │ null │ 'a'  │ 5610 │      │     │    │    │     │      │      │      │
+│  11 │ 11 │ 12 │ 12  │ null │ 'f'  │ 6110 │      │  47 │ 11 │ 12 │ xxx │  12  │ 'f'  │ 6110 │
+│  12 │ 12 │ 14 │ 12  │ null │ '¬'  │ 6671 │      │  48 │ 12 │ 14 │ xxx │  12  │ '-'  │ 6422 │
+│  13 │ 14 │ 15 │ 12  │ null │ 'f'  │ 6671 │      │  49 │ 14 │ 15 │ xxx │  12  │ 'f'  │ 6359 │
+│  14 │ 15 │ 16 │ 12  │ null │ 'i'  │ 6671 │      │  50 │ 15 │ 16 │ xxx │  12  │ 'i'  │ 6671 │
+│  15 │ 16 │ 17 │ 13  │ null │ 'r'  │ 6874 │      │     │    │    │     │      │      │      │
+│  16 │ 17 │ 18 │ 13  │ null │ 'm'  │ 7259 │
+│  17 │ 18 │ 19 │ 14  │ null │ ' '  │ 8014 │
+│     │    │    │     │      │      │      │
+
+
+
+
+
+
+
+
+```
+
 
 ## To Do
 
