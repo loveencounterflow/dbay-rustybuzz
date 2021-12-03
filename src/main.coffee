@@ -32,6 +32,10 @@ home                      = PATH.resolve PATH.join __dirname, '..'
 { Drb_sundry            } = require './sundry-mixin'
 font_path                 = PATH.resolve PATH.join __dirname, '../fonts'
 ZLIB                      = require 'zlib'
+special_chrs              =
+  hhy:              '\u{002d}' # hard hyphen
+  shy:              '\u{00ad}' # soft hyphen
+  wbr:              '\u{200b}' # word break opportunity (as in `foo/bar` with a WBR after the slash)
 
 
 #===========================================================================================================
@@ -65,9 +69,15 @@ class @Drb extends  \
     missing:
       gid:              0
     special_chrs:
-      hhy:              '\u{002d}' # hard hyphen
-      shy:              '\u{00ad}' # soft hyphen
-      wbr:              '\u{200b}' # word break opportunity (as in `foo/bar` with a WBR after the slash)
+      hhy:              special_chrs.hhy # hard hyphen
+      shy:              special_chrs.shy # soft hyphen
+      wbr:              special_chrs.wbr # word break opportunity (as in `foo/bar` with a WBR after the slash)
+    ### TAINT need byte counts in arrangement/_prepare_ads ###
+    ### Buffer.byteLength special_chrs.shy ###
+    byte_counts:
+      hhy:              Buffer.byteLength special_chrs.hhy
+      shy:              Buffer.byteLength special_chrs.shy
+      wbr:              Buffer.byteLength special_chrs.wbr
     defaults:
       #.....................................................................................................
       dbr_register_fontnick_cfg:
