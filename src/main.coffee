@@ -247,11 +247,13 @@ class @Drb extends  \
           doc     integer not null, -- document idx
           par     integer not null, -- paragraph idx
           alt     integer not null, -- variant idx
+          b1      integer not null,
+          b2      integer not null,
           adi     integer not null, -- arr. dat. idx
           sgi     integer not null, -- shape group idx, being a suite of ADs that must be reshaped if broken
+          -- sgp     integer not null default 0, -- shape group part; 1: up to & incl HHY, 2: right of HHY to end of SG
           osgi    integer, -- when alt > 1, the original SG that this SG replaces
           gid     integer,
-          b       integer,
           -- ### TAINT should be x1 + dx = x2, y1 + dy = y2
           x       integer not null,
           y       integer not null,
@@ -324,7 +326,7 @@ class @Drb extends  \
       insert_ad: @db.create_insert {
         schema,
         into:       'ads',
-        fields:     [ 'doc', 'par', 'alt', 'adi', 'sgi', 'osgi', 'gid', 'b',
+        fields:     [ 'doc', 'par', 'alt', 'b1', 'b2', 'adi', 'sgi', 'osgi', 'gid',
                       'x', 'y', 'dx', 'dy', 'chrs', 'sid', 'nobr', 'br', ]
         returning:  '*', }
       #.....................................................................................................

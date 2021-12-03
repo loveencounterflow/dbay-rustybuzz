@@ -85,7 +85,9 @@ jp                        = JSON.parse
     adi0        = 0                         # index of AD that represents current line start
     dx0         = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
-    urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, alt, adi, sgi;"
+    urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, alt, b1, adi, sgi;"
+    # urge '^4875^', 'ads'; console.table @db.all_rows SQL"select b1, b2, sgi, osgi, chrs, x from #{schema}.ads where sgi = 12 or osgi = 12 order by doc, par, alt, b1, adi, sgi;"
+    # process.exit 119
     # urge '^4875^', 'current_brps'; console.table @db.all_rows SQL"select * from #{schema}.current_brps;"
     #.......................................................................................................
     # select last AD: SQL"select * from ads where alt = 1 and adi = ( select max( adi ) from ads where alt = 1 );"

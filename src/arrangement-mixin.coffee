@@ -72,12 +72,14 @@ jp                        = JSON.parse
           and ( alt = 1 );""", { doc, par, }
       #.....................................................................................................
       # First batch: Chracters in same shape group as SHY, up to the shy, with an added hyphen:
-      { text, dx0, } = @db.first_row SQL"""
+      { text, b0, b2, dx0, } = @db.first_row SQL"""
         select
             coalesce(
               group_concat( case when br = 'shy' then '' else chrs end, '' ),
               '' ) || '-'             as text,
-            min( x )                  as dx0
+            min( x )                  as dx0,
+            min( b1 )                 as b0,
+            max( b2 )                 as b2
           from ads
           where true
             and ( doc = $doc )
@@ -88,15 +90,17 @@ jp                        = JSON.parse
           order by adi;""", { doc, par, shy_adi, shy_sgi, }
       urge '^460971^', { shy_adi, shy_sgi, dx0, text, new_alt, }
       new_alt++
-      left_ads      = @_shape_text { cfg..., text, dx0, alt: new_alt, osgi: shy_sgi, }
+      left_ads      = @_shape_text { cfg..., text, b0, b2, dx0, alt: new_alt, osgi: shy_sgi, }
       # last_left_ad  = left_ads[ left_ads.length - 1 ]
       #.....................................................................................................
-      { text, dx2, } = @db.first_row SQL"""
+      { text, b0, b2, dx2, } = @db.first_row SQL"""
         select
             coalesce(
               group_concat( case when br = 'shy' then '' else chrs end, '' ),
               '' )                    as text,
-            max( x1 )                 as dx2
+            max( x1 )                 as dx2,
+            min( b1 )                 as b0,
+            max( b2 )                 as b2
           from ads
           where true
             and ( doc = $doc )
@@ -108,7 +112,7 @@ jp                        = JSON.parse
       info '^460971^', { text, dx2, }
       if text isnt ''
         urge '^460971^', { shy_adi, shy_sgi, dx2, text, new_alt, }
-        right_ads = @_shape_text { cfg..., text, dx2, alt: new_alt, osgi: shy_sgi, }
+        right_ads = @_shape_text { cfg..., text, b0, b2, dx2, alt: new_alt, osgi: shy_sgi, }
       urge '^460971^'
     #.......................................................................................................
     return [ left_ads..., right_ads..., ]
@@ -122,12 +126,15 @@ jp                        = JSON.parse
     where WBRs and SHYs appear with other material to always make them standalone ADs. ###
     R                 = []
     { special_chrs
+      byte_counts
       ignored       } = @constructor.C
     bytes             = Buffer.from text, { encoding: 'utf-8', }
     prv_ad            = null
     for ad, adi in ads
-      nxt_b     = ads[ adi + 1 ]?.b ? Infinity
-      ad.chrs   = bytes[ ad.b ... nxt_b ].toString()
+      ad.b1     = ad.b
+      ad.b2     = ads[ adi + 1 ]?.b ? bytes.length
+      delete ad.b
+      ad.chrs   = bytes[ ad.b1 ... ad.b2 ].toString()
       extra_ad  = null
       has_shy   = false
       has_wbr   = false
@@ -137,7 +144,9 @@ jp                        = JSON.parse
         ad.br           = if has_shy then 'shy' else 'wbr'
         if ad.chrs.length > 1 ### NOTE safe b/c we know SHY is BMP codepoint ###
           extra_ad      = { ad..., }
+          ad.b2         = ad.b1 + byte_counts[ if has_shy then 'shy' else 'wbr' ]
           extra_ad.chrs = ad.chrs[ 1 .. ]
+          extra_ad.b1   = ad.b2
           extra_ad.br   = null
           extra_ad.gid  = ignored.gid
           extra_ad.sid  = "o#{ignored.gid}#{fontnick}"
@@ -161,12 +170,16 @@ jp                        = JSON.parse
       text
       dx0   ### NOTE optional leftmost  x reference coordinate ###
       dx2   ### NOTE optional rightmost x reference coordinate ###
+      b0    ### NOTE optional leftmost byte index ###
+      b2    ### NOTE optional rightmost byte index ###
       doc
       par
       alt
       osgi      } = cfg
     { missing   } = @constructor.C
     skip_ends     = dx0? or dx2? ### TAINT will probably be removed ###
+    b0           ?= 0
+    b2           ?= null
     dx0          ?= 0 ### TAINT use validation, defaults ###
     dx2          ?= null
     font_idx      = @_font_idx_from_fontnick fontnick
@@ -199,6 +212,8 @@ jp                        = JSON.parse
       ad.doc    = doc
       ad.par    = par
       ad.alt    = alt
+      ad.b1    += b0
+      ad.b2    += b0
       ad.adi    = current_adi
       ad.sgi    = sgi
       ad.osgi   = osgi
@@ -223,6 +238,7 @@ jp                        = JSON.parse
       ad.x1   = ad.x + ad.dx
       # debug '^3447^', ( rpr ad.chrs ), to_width ( rpr ad ), 100
     #.......................................................................................................
+    if b2?  then  ads[ ads.length - 1 ].b2 = b2
     if dx2? then  delta_x = dx2 - ads[ ads.length - 1 ].x1
     else          delta_x = 0
     #.......................................................................................................
