@@ -155,7 +155,15 @@ unless special care is taken.
       equals the `b1` of the succeeding AD (except for the last AD in a paragraph, whose `b2` always equals
       the byte length of the source text without a successor).
     * These constraints mean that fields `b1` and `b2` can be interpreted as implementing a doubly linked
-      list; this is a simple ('single-track') linked list when only looking at layer `alt: 1` and a
+      list; this is a simple ('single-track') linked list when only looking at track `alt: 1` and a multiply
+      linked list when one looks at all the tracks.
+      * Multiple tracks occur because of the need to re-shape Shape Groups (SGs) of interdependent outlines
+        in the presence of a Soft Hyphen (SHY); in the below example, there's
+        * a soft hyphen between the two `f`s of `affirm` (i.e. `af¬firm`, where the SHY is not normally
+          visible and does not inhibit the usage of GID 85 that pictures `ff` nor the application of kerning
+          between `ff` and `i`) on track `alt: 1` and an alternative track `alt: > 1` (an arbitrary but
+          locally unique number greater than 1), and
+        * a Hard Hyphen (HHY) between the two `f`s of `affirm` (i.e. `af-`, `firm`).
     * The pair `( b1, b2 )` can not only be used to sort ADs such that they are in *logical order* ([for
           which see *Chapter 2.2: Unicode Design Principles* in *The Unicode Standard (v14)*,
           p19](https://www.unicode.org/versions/Unicode14.0.0/ch02.pdf#G128)).
@@ -188,7 +196,7 @@ b1, b2                 11, 12     12, 14     14, 15     15, 16
 ```
 
 ```
-excerpt of table `ads` with `alt` layer 1:               .. and with `alt` layer > 1:
+excerpt of table `ads` with `alt` track 1:               .. and with `alt` track > 1:
 ┌─────┬────┬────┬─────┬──────┬──────┬──────┬──────┐      ┌─────┬────┬────┬─────┬──────┬──────┬──────┬──────┐
 │ adi │ b1 │ b2 │ sgi │ osgi │  gid │ chrs │  x   │      │ adi │ b1 │ b2 │ sgi │ osgi │  gid │ chrs │  x   │
 ├─────┼────┼────┼─────┼──────┼──────┼──────┼──────┤      ├─────┼────┼────┼─────┼──────┼──────┼──────┼──────┤
