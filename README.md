@@ -163,29 +163,32 @@ unless special care is taken.
       preserving the two fields across transformations, pinpoint, for any outline in the resulting output
       (HTML or PDF), the *exact location in the source text* that is responsible for the outline in
       question.
+    * One may say that the coordinate tuple `( x1, x2 )` reifies (materializes) the *visual ordering*
+      whereas the byte index tuple `( b1, b2 )` reifies the *logical ordering* of a given source text.
 
 ```
 
+( x1, x2 )            ┌ 6110 ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄ 6874 ┐
 
-
-GID          23         85          3         -1         176        40         180         3
+gid          23         85          3         -1         176        40         180         3
           ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐
-ALT: 1  ──┼─> a <─┼─┬┼─> f <─┼──┼─> ¬ <─┼──┼─> f <─┼──┼─> i <─┼┬─┼─> r <─┼──┼─> m <─┼──┼─> ␣ <─┼──
+alt: 1  ──┼─> a <─┼─┬┼─> f <─┼──┼─> ¬ <─┼──┼─> f <─┼──┼─> i <─┼┬─┼─> r <─┼──┼─> m <─┼──┼─> ␣ <─┼──
           └───────┘ ┆└───────┘  └───────┘  └───────┘  └───────┘┆ └───────┘  └───────┘  └───────┘
-B1, B2      10, 11  ┆  11, 12     12, 14     14, 15     15, 16 ┆   16, 17     17, 18     18, 19
+b1, b2      10, 11  ┆  11, 12     12, 14     14, 15     15, 16 ┆   16, 17     17, 18     18, 19
                     ┆                                          ┆
                     ┆                                          ┆
-GID                 ┆     28         50         28         176 ┆
+gid                 ┆   28         50         28         176   ┆
                     ┆┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐┆
-ALT: > 1            └┼─> f <─┼──┼─> - <─┼──┼─> f <─┼──┼─> i <─┼┘
+alt: > 1            └┼─> f <─┼──┼─> - <─┼──┼─> f <─┼──┼─> i <─┼┘
                      └───────┘  └───────┘  └───────┘  └───────┘
-B1, B2                 11, 12     12, 14     14, 15     15, 16
+b1, b2                 11, 12     12, 14     14, 15     15, 16
 
+( x1, x2 )            └ 6110 ┄┄┄┄ 6711 ┘    └ 6359 ┄┄┄┄ 6874 ┘
 
 ```
 
 ```
-excerpt of table `ads` with `alt` layer 1:        excerpt of table `ads` with `alt` layer ≠ 1:
+excerpt of table `ads` with `alt` layer 1:               .. and with `alt` layer > 1:
 ┌─────┬────┬────┬─────┬──────┬──────┬──────┬──────┐      ┌─────┬────┬────┬─────┬──────┬──────┬──────┬──────┐
 │ adi │ b1 │ b2 │ sgi │ osgi │  gid │ chrs │  x   │      │ adi │ b1 │ b2 │ sgi │ osgi │  gid │ chrs │  x   │
 ├─────┼────┼────┼─────┼──────┼──────┼──────┼──────┤      ├─────┼────┼────┼─────┼──────┼──────┼──────┼──────┤
