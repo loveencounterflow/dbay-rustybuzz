@@ -86,7 +86,7 @@ jp                        = JSON.parse
     dx0         = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
     urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, alt, b1, adi, sgi;"
-    # urge '^4875^', 'ads'; console.table @db.all_rows SQL"select b1, b2, sgi, osgi, chrs, x from #{schema}.ads where sgi = 12 or osgi = 12 order by doc, par, alt, b1, adi, sgi;"
+    # urge '^4875^', 'ads'; console.table @db.all_rows SQL"select b1, b2, sgi, osgi, gid, chrs, x as x1, x1 as x2 from #{schema}.ads order by doc, par, alt, b1, adi, sgi;"
     # process.exit 119
     # urge '^4875^', 'current_brps'; console.table @db.all_rows SQL"select * from #{schema}.current_brps;"
     #.......................................................................................................
