@@ -144,8 +144,12 @@ unless special care is taken.
 ## DB Structure
 
 * **table `ads`**:
-  * **fields `b1`, `b2`**: The indexes of the respective first bytes that correspond to the respective
-    *current* and *next* ADs in the source text.
+  * **field `ads.gid`**: Glyf ID, the numeric ID of the respective glyf (outline, shape) in the current
+    font. By convention and OTF specification, GID `0` is used to represent any codepoint that cannot be
+    represented with the current font; many applications will show those as so-called 'tofus' (often a
+    rectangle like ▯); beyond that, Glyf IDs are arbitrary and vary from font to font.
+  * **fields `ads.b1`, `ads.b2`**: The indexes of the respective first bytes that correspond to the
+    respective *current* and *next* ADs in the source text.
     * The `b1` value of an AD always equals the `b2` value of the preceding AD (except for the first AD in a
       paragraph, whose `b1` is always `0` without a predecessor); conversely, the `b2` value of AD always
       equals the `b1` of the succeeding AD (except for the last AD in a paragraph, whose `b2` always equals
@@ -164,38 +168,37 @@ unless special care is taken.
 
 
 
+GID         23         85          3         -1         176        40         180         3
+         ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐
+       ──┼─> a <─┼──┼─> f <─┼──┼─> ¬ <─┼──┼─> f <─┼──┼─> i <─┼──┼─> r <─┼──┼─> m <─┼──┼─> ␣ <─┼──
+         └───────┘  └───────┘  └───────┘  └───────┘  └───────┘  └───────┘  └───────┘  └───────┘
+B1, B2     10, 11     11, 12     12, 14     14, 15     15, 16     16, 17     17, 18     18, 19
 
-  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐
-──┼─> a <─┼──┼─> f <─┼──┼─> ¬ <─┼──┼─> f <─┼──┼─> i <─┼──┼─> r <─┼──┼─> m <─┼──┼─> ␣ <─┼──
-  └───────┘  └───────┘  └───────┘  └───────┘  └───────┘  └───────┘  └───────┘  └───────┘
 
-
-
-
+GID                    28         50         28         176
+                    ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐
+                   ─┼─> f <─┼──┼─> ¬ <─┼──┼─> f <─┼──┼─> i <─┼─
+                    └───────┘  └───────┘  └───────┘  └───────┘
+B1, B2                11, 12     12, 14     14, 15     15, 16
 
 
 ```
 
 ```
 excerpt of table `ads` with `alt` layer 1:        excerpt of table `ads` with `alt` layer ≠ 1:
-┌─────┬────┬────┬─────┬──────┬──────┬──────┐      ┌─────┬────┬────┬─────┬──────┬──────┬──────┐
-│ adi │ b1 │ b2 │ sgi │ osgi │ chrs │  x   │      │ adi │ b1 │ b2 │ sgi │ osgi │ chrs │  x   │
-├─────┼────┼────┼─────┼──────┼──────┼──────┤      ├─────┼────┼────┼─────┼──────┼──────┼──────┤
-│     │    │    │     │      │      │      │      │     │    │    │     │      │      │      │
-│  10 │ 10 │ 11 │ 11  │ null │ 'a'  │ 5610 │      │     │    │    │     │      │      │      │
-│  11 │ 11 │ 12 │ 12  │ null │ 'f'  │ 6110 │      │  47 │ 11 │ 12 │ xxx │  12  │ 'f'  │ 6110 │
-│  12 │ 12 │ 14 │ 12  │ null │ '¬'  │ 6671 │      │  48 │ 12 │ 14 │ xxx │  12  │ '-'  │ 6422 │
-│  13 │ 14 │ 15 │ 12  │ null │ 'f'  │ 6671 │      │  49 │ 14 │ 15 │ xxx │  12  │ 'f'  │ 6359 │
-│  14 │ 15 │ 16 │ 12  │ null │ 'i'  │ 6671 │      │  50 │ 15 │ 16 │ xxx │  12  │ 'i'  │ 6671 │
-│  15 │ 16 │ 17 │ 13  │ null │ 'r'  │ 6874 │      │     │    │    │     │      │      │      │
-│  16 │ 17 │ 18 │ 13  │ null │ 'm'  │ 7259 │
-│  17 │ 18 │ 19 │ 14  │ null │ ' '  │ 8014 │
-│     │    │    │     │      │      │      │
-
-
-
-
-
+┌─────┬────┬────┬─────┬──────┬──────┬──────┬──────┐      ┌─────┬────┬────┬─────┬──────┬──────┬──────┬──────┐
+│ adi │ b1 │ b2 │ sgi │ osgi │  gid │ chrs │  x   │      │ adi │ b1 │ b2 │ sgi │ osgi │  gid │ chrs │  x   │
+├─────┼────┼────┼─────┼──────┼──────┼──────┼──────┤      ├─────┼────┼────┼─────┼──────┼──────┼──────┼──────┤
+│     │    │    │     │      │      │      │      │      │     │    │    │     │      │      │      │      │
+│  10 │ 10 │ 11 │ 11  │ null │   23 │ 'a'  │ 5610 │      │     │    │    │     │      │      │      │      │
+│  11 │ 11 │ 12 │ 12  │ null │   85 │ 'f'  │ 6110 │      │  47 │ 11 │ 12 │ xxx │  12  │   28 │ 'f'  │ 6110 │
+│  12 │ 12 │ 14 │ 12  │ null │    3 │ '¬'  │ 6671 │      │  48 │ 12 │ 14 │ xxx │  12  │   50 │ '-'  │ 6422 │
+│  13 │ 14 │ 15 │ 12  │ null │   -1 │ 'f'  │ 6671 │      │  49 │ 14 │ 15 │ xxx │  12  │   28 │ 'f'  │ 6359 │
+│  14 │ 15 │ 16 │ 12  │ null │  176 │ 'i'  │ 6671 │      │  50 │ 15 │ 16 │ xxx │  12  │  176 │ 'i'  │ 6671 │
+│  15 │ 16 │ 17 │ 13  │ null │   40 │ 'r'  │ 6874 │      │     │    │    │     │      │      │      │      │
+│  16 │ 17 │ 18 │ 13  │ null │  180 │ 'm'  │ 7259 │
+│  17 │ 18 │ 19 │ 14  │ null │    3 │ ' '  │ 8014 │
+│     │    │    │     │      │      │      │      │
 
 
 
