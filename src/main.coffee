@@ -72,8 +72,6 @@ class @Drb extends  \
       hhy:              special_chrs.hhy # hard hyphen
       shy:              special_chrs.shy # soft hyphen
       wbr:              special_chrs.wbr # word break opportunity (as in `foo/bar` with a WBR after the slash)
-    ### TAINT need byte counts in arrangement/_prepare_ads ###
-    ### Buffer.byteLength special_chrs.shy ###
     byte_counts:
       hhy:              Buffer.byteLength special_chrs.hhy
       shy:              Buffer.byteLength special_chrs.shy
