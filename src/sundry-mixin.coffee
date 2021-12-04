@@ -98,7 +98,10 @@ SQL                       = String.raw
       b
       context }     = cfg
     { schema }      = @cfg
-    collector       = [ [], [], [], [], [], ]
+    collector       = [ [], [], [], [], [], [], ]
+    # widths_sum      = 0
+    sgis            = new Set()
+    prv_sgi         = null
     #.......................................................................................................
     row = @db.first_row SQL"""
       select
@@ -123,30 +126,38 @@ SQL                       = String.raw
           and ( id between $id - $context and $id + $context )
         order by b1;""", { id, context, }
       { gid
-        chrs  } = ad
-      b         = ad.b1.toString() + ' '
-      chrs      = ad.chrs
-      chrs      = chrs.replace '\xad', '¬'
-      chrs      = chrs.replace '\x20', '␣'
-      gid       = ad.gid.toString()
-      width     = Math.max 1, ( width_of b ), ( width_of chrs ), ( width_of gid )
-      b         = to_width b,     width, { align: 'left', }
-      chrs      = to_width chrs,  width, { align: 'right', }
-      gid       = to_width gid,   width, { align: 'right', }
-      h         = '─'.repeat width
+        chrs
+        sgi     } = ad
+      sgis.add sgi
+      b           = ad.b1.toString()
+      chrs        = ad.chrs
+      chrs        = chrs.replace '\xad', '¬'
+      chrs        = chrs.replace '\x20', '␣'
+      gid         = ad.gid.toString()
+      sgi_t       = if sgi is prv_sgi then '〃' else sgi.toString()
+      width       = Math.max 1, ( width_of b ), ( width_of chrs ), ( width_of gid ), ( width_of sgi_t )
+      # widths_sum += width
+      b           = to_width b,     width, { align: 'left',   }
+      chrs        = to_width chrs,  width, { align: 'right',  }
+      gid         = to_width gid,   width, { align: 'right',  }
+      sgi_t       = to_width sgi_t, width, { align: 'center', }
+      h           = '─'.repeat width
       collector[ 0 ].push b + ' '
       collector[ 1 ].push     '┬' + h
       collector[ 2 ].push     '│' + chrs
       collector[ 3 ].push     '│' + gid
       collector[ 4 ].push     '┴' + h
+      collector[ 5 ].push     ' ' + sgi_t
+      prv_sgi     = sgi
     collector[ 0 ].push ' '
     collector[ 1 ].push '┬'
     collector[ 2 ].push '│'
     collector[ 3 ].push '│'
     collector[ 4 ].push '┴'
+    collector[ 5 ].push ' '
     #.......................................................................................................
-    return (
-      to_width ( line.join '' ), 120, { align: 'left', } \
-        for line in collector ).join '\n'
+    debug '^77890^', sgis
+    #.......................................................................................................
+    return ( line.join '' for line in collector ).join '\n'
 
 
