@@ -95,7 +95,7 @@ jp                        = JSON.parse
           and ( doc = $doc )
           and ( par = $par )
           -- and ( br = 'start' )
-        order by adi asc
+        order by b1 asc
         limit 1;""", { doc, par, }
     brp_1         = null
     lnr           = 0
@@ -183,7 +183,7 @@ jp                        = JSON.parse
               and ( alt = $brp_2_alt )
               and ( b2 <= $brp_2_b2 )
               -- and ( br != 'shy' )
-            order by doc, par, x, adi;""", {
+            order by doc, par, x, b1;""", {
               doc,
               par,
               brp_2_alt:            brp_2.alt,
