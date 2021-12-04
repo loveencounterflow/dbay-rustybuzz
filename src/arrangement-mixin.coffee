@@ -72,13 +72,13 @@ jp                        = JSON.parse
           and ( alt = 1 );""", { doc, par, }
       #.....................................................................................................
       # First batch: Chracters in same shape group as SHY, up to the shy, with an added hyphen:
-      { text, b0, b2, dx0, } = @db.first_row SQL"""
+      { text, b1, b2, dx0, } = @db.first_row SQL"""
         select
             coalesce(
               group_concat( case when br = 'shy' then '' else chrs end, '' ),
               '' ) || '-'             as text,
             min( x )                  as dx0,
-            min( b1 )                 as b0,
+            min( b1 )                 as b1,
             max( b2 )                 as b2
           from ads
           where true
@@ -90,16 +90,16 @@ jp                        = JSON.parse
           order by adi;""", { doc, par, shy_adi, shy_sgi, }
       urge '^460971^', { shy_adi, shy_sgi, dx0, text, new_alt, }
       new_alt++
-      left_ads      = @_shape_text { cfg..., text, b0, b2, dx0, alt: new_alt, osgi: shy_sgi, }
+      left_ads      = @_shape_text { cfg..., text, b1, b2, dx0, alt: new_alt, osgi: shy_sgi, }
       # last_left_ad  = left_ads[ left_ads.length - 1 ]
       #.....................................................................................................
-      { text, b0, b2, dx2, } = @db.first_row SQL"""
+      { text, b1, b2, dx2, } = @db.first_row SQL"""
         select
             coalesce(
               group_concat( case when br = 'shy' then '' else chrs end, '' ),
               '' )                    as text,
             max( x1 )                 as dx2,
-            min( b1 )                 as b0,
+            min( b1 )                 as b1,
             max( b2 )                 as b2
           from ads
           where true
@@ -112,7 +112,7 @@ jp                        = JSON.parse
       info '^460971^', { text, dx2, }
       if text isnt ''
         urge '^460971^', { shy_adi, shy_sgi, dx2, text, new_alt, }
-        right_ads = @_shape_text { cfg..., text, b0, b2, dx2, alt: new_alt, osgi: shy_sgi, }
+        right_ads = @_shape_text { cfg..., text, b1, b2, dx2, alt: new_alt, osgi: shy_sgi, }
       urge '^460971^'
     #.......................................................................................................
     return [ left_ads..., right_ads..., ]
@@ -170,7 +170,7 @@ jp                        = JSON.parse
       text
       dx0   ### NOTE optional leftmost  x reference coordinate ###
       dx2   ### NOTE optional rightmost x reference coordinate ###
-      b0    ### NOTE optional leftmost byte index ###
+      b1    ### NOTE optional leftmost byte index ###
       b2    ### NOTE optional rightmost byte index ###
       doc
       par
@@ -178,7 +178,7 @@ jp                        = JSON.parse
       osgi      } = cfg
     { missing   } = @constructor.C
     skip_ends     = dx0? or dx2? ### TAINT will probably be removed ###
-    b0           ?= 0
+    b1           ?= 0
     b2           ?= null
     dx0          ?= 0 ### TAINT use validation, defaults ###
     dx2          ?= null
@@ -212,8 +212,8 @@ jp                        = JSON.parse
       ad.doc    = doc
       ad.par    = par
       ad.alt    = alt
-      ad.b1    += b0
-      ad.b2    += b0
+      ad.b1    += b1
+      ad.b2    += b1
       ad.adi    = current_adi
       ad.sgi    = sgi
       ad.osgi   = osgi
