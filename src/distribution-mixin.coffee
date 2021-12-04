@@ -82,7 +82,6 @@ jp                        = JSON.parse
       size_mm } = cfg                       # nominal type size (1em)
     width_u     = width_mm / mm_p_u         # line width in glyf design units (1000 per em)
     size_u      = size_mm  / mm_p_u
-    adi0        = 0                         # index of AD that represents current line start
     dx0         = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
     urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, alt, b1, sgi;"
@@ -105,7 +104,7 @@ jp                        = JSON.parse
     count         = 0
     loop
       count++
-      if count > 3
+      if count > 5
         warn "infinite loop"
         break
       # break if brp_2.br is 'end'
@@ -199,10 +198,7 @@ jp                        = JSON.parse
             y = ad.y
             @db @sql.insert_line_ad, { doc, par, lnr, ads_id: ad.id, x, y, }
           return null
-        # debug '^5850-14^ line_ads'; console.table @db.all_rows SQL"select * from #{schema}.line_ads order by 1, 2, 3;"
-        ### TAINT does not correctly handle case when shapegroup has elements on right hand side of HHY ###
-        debug '^5850-15^', original_shapegroup[ original_shapegroup.length - 1 ]
-        debug '^5850-16^', last_osg_adi = original_shapegroup[ original_shapegroup.length - 1 ].adi
+        #...................................................................................................
         urge '^5850-17^', "brp_2"; console.table [ brp_2, ]
         brp_2 = @db.first_row SQL"""
           select 1 as preference, * from #{schema}.ads
@@ -229,28 +225,6 @@ jp                        = JSON.parse
     # urge '^5850-21^', "line_ads", { lnr, }; console.table @db.all_rows SQL"select * from #{schema}.line_ads order by 1, 2, 3, 4;"
     return R
 
-  #---------------------------------------------------------------------------------------------------------
-  _text_from_adis: ( cfg ) ->
-    { schema
-      doc
-      par
-      adi_1
-      adi_2
-      alt   } = cfg
-    ads       = @db.all_rows SQL"""
-      select
-          *
-        from #{schema}.ads
-        where true
-          and doc = $doc
-          and par = $par
-          and adi between $adi_1 and $adi_2
-          and alt = $alt
-        order by doc, par, adi, sgi, alt;""", { doc, par, adi_1, adi_2, alt, }
-    ad_2  = ads[ ads.length - 1 ]
-    R     = ( ad.chrs ? '' for ad in ads ).join ''
-    R    += '-' if ad_2.br is 'shy'
-    return R
 
 
 
