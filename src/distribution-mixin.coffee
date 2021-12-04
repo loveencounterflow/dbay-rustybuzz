@@ -128,9 +128,7 @@ jp                        = JSON.parse
               and ( b1 >= $brp_1_b1 )
               and ( b2 <= $brp_2_b2 )
               and ( alt = 1 )
-              -- and ( br != 'shy' )
-            order by doc, par, b1;""", {
-              doc, par, brp_1_b1: brp_1.adi, brp_2_b2: brp_2.b2, }
+            order by doc, par, b1;""", { doc, par, brp_1_b1: brp_1.b1, brp_2_b2: brp_2.b2, }
         urge '^5850-5^', "line_ads", { lnr, }; console.table line_ads
         @db =>
           debug '^5850-6^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
@@ -172,7 +170,7 @@ jp                        = JSON.parse
               and ( doc = $doc )
               and ( par = $par )
               and ( b1 >= $brp_1_b1 )
-              and ( b2 <= $first_replaced_b2 )
+              and ( b2  < $first_replaced_b2 )
               and ( alt = 1 )
               -- and ( br != 'shy' )
           union all
