@@ -92,16 +92,12 @@ SQL                       = String.raw
   #---------------------------------------------------------------------------------------------------------
   render_ad_chain: ( cfg ) ->
     @types.validate.dbr_render_ad_chain_cfg ( cfg = { @constructor.C.defaults.dbr_render_ad_chain_cfg..., cfg..., } )
-    #.......................................................................................................
+    @types.validate.dbr_render_ad_chain_cfg ( cfg = { @constructor.C.defaults.dbr_render_ad_chain_cfg..., cfg..., } )
     { doc
       par
       b
-      context }     = cfg
-    { schema }      = @cfg
-    collector       = [ [], [], [], [], [], [], ]
-    # widths_sum      = 0
-    sgis            = new Set()
-    prv_sgi         = null
+      context     } = cfg
+    { schema      } = @cfg
     #.......................................................................................................
     row = @db.first_row SQL"""
       select
@@ -117,35 +113,74 @@ SQL                       = String.raw
     throw new E.Dbr_value_error '^Drb/sundry@1^', 'b', b, "no suitable row in table #{schema}.ads" unless row?
     { id, } = row
     #.......................................................................................................
+    ids = @db.all_first_values SQL"""
+      select
+          id
+        from #{schema}.ads
+        where true
+          and ( doc = $doc )
+          and ( par = $par )
+          and ( alt = 1 )
+          and ( b1 between $b - $context and $b + $context )
+        order by b1;""", { doc, par, b, context, }
+    #.......................................................................................................
+    { sgis
+      lines     } = @_render_ad_chain { doc, par, ids, }
+    R             = lines
+    #.......................................................................................................
+    for sgi from sgis
+      track_ids = @db.all_first_values SQL"""
+        select
+            *
+          from #{schema}.ads
+          where true
+            and ( doc = $doc )
+            and ( par = $par )
+            and ( alt > 1 )
+            and ( osgi = $sgi )
+          order by b1;""", { doc, par, sgi, }
+      if track_ids.length > 0
+        { lines } = @_render_ad_chain { doc, par, ids: track_ids, }
+        R         = [ R..., lines..., ]
+    return R.join '\n'
+
+  #---------------------------------------------------------------------------------------------------------
+  _render_ad_chain: ({ doc, par, ids, }) ->
+    { schema }      = @cfg
+    collector       = [ [], [], [], [], [], [], ]
+    # widths_sum      = 0
+    { V, I, L, }    = @db.sql
+    sgis            = new Set()
+    prv_sgi         = null
+    #.......................................................................................................
     for ad from @db SQL"""
       select
           *
         from ads
         where true
-          and ( alt = 1 )
-          and ( id between $id - $context and $id + $context )
-        order by b1;""", { id, context, }
+          and ( id in #{V ids} )
+        order by b1;"""
       { gid
         chrs
         sgi     } = ad
       sgis.add sgi
-      b           = ad.b1.toString()
-      chrs        = ad.chrs
-      chrs        = chrs.replace '\xad', '¬'
-      chrs        = chrs.replace '\x20', '␣'
-      gid         = ad.gid.toString()
+      b_t         = ad.b1.toString()
+      chrs_t      = ad.chrs
+      chrs_t      = chrs_t.replace '\xad', '¬'
+      chrs_t      = chrs_t.replace '\x20', '␣'
+      gid_t       = ad.gid.toString()
       sgi_t       = if sgi is prv_sgi then '〃' else sgi.toString()
-      width       = Math.max 1, ( width_of b ), ( width_of chrs ), ( width_of gid ), ( width_of sgi_t )
+      width       = Math.max 2, ( width_of b_t ), ( width_of chrs_t ), ( width_of gid_t ), ( width_of sgi_t )
       # widths_sum += width
-      b           = to_width b,     width, { align: 'left',   }
-      chrs        = to_width chrs,  width, { align: 'right',  }
-      gid         = to_width gid,   width, { align: 'right',  }
+      b_t         = to_width b_t,     width, { align: 'left',   }
+      chrs_t      = to_width chrs_t,  width, { align: 'right',  }
+      gid_t       = to_width gid_t,   width, { align: 'right',  }
       sgi_t       = to_width sgi_t, width, { align: 'center', }
       h           = '─'.repeat width
-      collector[ 0 ].push b + ' '
+      collector[ 0 ].push b_t + ' '
       collector[ 1 ].push     '┬' + h
-      collector[ 2 ].push     '│' + chrs
-      collector[ 3 ].push     '│' + gid
+      collector[ 2 ].push     '│' + chrs_t
+      collector[ 3 ].push     '│' + gid_t
       collector[ 4 ].push     '┴' + h
       collector[ 5 ].push     ' ' + sgi_t
       prv_sgi     = sgi
@@ -156,8 +191,7 @@ SQL                       = String.raw
     collector[ 4 ].push '┴'
     collector[ 5 ].push ' '
     #.......................................................................................................
-    debug '^77890^', sgis
-    #.......................................................................................................
-    return ( line.join '' for line in collector ).join '\n'
+    lines = ( line.join '' for line in collector )
+    return { sgis, lines, }
 
 
