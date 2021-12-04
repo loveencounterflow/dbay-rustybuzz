@@ -127,3 +127,11 @@ dbay_types                = require 'dbay/lib/types'
   "@isa.text x.text":                                 ( x ) -> @isa.text x.text
   "@isa.boolean x.ncrs":                              ( x ) -> @isa.boolean x.ncrs
 
+#-----------------------------------------------------------------------------------------------------------
+@declare 'dbr_render_ad_chain_cfg', tests:
+  "@isa.object x":                                    ( x ) -> @isa.object x
+  "x.format in [ 'compact', ]":                       ( x ) -> x.format in [ 'compact', ]
+  "@isa.integer x.doc":                               ( x ) -> @isa.integer x.doc
+  "@isa.integer x.par":                               ( x ) -> @isa.integer x.par
+  "@isa.integer x.b":                                 ( x ) -> @isa.integer x.b
+  "@isa.cardinal x.context":                          ( x ) -> @isa.cardinal x.context

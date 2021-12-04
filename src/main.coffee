@@ -134,6 +134,13 @@ class @Drb extends  \
         text:             null
         ncrs:             true
       #.....................................................................................................
+      dbr_render_ad_chain_cfg:
+        format:           'compact'
+        doc:              1
+        par:              1
+        b:                null
+        context:          5
+      #.....................................................................................................
       constructor_cfg:
         db:               null
         prefix:           'drb_'

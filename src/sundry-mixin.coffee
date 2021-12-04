@@ -23,6 +23,7 @@ ZLIB                      = require 'zlib'
 jr                        = JSON.stringify
 jp                        = JSON.parse
 HYPH                      = require 'intertext/lib/hyphenation'
+SQL                       = String.raw
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -86,6 +87,66 @@ HYPH                      = require 'intertext/lib/hyphenation'
   _hyphenate: ( text ) -> HYPH.hyphenate text
 
 
-
+  #=========================================================================================================
+  # VISUALIZATION
+  #---------------------------------------------------------------------------------------------------------
+  render_ad_chain: ( cfg ) ->
+    @types.validate.dbr_render_ad_chain_cfg ( cfg = { @constructor.C.defaults.dbr_render_ad_chain_cfg..., cfg..., } )
+    #.......................................................................................................
+    { doc
+      par
+      b
+      context }     = cfg
+    { schema }      = @cfg
+    collector       = [ [], [], [], [], [], ]
+    #.......................................................................................................
+    row = @db.first_row SQL"""
+      select
+          id
+        from #{schema}.ads
+        where true
+          and ( doc = $doc )
+          and ( par = $par )
+          and ( alt = 1 )
+          and ( b1 between $b - 10 and $b + 10 )
+        order by abs( b1 - $b ), id
+        limit 1;""", { doc, par, b, }
+    throw new E.Dbr_value_error '^Drb/sundry@1^', 'b', b, "no suitable row in table #{schema}.ads" unless row?
+    { id, } = row
+    #.......................................................................................................
+    for ad from @db SQL"""
+      select
+          *
+        from ads
+        where true
+          and ( alt = 1 )
+          and ( id between $id - $context and $id + $context )
+        order by b1;""", { id, context, }
+      { gid
+        chrs  } = ad
+      b         = ad.b1.toString() + ' '
+      chrs      = ad.chrs
+      chrs      = chrs.replace '\xad', '¬'
+      chrs      = chrs.replace '\x20', '␣'
+      gid       = ad.gid.toString()
+      width     = Math.max 1, ( width_of b ), ( width_of chrs ), ( width_of gid )
+      b         = to_width b,     width, { align: 'left', }
+      chrs      = to_width chrs,  width, { align: 'right', }
+      gid       = to_width gid,   width, { align: 'right', }
+      h         = '─'.repeat width
+      collector[ 0 ].push b + ' '
+      collector[ 1 ].push     '┬' + h
+      collector[ 2 ].push     '│' + chrs
+      collector[ 3 ].push     '│' + gid
+      collector[ 4 ].push     '┴' + h
+    collector[ 0 ].push ' '
+    collector[ 1 ].push '┬'
+    collector[ 2 ].push '│'
+    collector[ 3 ].push '│'
+    collector[ 4 ].push '┴'
+    #.......................................................................................................
+    return (
+      to_width ( line.join '' ), 120, { align: 'left', } \
+        for line in collector ).join '\n'
 
 
