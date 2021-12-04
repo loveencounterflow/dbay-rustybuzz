@@ -61,17 +61,15 @@ jp                        = JSON.parse
       from #{schema}.ads where ( doc = $doc ) and ( par = $par );""", { doc, par, }
     new_alt = alt_max
     #.......................................................................................................
-    # urge '^7875^', {  fontnick, doc, par, alt,         }
-    # urge '^7875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, adi, sgi, alt;"
-    for { shy_adi, shy_sgi, } in @db.all_rows SQL"""
-      select adi as shy_adi, sgi as shy_sgi from #{schema}.ads
+    for { shy_b1, shy_sgi, } in @db.all_rows SQL"""
+      select b1 as shy_b1, sgi as shy_sgi from #{schema}.ads
         where true
           and ( doc = $doc )
           and ( par = $par )
           and ( br  = 'shy' )
           and ( alt = 1 );""", { doc, par, }
       #.....................................................................................................
-      # First batch: Chracters in same shape group as SHY, up to the shy, with an added hyphen:
+      # First batch: Characters in same shape group as SHY, up to the shy, with an added hyphen:
       { text, b1, b2, dx0, } = @db.first_row SQL"""
         select
             coalesce(
@@ -85,10 +83,10 @@ jp                        = JSON.parse
             and ( doc = $doc )
             and ( par = $par )
             and ( sgi = $shy_sgi )
-            and ( adi <= $shy_adi )
+            and ( b1 <= $shy_b1 )
             and ( alt = 1 )
-          order by adi;""", { doc, par, shy_adi, shy_sgi, }
-      urge '^460971^', { shy_adi, shy_sgi, dx0, text, new_alt, }
+          order by b1, id;""", { doc, par, shy_b1, shy_sgi, }
+      urge '^460971^', { shy_b1, shy_sgi, dx0, text, new_alt, }
       new_alt++
       left_ads      = @_shape_text { cfg..., text, b1, b2, dx0, alt: new_alt, osgi: shy_sgi, }
       # last_left_ad  = left_ads[ left_ads.length - 1 ]
@@ -106,12 +104,12 @@ jp                        = JSON.parse
             and ( doc = $doc )
             and ( par = $par )
             and ( sgi = $shy_sgi )
-            and ( adi > $shy_adi )
+            and ( b1  > $shy_b1 )
             and ( alt = 1 )
-          order by adi;""", { doc, par, shy_adi, shy_sgi, }
+          order by b1, id;""", { doc, par, shy_b1, shy_sgi, }
       info '^460971^', { text, dx2, }
       if text isnt ''
-        urge '^460971^', { shy_adi, shy_sgi, dx2, text, new_alt, }
+        urge '^460971^', { shy_b1, shy_sgi, dx2, text, new_alt, }
         right_ads = @_shape_text { cfg..., text, b1, b2, dx2, alt: new_alt, osgi: shy_sgi, }
       urge '^460971^'
     #.......................................................................................................
@@ -130,9 +128,9 @@ jp                        = JSON.parse
       ignored       } = @constructor.C
     bytes             = Buffer.from text, { encoding: 'utf-8', }
     prv_ad            = null
-    for ad, adi in ads
+    for ad, idx in ads
       ad.b1     = ad.b
-      ad.b2     = ads[ adi + 1 ]?.b ? bytes.length
+      ad.b2     = ads[ idx + 1 ]?.b ? bytes.length
       delete ad.b
       ad.chrs   = bytes[ ad.b1 ... ad.b2 ].toString()
       extra_ad  = null
@@ -188,16 +186,6 @@ jp                        = JSON.parse
     ads           = @_prepare_ads text, fontnick, ads
     { schema, }   = @cfg
     #.......................................................................................................
-    { current_adi, } = @db.first_row SQL"""
-      select
-          max( adi ) as current_adi
-        from #{schema}.ads
-        where true
-          and ( doc = $doc )
-          and ( par = $par )
-          and ( alt = $alt );""", { doc, par, alt, }
-    current_adi ?= 0
-    #.......................................................................................................
     ced_x           = 0 # cumulative error displacement from missing outlines
     ced_y           = 0 # cumulative error displacement from missing outlines
     osgi           ?= null
@@ -205,16 +193,12 @@ jp                        = JSON.parse
     ### TAINT will not properly handle multiple SHYs in the same segment (this might happen in ligatures
     like `ffi`) ###
     for ad, idx in ads
-      # continue if ( not skip_ends ) and ( idx is 0 )
-      current_adi++
-      #.....................................................................................................
       sgi++ unless ad.nobr
       ad.doc    = doc
       ad.par    = par
       ad.alt    = alt
       ad.b1    += b1
       ad.b2    += b1
-      ad.adi    = current_adi
       ad.sgi    = sgi
       ad.osgi   = osgi
       ad.sid    = "o#{ad.gid}#{fontnick}"
@@ -244,13 +228,13 @@ jp                        = JSON.parse
     #.......................................................................................................
     @db =>
       insert_ad = @db.prepare @sql.insert_ad
-      for ad, adi in ads
+      for ad, idx in ads
         ad.x       += delta_x
         ad.x1      += delta_x
         row         = { br: null, ad..., }
         row.nobr    = if row.nobr then 1 else 0
         # debug '^545456^', row
-        ads[ adi ]  = @db.first_row insert_ad, row
+        ads[ idx ]  = @db.first_row insert_ad, row
       return null
     #.......................................................................................................
     return ads
