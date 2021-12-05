@@ -228,9 +228,11 @@ jp                        = JSON.parse
     #.......................................................................................................
     @db =>
       insert_ad = @db.prepare @sql.insert_ad
+      last_idx  = ads.length - 1
       for ad, idx in ads
         ad.x       += delta_x
         ad.x1      += delta_x
+        ad.br       = 'end' if idx is last_idx
         row         = { br: null, ad..., }
         row.nobr    = if row.nobr then 1 else 0
         # debug '^545456^', row
