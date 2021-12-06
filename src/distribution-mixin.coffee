@@ -68,7 +68,22 @@ jp                        = JSON.parse
         where ( br is not null ) and ( br != 'shy' )
         order by abs( deviation ) asc
         limit $limit;""", { schema, dx0, size_u, width_u, limit, }
-    return if limit is 1 then R[ 0 ] else R
+    return null if R.length is 0
+    closest_ad  = R[ 0 ]
+    first_nl_ad = @db.first_row SQL"""
+      select
+          *
+        from #{schema}.ads
+        where true
+          and ( br = 'nl' )
+          and ( x >= $dx0 )
+          and ( x1 <= $closest_ad_x1 )
+        order by x
+        limit 1;""", { dx0, closest_ad_x1: closest_ad.x1, }
+    return if limit is 1
+        if first_nl_ad? then first_nl_ad else closest_ad
+      else
+        if first_nl_ad? then [ first_nl_ad, ] else R
 
   #---------------------------------------------------------------------------------------------------------
   _distribute_with_db: ( cfg ) ->
