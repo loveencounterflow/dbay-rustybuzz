@@ -53,6 +53,7 @@ SQL                       = String.raw
     R         = @_decode_entities R                     if entities
     R         = @_hyphenate R                           if hyphenate
     R         = @_uax14 R                               if uax14
+    R         = R.replace /\x20*\n\x20+/g, '\n'         if trim
     return R
 
   #---------------------------------------------------------------------------------------------------------
@@ -74,6 +75,7 @@ SQL                       = String.raw
     ### TAINT precompile patterns, always use constants instead of literals ###
     R         = R.replace /\xad\u200b/g, @constructor.C.special_chrs.shy
     R         = R.replace /\x20\u200b/g, '\x20'
+    R         = R.replace /\n\u200b/g,   '\n'
     R         = R.replace /\u200b{2,}/g, @constructor.C.special_chrs.wbr
     R         = R.replace /\u200b$/g, ''
     return R
