@@ -96,6 +96,7 @@ jp                        = JSON.parse
           -- and ( br = 'start' )
         order by b1 asc
         limit 1;""", { doc, par, }
+    #.......................................................................................................
     brp_1         = null
     lnr           = 0
     # lines         = []
@@ -104,10 +105,7 @@ jp                        = JSON.parse
     count         = 0
     loop
       count++
-      if count > 5
-        warn "infinite loop"
-        break
-      # break if brp_2.br is 'end'
+      throw new Error "^drb/distribution@440487^ infinite loop" if count > 1000
       lnr++
       info '^5850-1^', '███████████████████████████████████████████████████ line:', lnr
       brp_1   = brp_2
