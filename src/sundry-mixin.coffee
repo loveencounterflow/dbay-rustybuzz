@@ -42,32 +42,27 @@ SQL                       = String.raw
     @types.validate.dbr_prepare_text_cfg ( cfg = { @constructor.C.defaults.dbr_prepare_text_cfg..., cfg..., } )
     { text: R
       entities
-      ncrs
       hyphenate
       newlines
       uax14
       trim
-      chomp       } = cfg
-    R               = @_decode_entities R, ncrs               if entities
-    R               = @_hyphenate R                           if hyphenate
-    R               = R.replace /\n+/g, '\x20'                if newlines
-    R               = @_uax14 R                               if uax14
-    R               = R.replace /^\n+$/, ''                   if chomp
-    R               = R.replace /^\x20*(.*?)\x20*$/, '$1'     if trim
+      chomp } = cfg
+    R         = R.replace /^\s+$/, ''                   if chomp
+    R         = @_decode_entities R                     if entities
+    R         = @_hyphenate R                           if hyphenate
+    R         = R.replace /\n+/g, '\x20'                if newlines
+    R         = @_uax14 R                               if uax14
+    R         = R.replace /^\x20*(.*?)\x20*$/, '$1'     if trim
     return R
 
   #---------------------------------------------------------------------------------------------------------
-  decode_entities: ( cfg ) ->
-    ### ###
-    @types.validate.dbr_decode_entities_cfg ( cfg = { @constructor.C.defaults.dbr_decode_entities_cfg..., cfg..., } )
-    return @_decode_entities cfg.text, cfg.ncrs
-
-  #---------------------------------------------------------------------------------------------------------
-  _decode_entities: ( text, ncrs ) ->
-    R               = text
-    if ncrs then  R = @RBW.decode_ncrs R
-    else          R = R.replace /&shy;/g, @constructor.C.special_chrs.shy
-    return R.replace /&wbr;/g, @constructor.C.special_chrs.wbr
+  _decode_entities: ( text ) ->
+    R = text
+    R = @RBW.decode_ncrs R
+    # else          R = R.replace /&shy;/g, @constructor.C.special_chrs.shy
+    R = R.replace /&wbr;/g, @constructor.C.special_chrs.wbr
+    R = R.replace /&br;/g,  @constructor.C.special_chrs.br
+    return R
 
   #---------------------------------------------------------------------------------------------------------
   _uax14: ( text ) ->

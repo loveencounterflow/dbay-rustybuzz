@@ -123,16 +123,11 @@ class @Drb extends  \
       dbr_prepare_text_cfg:
         text:             null
         entities:         true
-        ncrs:             true
         hyphenate:        true
         newlines:         true
         uax14:            true
         trim:             true
         chomp:            true
-      #.....................................................................................................
-      dbr_decode_entities_cfg:
-        text:             null
-        ncrs:             true
       #.....................................................................................................
       dbr_render_ad_chain_cfg:
         format:           'compact'

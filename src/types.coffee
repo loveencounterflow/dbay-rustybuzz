@@ -114,18 +114,11 @@ dbay_types                = require 'dbay/lib/types'
   "@isa.object x":                                    ( x ) -> @isa.object x
   "@isa.text x.text":                                 ( x ) -> @isa.text x.text
   "@isa.boolean x.entities":                          ( x ) -> @isa.boolean x.entities
-  "@isa.boolean x.ncrs":                              ( x ) -> @isa.boolean x.ncrs
   "@isa.boolean x.hyphenate":                         ( x ) -> @isa.boolean x.hyphenate
   "@isa.boolean x.newlines":                          ( x ) -> @isa.boolean x.newlines
   "@isa.boolean x.uax14":                             ( x ) -> @isa.boolean x.uax14
   "@isa.boolean x.trim":                              ( x ) -> @isa.boolean x.trim
   "@isa.boolean x.chomp":                             ( x ) -> @isa.boolean x.chomp
-
-#-----------------------------------------------------------------------------------------------------------
-@declare 'dbr_decode_entities_cfg', tests:
-  "@isa.object x":                                    ( x ) -> @isa.object x
-  "@isa.text x.text":                                 ( x ) -> @isa.text x.text
-  "@isa.boolean x.ncrs":                              ( x ) -> @isa.boolean x.ncrs
 
 #-----------------------------------------------------------------------------------------------------------
 @declare 'dbr_render_ad_chain_cfg', tests:
