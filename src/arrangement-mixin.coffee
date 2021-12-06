@@ -186,8 +186,7 @@ jp                        = JSON.parse
     dx0          ?= 0 ### TAINT use validation, defaults ###
     dx2          ?= null
     font_idx      = @_font_idx_from_fontnick fontnick
-    ads           = @RBW.shape_text { format: 'json', text, font_idx, }
-    ads           = JSON.parse ads
+    ads           = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, }
     ads           = @_prepare_ads text, fontnick, ads
     { schema, }   = @cfg
     #.......................................................................................................
