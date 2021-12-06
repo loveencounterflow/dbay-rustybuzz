@@ -48,11 +48,11 @@ SQL                       = String.raw
       trim
       chomp } = cfg
     R         = R.replace /^\s+$/, ''                   if chomp
+    R         = R.replace /\n+/g, '\x20'                if newlines
+    R         = R.replace /^\x20*(.*?)\x20*$/, '$1'     if trim
     R         = @_decode_entities R                     if entities
     R         = @_hyphenate R                           if hyphenate
-    R         = R.replace /\n+/g, '\x20'                if newlines
     R         = @_uax14 R                               if uax14
-    R         = R.replace /^\x20*(.*?)\x20*$/, '$1'     if trim
     return R
 
   #---------------------------------------------------------------------------------------------------------
