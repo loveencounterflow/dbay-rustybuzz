@@ -125,7 +125,7 @@ jp                        = JSON.parse
     R                 = []
     { special_chrs
       byte_counts
-      br
+      nl
       ignored       } = @constructor.C
     bytes             = Buffer.from text, { encoding: 'utf-8', }
     prv_ad            = null
@@ -157,9 +157,9 @@ jp                        = JSON.parse
       else if ad.chrs is '-'
         ad.br           = 'hhy'
       else if ad.chrs is '\n'
-        ad.br           = 'br'
-        ad.gid          = br.gid
-        ad.sid          = "o#{br.gid}#{fontnick}"
+        ad.br           = 'nl'
+        ad.gid          = nl.gid
+        ad.sid          = "o#{nl.gid}#{fontnick}"
       R.push ad
       if extra_ad?
         R.push extra_ad

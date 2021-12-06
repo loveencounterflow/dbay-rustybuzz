@@ -36,7 +36,7 @@ special_chrs              =
   hhy:              '\u{002d}' # hard hyphen
   shy:              '\u{00ad}' # soft hyphen
   wbr:              '\u{200b}' # word break opportunity (as in `foo/bar` with a WBR after the slash)
-  br:               '\n'       # manual line break
+  nl:               '\n'       # manual line break
 
 
 #===========================================================================================================
@@ -62,11 +62,11 @@ class @Drb extends  \
     gids:
       # '-4':           'sop'       # start of paragraph
       # '-3':           'eop'       # end of paragraph
-      '-3':           'br'        # new line / end of linegroup
+      '-3':           'nl'        # new line / end of linegroup
       '-2':           'reserved'  # for future purposes
       '-1':           'ignored'   # for ADs that intentionally have no outline (but may appear in debugging)
       '0':            'missing'   # font cannot render this codepoint
-    br:
+    nl:
       gid:             -3
     ignored:
       gid:             -1
@@ -76,12 +76,12 @@ class @Drb extends  \
       hhy:              special_chrs.hhy # hard hyphen
       shy:              special_chrs.shy # soft hyphen
       wbr:              special_chrs.wbr # word break opportunity (as in `foo/bar` with a WBR after the slash)
-      br:               special_chrs.br  # manual line break
+      nl:               special_chrs.nl  # manual line break
     byte_counts:
       hhy:              Buffer.byteLength special_chrs.hhy
       shy:              Buffer.byteLength special_chrs.shy
       wbr:              Buffer.byteLength special_chrs.wbr
-      br:               Buffer.byteLength special_chrs.br
+      nl:               Buffer.byteLength special_chrs.nl
     defaults:
       #.....................................................................................................
       dbr_register_fontnick_cfg:

@@ -61,7 +61,7 @@ SQL                       = String.raw
     R = @RBW.decode_ncrs R
     # else          R = R.replace /&shy;/g, @constructor.C.special_chrs.shy
     R = R.replace /&wbr;/g, @constructor.C.special_chrs.wbr
-    R = R.replace /&br;/g,  @constructor.C.special_chrs.br
+    R = R.replace /&nl;/g,  @constructor.C.special_chrs.nl
     return R
 
   #---------------------------------------------------------------------------------------------------------
