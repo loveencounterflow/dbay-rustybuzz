@@ -86,9 +86,10 @@ jp                        = JSON.parse
             and ( b1 <= $shy_b1 )
             and ( alt = 1 )
           order by b1, id;""", { doc, par, shy_b1, shy_sgi, }
-      urge '^460971^', { shy_b1, shy_sgi, dx0, text, new_alt, }
+      urge '^arg740-1^', { shy_b1, shy_sgi, dx0, text, new_alt, }
       new_alt++
       left_ads      = @_shape_text { cfg..., text, b1, b2, dx0, alt: new_alt, osgi: shy_sgi, }
+      urge '^arg740-2^', "left_ads"; console.table left_ads
       # last_left_ad  = left_ads[ left_ads.length - 1 ]
       #.....................................................................................................
       { text, b1, b2, dx2, } = @db.first_row SQL"""
@@ -107,11 +108,12 @@ jp                        = JSON.parse
             and ( b1  > $shy_b1 )
             and ( alt = 1 )
           order by b1, id;""", { doc, par, shy_b1, shy_sgi, }
-      info '^460971^', { text, dx2, }
+      info '^arg740-3^', { text, dx2, }
       if text isnt ''
-        urge '^460971^', { shy_b1, shy_sgi, dx2, text, new_alt, }
+        urge '^arg740-4^', { shy_b1, shy_sgi, dx2, text, new_alt, }
         right_ads = @_shape_text { cfg..., text, b1, b2, dx2, alt: new_alt, osgi: shy_sgi, }
-      urge '^460971^'
+        urge '^arg740-5^', "right_ads"; console.table right_ads
+      urge '^arg740-6^'
     #.......................................................................................................
     return [ left_ads..., right_ads..., ]
 
@@ -224,7 +226,7 @@ jp                        = JSON.parse
       ad.dx   = Math.round ad.dx
       ad.dy   = Math.round ad.dy
       ad.x1   = ad.x + ad.dx
-      # debug '^3447^', ( rpr ad.chrs ), to_width ( rpr ad ), 100
+      # debug '^arg740-7^', ( rpr ad.chrs ), to_width ( rpr ad ), 100
     #.......................................................................................................
     if b2?  then  ads[ ads.length - 1 ].b2 = b2
     if dx2? then  delta_x = dx2 - ads[ ads.length - 1 ].x1
@@ -239,7 +241,7 @@ jp                        = JSON.parse
         ad.br       = 'end' if ( alt is 1 ) and ( idx is last_idx )
         row         = { br: null, ad..., }
         row.nobr    = if row.nobr then 1 else 0
-        # debug '^545456^', row
+        # debug '^arg740-8^', row
         ads[ idx ]  = @db.first_row insert_ad, row
       return null
     #.......................................................................................................
