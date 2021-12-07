@@ -174,13 +174,13 @@ jp                        = JSON.parse
         #...................................................................................................
         urge '^5850-8^', "line_ads", { lnr, }; console.table line_ads
         @db =>
-          debug '^5850-6^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
+          debug '^5850-9^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
           for ad in line_ads
             x = ad.x - dx0
             y = ad.y
             @db @sql.insert_line_ad, { doc, par, lnr, ads_id: ad.id, x, y, }
           return null
-        # info '^5850-7^', "brp_2 (1)"; console.table [ brp_2, ]
+        # info '^5850-10^', "brp_2 (1)"; console.table [ brp_2, ]
         brp_2 = @db.first_row SQL"""
           select * from #{schema}.ads
             where true
@@ -189,15 +189,15 @@ jp                        = JSON.parse
               and ( b1  = $brp_2_b2 )
               and ( alt = 1 )
             limit 1;""", { doc, par, brp_2_b2: brp_2.b2, }
-        # info '^5850-8^', "brp_2 (2)"; console.table [ brp_2, ]
+        # info '^5850-11^', "brp_2 (2)"; console.table [ brp_2, ]
         unless brp_2?
-          warn '^5850-9^', "did not find `end` element"
+          warn '^5850-12^', "did not find `end` element"
           break
-        urge '^5850-10^', "brp_2"; console.table [ brp_2, ]
+        urge '^5850-13^', "brp_2"; console.table [ brp_2, ]
         dx0 = brp_2.x
       #.....................................................................................................
       else
-        ### TAINT how to handle case when shapegroup has elements on right hand side of HHY? ###
+        info '^5850-14^', "branch A"
         original_shapegroup = @db.all_rows SQL"""
           select * from #{schema}.ads
             where true
@@ -206,7 +206,7 @@ jp                        = JSON.parse
               and ( sgi = $osgi )
               and ( alt = 1 )
             order by doc, par, b1;""", { doc, par, osgi: brp_2.osgi, }
-        urge '^5850-11^', "original_shapegroup"; console.table original_shapegroup
+        urge '^5850-15^', "original_shapegroup"; console.table original_shapegroup
         line_ads = @db.all_rows SQL"""
           select * from #{schema}.ads
             where true
@@ -231,19 +231,19 @@ jp                        = JSON.parse
               brp_1_b1:             brp_1.b1,
               first_replaced_b2:    original_shapegroup[ 0 ].b2,
               brp_2_b2:             brp_2.b2, }
-        urge '^5850-12^', "line_ads", { lnr, }; console.table line_ads
+        urge '^5850-16^', "line_ads", { lnr, }; console.table line_ads
         ### at his point we know that the material to be typeset on the current line
         starts with BRP 1 and extends to the SG of BRP 2 using the ALT of that break point;
         it excludes the SG of BRP 2 with ALT = 1 (that is the one with a SHY). ###
         @db =>
-          debug '^5850-13^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
+          debug '^5850-17^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
           for ad in line_ads
             x = ad.x - dx0
             y = ad.y
             @db @sql.insert_line_ad, { doc, par, lnr, ads_id: ad.id, x, y, }
           return null
         #...................................................................................................
-        urge '^5850-17^', "brp_2"; console.table [ brp_2, ]
+        urge '^5850-18^', "brp_2"; console.table [ brp_2, ]
         brp_2 = @db.first_row SQL"""
           select 1 as preference, * from #{schema}.ads
             where true
@@ -258,8 +258,7 @@ jp                        = JSON.parse
               and ( par = $par )
               and ( b1  = $brp_2_b2 )
               and ( alt = 1 )
-          order by preference;""", {
-                doc, par, brp_2_b2: brp_2.b2, brp_2_alt: brp_2.alt, }
+          order by preference;""", { doc, par, brp_2_b2: brp_2.b2, brp_2_alt: brp_2.alt, }
         unless brp_2?
           warn '^5850-19^', "did not find `end` element"
           break
