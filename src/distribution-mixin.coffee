@@ -132,16 +132,47 @@ jp                        = JSON.parse
       urge '^5850-4^ brp_1 and brp_2'; console.table [ brp_1, brp_2, ]
       #.....................................................................................................
       if brp_2.alt is 1 ### non-shy BRP ###
-        line_ads = @db.all_rows SQL"""
-          select * from #{schema}.ads
-            where true
-              and ( doc = $doc )
-              and ( par = $par )
-              and ( b1 >= $brp_1_b1 )
-              and ( b2 <= $brp_2_b2 )
-              and ( alt = 1 )
-            order by doc, par, b1;""", { doc, par, brp_1_b1: brp_1.b1, brp_2_b2: brp_2.b2, }
-        urge '^5850-5^', "line_ads", { lnr, }; console.table line_ads
+        info '^5850-5^', "branch A"
+        #...................................................................................................
+        if brp_1.alt > 1
+          info '^5850-6^', "there are some leftover shapegroup outlines"
+          line_ads = @db.all_rows SQL"""
+            select * from #{schema}.ads
+              where true
+                and ( doc  = $doc         )
+                and ( par  = $par         )
+                and ( b1  >= $brp_1_b1    )
+                and ( osgi = $brp_1_osgi  )
+                and ( alt  = $brp_1_alt   )
+            union all select * from #{schema}.ads
+              where true
+                and ( doc  = $doc         )
+                and ( par  = $par         )
+                and ( b1  >= $brp_1_b1    )
+                and ( b2  <= $brp_2_b2    )
+                and ( sgi  > $brp_1_osgi  )
+                and ( alt  = 1 )
+            order by doc, par, b1;""", {
+              doc
+              par
+              brp_1_b1:     brp_1.b1
+              brp_1_alt:    brp_1.alt
+              brp_1_osgi:   brp_1.osgi
+              brp_2_b2:     brp_2.b2 }
+        #...................................................................................................
+        else
+          info '^5850-7^', "there are no leftover shapegroup outlines"
+          line_ads = @db.all_rows SQL"""
+            select * from #{schema}.ads
+              where true
+                and ( doc = $doc )
+                and ( par = $par )
+                and ( b1 >= $brp_1_b1 )
+                and ( b2 <= $brp_2_b2 )
+                and ( alt = 1 )
+              order by doc, par, b1;""", { doc, par, brp_1_b1: brp_1.b1, brp_2_b2: brp_2.b2, }
+        #...................................................................................................
+        urge '^5850-8^', "line_ads", { lnr, }; console.table line_ads
         @db =>
           debug '^5850-6^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
           for ad in line_ads
