@@ -39,7 +39,7 @@ jp                        = JSON.parse
   ### 'arrange()' like 'compose()' and 'distribute()' ###
   arrange: ( cfg ) ->
     @types.validate.dbr_arrange_cfg ( cfg = { @constructor.C.defaults.dbr_arrange_cfg..., cfg..., } )
-    ads     = @_shape_text        { cfg..., alt: 1, }
+    ads     = @_shape_text        { cfg..., trk: 1, }
     shy_ads = @_shape_hyphenated  { cfg..., ads, }
     return [ ads..., shy_ads..., ]
 
@@ -56,10 +56,10 @@ jp                        = JSON.parse
     left_ads        = []
     right_ads       = []
     #.......................................................................................................
-    { alt_max, } = @db.single_row SQL"""
-      select max( alt ) as alt_max
+    { trk_max, } = @db.single_row SQL"""
+      select max( trk ) as trk_max
       from #{schema}.ads where ( doc = $doc ) and ( par = $par );""", { doc, par, }
-    new_alt = alt_max
+    new_trk = trk_max
     #.......................................................................................................
     for { shy_b1, shy_sgi, } in @db.all_rows SQL"""
       select b1 as shy_b1, sgi as shy_sgi from #{schema}.ads
@@ -67,7 +67,7 @@ jp                        = JSON.parse
           and ( doc = $doc )
           and ( par = $par )
           and ( br  in ( 'shy', 'wbr' ) )
-          and ( alt = 1 );""", { doc, par, }
+          and ( trk = 1 );""", { doc, par, }
       #.....................................................................................................
       # First batch: Characters in same shape group as SHY, up to the shy, with an added hyphen:
       { text, b1, b2, dx0, } = @db.first_row SQL"""
@@ -84,11 +84,11 @@ jp                        = JSON.parse
             and ( par = $par )
             and ( sgi = $shy_sgi )
             and ( b1 <= $shy_b1 )
-            and ( alt = 1 )
+            and ( trk = 1 )
           order by b1, id;""", { doc, par, shy_b1, shy_sgi, }
-      urge '^arg740-1^', { shy_b1, shy_sgi, dx0, text, new_alt, }
-      new_alt++
-      left_ads      = @_shape_text { cfg..., text, b1, b2, dx0, alt: new_alt, osgi: shy_sgi, }
+      urge '^arg740-1^', { shy_b1, shy_sgi, dx0, text, new_trk, }
+      new_trk++
+      left_ads      = @_shape_text { cfg..., text, b1, b2, dx0, trk: new_trk, osgi: shy_sgi, }
       urge '^arg740-2^', "left_ads"; console.table left_ads
       # last_left_ad  = left_ads[ left_ads.length - 1 ]
       #.....................................................................................................
@@ -106,12 +106,12 @@ jp                        = JSON.parse
             and ( par = $par )
             and ( sgi = $shy_sgi )
             and ( b1  > $shy_b1 )
-            and ( alt = 1 )
+            and ( trk = 1 )
           order by b1, id;""", { doc, par, shy_b1, shy_sgi, }
       info '^arg740-3^', { text, dx2, }
       if text isnt ''
-        urge '^arg740-4^', { shy_b1, shy_sgi, dx2, text, new_alt, }
-        right_ads = @_shape_text { cfg..., text, b1, b2, dx2, alt: new_alt, osgi: shy_sgi, }
+        urge '^arg740-4^', { shy_b1, shy_sgi, dx2, text, new_trk, }
+        right_ads = @_shape_text { cfg..., text, b1, b2, dx2, trk: new_trk, osgi: shy_sgi, }
         urge '^arg740-5^', "right_ads"; console.table right_ads
       urge '^arg740-6^'
     #.......................................................................................................
@@ -179,7 +179,7 @@ jp                        = JSON.parse
       b2    ### NOTE optional rightmost byte index ###
       doc
       par
-      alt
+      trk
       osgi      } = cfg
     { missing   } = @constructor.C
     skip_ends     = dx0? or dx2? ### TAINT will probably be removed ###
@@ -202,7 +202,7 @@ jp                        = JSON.parse
       sgi++ unless ad.nobr
       ad.doc    = doc
       ad.par    = par
-      ad.alt    = alt
+      ad.trk    = trk
       ad.b1    += b1
       ad.b2    += b1
       ad.sgi    = sgi
@@ -238,7 +238,7 @@ jp                        = JSON.parse
       for ad, idx in ads
         ad.x       += delta_x
         ad.x1      += delta_x
-        ad.br       = 'end' if ( alt is 1 ) and ( idx is last_idx )
+        ad.br       = 'end' if ( trk is 1 ) and ( idx is last_idx )
         row         = { br: null, ad..., }
         row.nobr    = if row.nobr then 1 else 0
         # debug '^arg740-8^', row

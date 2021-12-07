@@ -66,7 +66,7 @@ jp                        = JSON.parse
           #{prefix}get_deviation( $dx0, $size_u, $width_u, x1 ) as deviation
         from #{schema}.ads
         where ( br is not null ) and ( br != 'shy' )
-        order by abs( deviation ) asc, alt desc
+        order by abs( deviation ) asc, trk desc
         limit $limit;""", { schema, dx0, size_u, width_u, limit, }
     return null if R.length is 0
     closest_ad  = R[ 0 ]
@@ -99,7 +99,7 @@ jp                        = JSON.parse
     size_u      = size_mm  / mm_p_u
     dx0         = 0                         # extraneous width (b/c paragraph was set in single long line)
     #.......................................................................................................
-    urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, alt, b1, sgi;"
+    urge '^4875^', 'ads'; console.table @db.all_rows SQL"select * from #{schema}.ads order by doc, par, trk, b1, sgi;"
     #.......................................................................................................
     brp_2       = @db.single_row SQL"""
       select
@@ -131,10 +131,10 @@ jp                        = JSON.parse
         break
       urge '^5850-4^ brp_1 and brp_2'; console.table [ brp_1, brp_2, ]
       #.....................................................................................................
-      if brp_2.alt is 1 ### non-shy BRP ###
+      if brp_2.trk is 1 ### non-shy BRP ###
         info '^5850-5^', "branch A"
         #...................................................................................................
-        if brp_1.alt > 1
+        if brp_1.trk > 1
           info '^5850-6^', "there are some leftover shapegroup outlines"
           line_ads = @db.all_rows SQL"""
             select * from #{schema}.ads
@@ -143,7 +143,7 @@ jp                        = JSON.parse
                 and ( par  = $par         )
                 and ( b1  >= $brp_1_b1    )
                 and ( osgi = $brp_1_osgi  )
-                and ( alt  = $brp_1_alt   )
+                and ( trk  = $brp_1_trk   )
             union all select * from #{schema}.ads
               where true
                 and ( doc  = $doc         )
@@ -151,12 +151,12 @@ jp                        = JSON.parse
                 and ( b1  >= $brp_1_b1    )
                 and ( b2  <= $brp_2_b2    )
                 and ( sgi  > $brp_1_osgi  )
-                and ( alt  = 1 )
+                and ( trk  = 1 )
             order by doc, par, b1;""", {
               doc
               par
               brp_1_b1:     brp_1.b1
-              brp_1_alt:    brp_1.alt
+              brp_1_trk:    brp_1.trk
               brp_1_osgi:   brp_1.osgi
               brp_2_b2:     brp_2.b2 }
         #...................................................................................................
@@ -169,7 +169,7 @@ jp                        = JSON.parse
                 and ( par = $par )
                 and ( b1 >= $brp_1_b1 )
                 and ( b2 <= $brp_2_b2 )
-                and ( alt = 1 )
+                and ( trk = 1 )
               order by doc, par, b1;""", { doc, par, brp_1_b1: brp_1.b1, brp_2_b2: brp_2.b2, }
         #...................................................................................................
         urge '^5850-8^', "line_ads", { lnr, }; console.table line_ads
@@ -187,7 +187,7 @@ jp                        = JSON.parse
               and ( doc = $doc )
               and ( par = $par )
               and ( b1  = $brp_2_b2 )
-              and ( alt = 1 )
+              and ( trk = 1 )
             limit 1;""", { doc, par, brp_2_b2: brp_2.b2, }
         # info '^5850-11^', "brp_2 (2)"; console.table [ brp_2, ]
         unless brp_2?
@@ -204,7 +204,7 @@ jp                        = JSON.parse
               and ( doc = $doc )
               and ( par = $par )
               and ( sgi = $osgi )
-              and ( alt = 1 )
+              and ( trk = 1 )
             order by doc, par, b1;""", { doc, par, osgi: brp_2.osgi, }
         urge '^5850-15^', "original_shapegroup"; console.table original_shapegroup
         line_ads = @db.all_rows SQL"""
@@ -214,27 +214,27 @@ jp                        = JSON.parse
               and ( par = $par )
               and ( b1 >= $brp_1_b1 )
               and ( b2  < $first_replaced_b2 )
-              and ( alt = 1 )
+              and ( trk = 1 )
               -- and ( br != 'shy' )
           union all
           select * from #{schema}.ads
             where true
               and ( doc = $doc )
               and ( par = $par )
-              and ( alt = $brp_2_alt )
+              and ( trk = $brp_2_trk )
               and ( b2 <= $brp_2_b2 )
               -- and ( br != 'shy' )
             order by doc, par, x, b1;""", {
               doc,
               par,
-              brp_2_alt:            brp_2.alt,
+              brp_2_trk:            brp_2.trk,
               brp_1_b1:             brp_1.b1,
               first_replaced_b2:    original_shapegroup[ 0 ].b2,
               brp_2_b2:             brp_2.b2, }
         urge '^5850-16^', "line_ads", { lnr, }; console.table line_ads
         ### at his point we know that the material to be typeset on the current line
-        starts with BRP 1 and extends to the SG of BRP 2 using the ALT of that break point;
-        it excludes the SG of BRP 2 with ALT = 1 (that is the one with a SHY). ###
+        starts with BRP 1 and extends to the SG of BRP 2 using the TRK of that break point;
+        it excludes the SG of BRP 2 with TRK = 1 (that is the one with a SHY). ###
         @db =>
           debug '^5850-17^', @db.all_rows @sql.insert_line, { doc, par, lnr, x0: brp_1.x, x1: brp_2.x1, }
           for ad in line_ads
@@ -250,15 +250,15 @@ jp                        = JSON.parse
               and ( doc = $doc )
               and ( par = $par )
               and ( b1  = $brp_2_b2 )
-              and ( alt = $brp_2_alt )
+              and ( trk = $brp_2_trk )
             union all
           select 2 as preference, * from #{schema}.ads
             where true
               and ( doc = $doc )
               and ( par = $par )
               and ( b1  = $brp_2_b2 )
-              and ( alt = 1 )
-          order by preference;""", { doc, par, brp_2_b2: brp_2.b2, brp_2_alt: brp_2.alt, }
+              and ( trk = 1 )
+          order by preference;""", { doc, par, brp_2_b2: brp_2.b2, brp_2_trk: brp_2.trk, }
         unless brp_2?
           warn '^5850-19^', "did not find `end` element"
           break

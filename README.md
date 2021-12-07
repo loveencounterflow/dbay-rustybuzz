@@ -155,13 +155,13 @@ unless special care is taken.
       equals the `b1` of the succeeding AD (except for the last AD in a paragraph, whose `b2` always equals
       the byte length of the source text without a successor).
     * These constraints mean that fields `b1` and `b2` can be interpreted as implementing a doubly linked
-      list; this is a simple ('single-track') linked list when only looking at track `alt: 1` and a multiply
+      list; this is a simple ('single-track') linked list when only looking at track `trk: 1` and a multiply
       linked list when one looks at all the tracks.
       * Multiple tracks occur because of the need to re-shape Shape Groups (SGs) of interdependent outlines
         in the presence of a Soft Hyphen (SHY); in the below example, there's
         * a soft hyphen between the two `f`s of `affirm` (i.e. `af¬firm`, where the SHY is not normally
           visible and does not inhibit the usage of GID 85 that pictures `ff` nor the application of kerning
-          between `ff` and `i`) on track `alt: 1` and an alternative track `alt: > 1` (an arbitrary but
+          between `ff` and `i`) on track `trk: 1` and an alternative track `trk: > 1` (an arbitrary but
           locally unique number greater than 1), and
         * a Hard Hyphen (HHY) between the two `f`s of `affirm` (i.e. `af-`, `firm`).
         * Observe that some GIDs differ between the two tracks, that's because one track uses a ligature
@@ -182,14 +182,14 @@ unless special care is taken.
                       │                                      │
 gid          23         85          3         -1         176        40         180         3
           ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐
-alt: 1  ──┼─> a <─┼─┬┼─> f <─┼──┼─> ¬ <─┼──┼─> f <─┼──┼─> i <─┼┬─┼─> r <─┼──┼─> m <─┼──┼─> ␣ <─┼──
+trk: 1  ──┼─> a <─┼─┬┼─> f <─┼──┼─> ¬ <─┼──┼─> f <─┼──┼─> i <─┼┬─┼─> r <─┼──┼─> m <─┼──┼─> ␣ <─┼──
           └───────┘ ┆└───────┘  └───────┘  └───────┘  └───────┘┆ └───────┘  └───────┘  └───────┘
 b1, b2      10, 11  ┆  11, 12     12, 14     14, 15     15, 16 ┆   16, 17     17, 18     18, 19
                     ┆                                          ┆
                     ┆                                          ┆
 gid                 ┆   28         50         28         176   ┆
                     ┆┌───────┐  ┌───────┐  ┌───────┐  ┌───────┐┆
-alt: > 1            └┼─> f <─┼──┼─> - <─┼──┼─> f <─┼──┼─> i <─┼┘
+trk: > 1            └┼─> f <─┼──┼─> - <─┼──┼─> f <─┼──┼─> i <─┼┘
                      └───────┘  └───────┘  └───────┘  └───────┘
 b1, b2                 11, 12     12, 14     14, 15     15, 16
                       │                │    │                │
@@ -198,7 +198,7 @@ b1, b2                 11, 12     12, 14     14, 15     15, 16
 ```
 
 ```
-excerpt of table `ads` with `alt` track 1:               .. and with `alt` track > 1:
+excerpt of table `ads` with `trk` track 1:               .. and with `trk` track > 1:
 ┌─────┬────┬────┬─────┬──────┬──────┬──────┬──────┐      ┌─────┬────┬────┬─────┬──────┬──────┬──────┬──────┐
 │ adi │ b1 │ b2 │ sgi │ osgi │  gid │ chrs │  x   │      │ adi │ b1 │ b2 │ sgi │ osgi │  gid │ chrs │  x   │
 ├─────┼────┼────┼─────┼──────┼──────┼──────┼──────┤      ├─────┼────┼────┼─────┼──────┼──────┼──────┼──────┤
@@ -256,7 +256,7 @@ excerpt of table `ads` with `alt` track 1:               .. and with `alt` track
 * **[–]** document SVG units (mm, px, implicit)
 * **[–]** implement CSS scaling function (so `1mm` in CSS shows up as 1mm in rendering)
 * **[–]** implement bbox display
-* **[–]** rename `shape_text()` to `arrange()`:
+* **[+]** rename `shape_text()` to `arrange()`:
   * `arrange() -> ads`: gets an arrangement of SIDs (`a`rrangement `d`ata item`s`); this called by
   * `compose() -> { known_ods, new_ods, missing_chrs, ads, fm, }`: turns an arrangement into a hitherto
     unnamed data structure that indicates which outlines to put where, which SIDs are known, which are new,
@@ -266,8 +266,8 @@ excerpt of table `ads` with `alt` track 1:               .. and with `alt` track
 * **[–]** Ensure that entire text gets reflected in SVG comments when so configured, even while omitting
   refs for whitespace.
 * **[+]** [hengist] Implement a 'Glyf Grid' to see which outlines are mapped to which GIDs
-* **[–]** Rename field `ads.alt` to `ads.trk` ('track', as used in this README)
-* **[–]** Remove field `ads.adi` (or rename `ads.id` -> `ads.adi`) if possible since fields `id` and `b1`
+* **[+]** Rename field `ads.alt` to `ads.trk` ('track', as used in this README)
+* **[+]** Remove field `ads.adi` (or rename `ads.id` -> `ads.adi`) if possible since fields `id` and `b1`
   are better fits for the same puproses (identifying an AD, logical ordering of ADs).
 
 

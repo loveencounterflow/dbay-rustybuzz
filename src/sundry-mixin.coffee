@@ -103,7 +103,7 @@ SQL                       = String.raw
         where true
           and ( doc = $doc )
           and ( par = $par )
-          and ( alt = 1 )
+          and ( trk = 1 )
           and ( b1 between $b - 10 and $b + 10 )
         order by abs( b1 - $b ), id
         limit 1;""", { doc, par, b, }
@@ -117,7 +117,7 @@ SQL                       = String.raw
         where true
           and ( doc = $doc )
           and ( par = $par )
-          and ( alt = 1 )
+          and ( trk = 1 )
           and ( b1 between $b - $context and $b + $context )
         order by b1;""", { doc, par, b, context, }
     #.......................................................................................................
@@ -133,7 +133,7 @@ SQL                       = String.raw
           where true
             and ( doc = $doc )
             and ( par = $par )
-            and ( alt > 1 )
+            and ( trk > 1 )
             and ( osgi = $sgi )
           order by b1;""", { doc, par, sgi, }
       if track_ids.length > 0

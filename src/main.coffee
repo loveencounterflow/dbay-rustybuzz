@@ -115,7 +115,7 @@ class @Drb extends  \
         text:             null
         doc:              1
         par:              1
-        alt:              1
+        trk:              1
       #.....................................................................................................
       dbr_get_fontmetrics_cfg:
         fontnick:         null
@@ -252,12 +252,12 @@ class @Drb extends  \
           id      integer not null primary key,
           doc     integer not null, -- document idx
           par     integer not null, -- paragraph idx
-          alt     integer not null, -- variant idx
+          trk     integer not null, -- variant idx
           b1      integer not null,
           b2      integer not null,
           sgi     integer not null, -- shape group idx, being a suite of ADs that must be reshaped if broken
           -- sgp     integer not null default 0, -- shape group part; 1: up to & incl HHY, 2: right of HHY to end of SG
-          osgi    integer, -- when alt > 1, the original SG that this SG replaces
+          osgi    integer, -- when trk > 1, the original SG that this SG replaces
           gid     integer,
           -- ### TAINT should be x1 + dx = x2, y1 + dy = y2
           x       integer not null,
@@ -271,7 +271,7 @@ class @Drb extends  \
           nobr    boolean not null, -- if true, must re-shape when separated from previous outline
           br      text );
       -- ...................................................................................................
-      -- create unique index #{schema}.ads_location_idx on ads ( doc, par, b1, b2, sgi, alt );
+      -- create unique index #{schema}.ads_location_idx on ads ( doc, par, b1, b2, sgi, trk );
       -- ...................................................................................................
       create table #{schema}.lines (
           -- id      integer not null primary key,
@@ -331,7 +331,7 @@ class @Drb extends  \
       insert_ad: @db.create_insert {
         schema,
         into:       'ads',
-        fields:     [ 'doc', 'par', 'alt', 'b1', 'b2', 'sgi', 'osgi', 'gid',
+        fields:     [ 'doc', 'par', 'trk', 'b1', 'b2', 'sgi', 'osgi', 'gid',
                       'x', 'y', 'dx', 'dy', 'chrs', 'sid', 'nobr', 'br', ]
         returning:  '*', }
       #.....................................................................................................

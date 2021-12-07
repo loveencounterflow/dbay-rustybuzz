@@ -65,7 +65,7 @@ dbay_types                = require 'dbay/lib/types'
   "@isa.text x.text":                               ( x ) -> @isa.text x.text
   "@isa.integer x.doc":                             ( x ) -> @isa.integer x.doc
   "@isa.integer x.par":                             ( x ) -> @isa.integer x.par
-  "@isa.integer x.alt":                             ( x ) -> @isa.integer x.alt
+  "@isa.integer x.trk":                             ( x ) -> @isa.integer x.trk
   # "( @isa.float x.size_mm ) and ( 0 <= x.size_mm <= 1000 )": ( x ) -> ( @isa.float x.size_mm ) and ( 0 <= x.size_mm <= 1000 )
 
 #-----------------------------------------------------------------------------------------------------------

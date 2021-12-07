@@ -89,7 +89,7 @@ jp                        = JSON.parse
     font_idx      = @_font_idx_from_fontnick fontnick
     if @types.isa.list chrs then  text = chrs.join '\n'
     else                          text = chrs
-    sds           = @arrange { fontnick, text, fm: {}, doc: 0, par: 0, alt: 1, }
+    sds           = @arrange { fontnick, text, fm: {}, doc: 0, par: 0, trk: 1, }
     R             = new Map()
     for sd in sds
       continue if sd.gid is 0
