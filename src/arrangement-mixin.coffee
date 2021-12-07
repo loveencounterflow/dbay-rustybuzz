@@ -236,7 +236,7 @@ jp                        = JSON.parse
       for ad, idx in ads
         ad.x       += delta_x
         ad.x1      += delta_x
-        ad.br       = 'end' if idx is last_idx
+        ad.br       = 'end' if ( alt is 1 ) and ( idx is last_idx )
         row         = { br: null, ad..., }
         row.nobr    = if row.nobr then 1 else 0
         # debug '^545456^', row
