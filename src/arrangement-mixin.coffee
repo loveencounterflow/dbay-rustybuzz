@@ -66,7 +66,7 @@ jp                        = JSON.parse
         where true
           and ( doc = $doc )
           and ( par = $par )
-          and ( br  = 'shy' )
+          and ( br  in ( 'shy', 'wbr' ) )
           and ( alt = 1 );""", { doc, par, }
       #.....................................................................................................
       # First batch: Characters in same shape group as SHY, up to the shy, with an added hyphen:
@@ -74,10 +74,10 @@ jp                        = JSON.parse
         select
             coalesce(
               group_concat( case when br = 'shy' then '' else chrs end, '' ),
-              '' ) || '-'             as text,
-            min( x )                  as dx0,
-            min( b1 )                 as b1,
-            max( b2 )                 as b2
+              '' ) || case when br = 'shy' then '-' else '' end               as text,
+            min( x )                                                          as dx0,
+            min( b1 )                                                         as b1,
+            max( b2 )                                                         as b2
           from ads
           where true
             and ( doc = $doc )
