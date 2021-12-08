@@ -60,24 +60,24 @@ SQL                       = String.raw
   _decode_entities: ( text ) ->
     R = text
     R = @RBW.decode_ncrs R
-    # else          R = R.replace /&shy;/g, @constructor.C.special_chrs.shy
-    R = R.replace /&wbr;/g, @constructor.C.special_chrs.wbr
-    R = R.replace /&nl;/g,  @constructor.C.special_chrs.nl
+    R = R.replace /&wbr;/g, @constructor.C.specials.wbr.chrs
+    R = R.replace /&nl;/g,  @constructor.C.specials.nl.chrs
     return R
 
   #---------------------------------------------------------------------------------------------------------
   _uax14: ( text ) ->
-    text_bfr  = Buffer.from text
-    bris      = JSON.parse @RBW.find_line_break_positions text
-    parts     = ( ( text_bfr[ bri ... bris[ idx + 1 ] ? Infinity ].toString 'utf-8' ) for bri, idx in bris )
-    R         = parts.join @constructor.C.special_chrs.wbr
+    text_bfr      = Buffer.from text
+    bris          = JSON.parse @RBW.find_line_break_positions text
+    parts         = ( ( text_bfr[ bri ... bris[ idx + 1 ] ? Infinity ].toString 'utf-8' ) for bri, idx in bris )
+    { specials  } = @constructor.C
+    R             = parts.join specials.wbr.chrs
     ### remove WBR after SHY, SPC? ###
     ### TAINT precompile patterns, always use constants instead of literals ###
-    R         = R.replace /\xad\u200b/g, @constructor.C.special_chrs.shy
-    R         = R.replace /\x20\u200b/g, '\x20'
-    R         = R.replace /\n\u200b/g,   '\n'
-    R         = R.replace /\u200b{2,}/g, @constructor.C.special_chrs.wbr
-    R         = R.replace /\u200b$/g, ''
+    R             = R.replace /\xad\u200b/g, specials.shy.chrs
+    R             = R.replace /\x20\u200b/g, '\x20'
+    R             = R.replace /\n\u200b/g,   '\n'
+    R             = R.replace /\u200b{2,}/g, specials.wbr.chrs
+    R             = R.replace /\u200b$/g, ''
     return R
 
   #---------------------------------------------------------------------------------------------------------
@@ -88,7 +88,6 @@ SQL                       = String.raw
   # VISUALIZATION
   #---------------------------------------------------------------------------------------------------------
   render_ad_chain: ( cfg ) ->
-    @types.validate.dbr_render_ad_chain_cfg ( cfg = { @constructor.C.defaults.dbr_render_ad_chain_cfg..., cfg..., } )
     @types.validate.dbr_render_ad_chain_cfg ( cfg = { @constructor.C.defaults.dbr_render_ad_chain_cfg..., cfg..., } )
     { doc
       par

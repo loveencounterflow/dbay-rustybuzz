@@ -52,7 +52,6 @@ jp                        = JSON.parse
       ads         } = cfg
     { schema      } = @cfg
     { V, I, L,    } = @sql
-    { shy         } = @constructor.C.special_chrs
     left_ads        = []
     right_ads       = []
     #.......................................................................................................
@@ -125,10 +124,7 @@ jp                        = JSON.parse
     `ff` or `ffi`). In order to simplify processing and remove the case distinction, we normalize all cases
     where WBRs and SHYs appear with other material to always make them standalone ADs. ###
     R                 = []
-    { special_chrs
-      byte_counts
-      nl
-      ignored       } = @constructor.C
+    { specials      } = @constructor.C
     bytes             = Buffer.from text, { encoding: 'utf-8', }
     prv_ad            = null
     for ad, idx in ads
@@ -139,29 +135,32 @@ jp                        = JSON.parse
       extra_ad  = null
       has_shy   = false
       has_wbr   = false
-      if      ad.chrs.startsWith special_chrs.shy then has_shy = true
-      else if ad.chrs.startsWith special_chrs.wbr then has_wbr = true
-      if has_shy or has_wbr
-        ad.br           = if has_shy then 'shy' else 'wbr'
+      special   = null
+      if      ad.chrs.startsWith specials.shy.chrs then special = specials.shy
+      else if ad.chrs.startsWith specials.wbr.chrs then special = specials.wbr
+      ### SHY and WBR may appear together with other material in the same AD, this we don't want so we
+      separate those into their own ADs: ###
+      if special?
+        ad.br           = special.name
         if ad.chrs.length > 1 ### NOTE safe b/c we know SHY is BMP codepoint ###
           extra_ad      = { ad..., }
-          ad.b2         = ad.b1 + byte_counts[ if has_shy then 'shy' else 'wbr' ]
+          ad.b2         = ad.b1 + special.bytecount
           extra_ad.chrs = ad.chrs[ 1 .. ]
           extra_ad.b1   = ad.b2
           extra_ad.br   = null
-          extra_ad.gid  = ignored.gid
-          extra_ad.sid  = "o#{ignored.gid}#{fontnick}"
+          extra_ad.gid  = specials.ignored.gid
+          extra_ad.sid  = "o#{specials.ignored.gid}#{fontnick}"
           ad.chrs       = ad.chrs[ 0 ]
           ad.dx         = 0
           ad.x1         = ad.x
       else if ad.chrs is ' '
-        ad.br           = 'spc'
+        ad.br           = specials.spc.name
       else if ad.chrs is '-'
-        ad.br           = 'hhy'
+        ad.br           = specials.hhy.name
       else if ad.chrs is '\n'
-        ad.br           = 'nl'
-        ad.gid          = nl.gid
-        ad.sid          = "o#{nl.gid}#{fontnick}"
+        ad.br           = specials.nl.name
+        ad.gid          = specials.nl.gid
+        ad.sid          = "o#{specials.nl.gid}#{fontnick}"
       R.push ad
       if extra_ad?
         R.push extra_ad
@@ -181,7 +180,6 @@ jp                        = JSON.parse
       par
       trk
       osgi      } = cfg
-    { missing   } = @constructor.C
     skip_ends     = dx0? or dx2? ### TAINT will probably be removed ###
     b1           ?= 0
     b2           ?= null
@@ -190,7 +188,8 @@ jp                        = JSON.parse
     font_idx      = @_font_idx_from_fontnick fontnick
     ads           = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, }
     ads           = @_prepare_ads text, fontnick, ads
-    { schema, }   = @cfg
+    { specials  } = @constructor.C
+    { schema    } = @cfg
     #.......................................................................................................
     ced_x           = 0 # cumulative error displacement from missing outlines
     ced_y           = 0 # cumulative error displacement from missing outlines
@@ -212,7 +211,7 @@ jp                        = JSON.parse
       ad.y     += ced_y
       #.....................................................................................................
       # Replace original metrics with those of missing outline:
-      if ad.gid is missing.gid
+      if ad.gid is specials.missing.gid
         if ( width_of ( Array.from ad.chrs )[ 0 ] ) < 2
           width = 500
         else
