@@ -121,7 +121,8 @@ jp                        = JSON.parse
       ads             } = cfg
     cgid_map           ?= @get_cgid_map { fontnick, chrs, ads, }
     insert_outline      = @db.prepare @sql.insert_outline
-    { missing }         = @constructor.C
+    { specials }        = @constructor.C
+    { missing }         = specials
     #.......................................................................................................
     try
       @db.begin_transaction() unless @db.within_transaction()
