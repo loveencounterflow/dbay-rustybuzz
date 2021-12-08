@@ -58,7 +58,7 @@ class @Drb extends  \
     last_fontidx:       15
     zlib_zip_cfg:       { level: 1, strategy: ZLIB.constants.Z_HUFFMAN_ONLY, }
     ### TAINT try to reorder specials for better comprehension ###
-    specials:           require './_specials'
+    specials:           ( require './_specials' ).specials
     #   missing:
     #     gid:    0
     #   ignored:
