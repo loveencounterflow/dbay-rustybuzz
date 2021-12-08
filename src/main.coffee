@@ -24,6 +24,7 @@ SQL                       = String.raw
 guy                       = require 'guy'
 home                      = PATH.resolve PATH.join __dirname, '..'
 # data_path                 = PATH.join home, 'data'
+E                         = require './errors'
 { Drb_preparation       } = require './preparation-mixin'
 { Drb_outlines          } = require './outlines-mixin'
 { Drb_arrangement       } = require './arrangement-mixin'
@@ -39,7 +40,10 @@ special_chrs              =
   nl:               '\n'       # manual line break
 
 
+
 #===========================================================================================================
+#
+#-----------------------------------------------------------------------------------------------------------
 class @Drb extends  \
   Drb_outlines      \
   Drb_arrangement   \
@@ -54,7 +58,7 @@ class @Drb extends  \
     last_fontidx:       15
     zlib_zip_cfg:       { level: 1, strategy: ZLIB.constants.Z_HUFFMAN_ONLY, }
     ### TAINT try to reorder specials for better comprehension ###
-    # special:
+    specials:           require './_specials'
     #   missing:
     #     gid:    0
     #   ignored:
@@ -63,7 +67,7 @@ class @Drb extends  \
       # '-4':           'sop'       # start of paragraph
       # '-3':           'eop'       # end of paragraph
       '-3':           'nl'        # new line / end of linegroup
-      '-2':           'reserved'  # for future purposes
+      # '-2':           'reserved'  # for future purposes
       '-1':           'ignored'   # for ADs that intentionally have no outline (but may appear in debugging)
       '0':            'missing'   # font cannot render this codepoint
     nl:
