@@ -160,7 +160,6 @@ jp                        = JSON.parse
       else if ad.chrs is '\n'
         ad.br           = specials.nl.name
         ad.gid          = specials.nl.gid
-        ad.sid          = "o#{specials.nl.gid}#{fontnick}"
       R.push ad
       if extra_ad?
         R.push extra_ad
