@@ -40,9 +40,6 @@ jp                        = JSON.parse
   # _$outlines_initialize: ->
 
   #---------------------------------------------------------------------------------------------------------
-  _parse_sid: ( sid ) -> ( sid.match /^o(?<gid>[0-9]+)(?<fontnick>.+)$/ ).groups
-
-  #---------------------------------------------------------------------------------------------------------
   get_single_outline: ( cfg ) ->
     ### TAINT this method is highly inefficient for large numbers of outline retrievals; the intention is to
     replace it with a function that allows for lists of `gid`s to be handled with a single call. ###

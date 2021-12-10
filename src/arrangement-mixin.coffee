@@ -149,12 +149,13 @@ jp                        = JSON.parse
           extra_ad.b1   = ad.b2
           extra_ad.br   = null
           extra_ad.gid  = specials.ignored.gid
-          extra_ad.sid  = "o#{specials.ignored.gid}#{fontnick}"
+          extra_ad.sid  = _get_sid { fontnick, gid: specials.ignored.gid, }
           ad.chrs       = ad.chrs[ 0 ]
           ad.dx         = 0
           ad.x1         = ad.x
       else if ad.chrs is ' '
         ad.br           = specials.spc.name
+        ad.gid          = specials.spc.gid
       else if ad.chrs is '-'
         ad.br           = specials.hhy.name
       else if ad.chrs is '\n'
@@ -205,7 +206,7 @@ jp                        = JSON.parse
       ad.b2    += b1
       ad.sgi    = sgi
       ad.osgi   = osgi
-      ad.sid    = "o#{ad.gid}#{fontnick}"
+      ad.sid    = _get_sid { fontnick, gid: ad.gid, }
       ad.x     += ced_x
       ad.y     += ced_y
       #.....................................................................................................
