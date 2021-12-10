@@ -33,11 +33,6 @@ E                         = require './errors'
 { Drb_sundry            } = require './sundry-mixin'
 font_path                 = PATH.resolve PATH.join __dirname, '../fonts'
 ZLIB                      = require 'zlib'
-special_chrs              =
-  hhy:              '\u{002d}' # hard hyphen
-  shy:              '\u{00ad}' # soft hyphen
-  wbr:              '\u{200b}' # word break opportunity (as in `foo/bar` with a WBR after the slash)
-  nl:               '\n'       # manual line break
 
 
 
