@@ -142,6 +142,7 @@ jp                        = JSON.parse
       separate those into their own ADs: ###
       if special?
         ad.br           = special.name
+        ad.gid          = special.gid
         if ad.chrs.length > 1 ### NOTE safe b/c we know SHY is BMP codepoint ###
           extra_ad      = { ad..., }
           ad.b2         = ad.b1 + special.bytecount
