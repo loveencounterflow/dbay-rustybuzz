@@ -207,6 +207,13 @@ class @Drb extends  \
           scale           integer not null,
           angle           integer not null );
       -- ...................................................................................................
+      create table #{schema}.outline_types (
+          olt             text not null primary key,
+          description     text not null );
+      insert into #{schema}.outline_types ( olt, description ) values
+          ( 'pd', 'SVG path data, to be reconstructed within a `<path/>` element' ),
+          ( 'g',  'arbitrary SVG elements, to be reconstructed within a `<g/>` element' );
+      -- ...................................................................................................
       create table #{schema}.outlines (
           fontnick  text    not null references fontnicks ( fontnick ),
           gid       integer not null,
@@ -218,9 +225,10 @@ class @Drb extends  \
           y         float   not null,
           x1        float   not null,
           y1        float   not null,
-          /* PathData (PD): */
-          pd        text generated always as ( #{prefix}unzip( pd_blob ) ) virtual,
-          pd_blob   blob    not null,
+          /* GlyfData (GD): */
+          olt       text not null references outline_types,
+          gd        text generated always as ( #{prefix}glyfdata_from_blob( sid, olt, gd_blob ) ) virtual,
+          gd_blob   blob    not null,
           primary key ( fontnick, gid ) );
       -- ...................................................................................................
       create table #{schema}.ads (
@@ -301,8 +309,8 @@ class @Drb extends  \
       insert_outline: @db.create_insert {
         schema,
         into:       'outlines',
-        fields:     [ 'fontnick', 'gid', 'chrs', 'x', 'y', 'x1', 'y1', 'pd_blob', ],
-        returning:  '*',
+        fields:     [ 'fontnick', 'gid', 'chrs', 'x', 'y', 'x1', 'y1', 'olt', 'gd_blob', ],
+        returning:  'fontnick, gid, chrs, x, y, x1, y1, olt, gd',
         on_conflict: { update: true, }, }
       #.....................................................................................................
       insert_ad: @db.create_insert {
@@ -321,8 +329,7 @@ class @Drb extends  \
       insert_line_ad: @db.create_insert {
         schema,
         into:       'line_ads',
-        fields:     [ 'doc', 'par', 'lnr', 'ads_id', 'x', 'y', ]
-        ### returning:  '*', ### }
+        fields:     [ 'doc', 'par', 'lnr', 'ads_id', 'x', 'y', ] }
       #.....................................................................................................
       fspath_from_fontnick: SQL"select fspath from fontnicks where fontnick = $fontnick;"
     #.......................................................................................................
@@ -332,12 +339,18 @@ class @Drb extends  \
   _create_sql_functions: ->
     { prefix
       schema } = @cfg
+    # #-------------------------------------------------------------------------------------------------------
+    # @db.create_function
+    #   name:           prefix + 'unzip'
+    #   deterministic:  true
+    #   varargs:        false
+    #   call:           ( pd_bfr ) => @_unzip pd_bfr
     #-------------------------------------------------------------------------------------------------------
     @db.create_function
-      name:           prefix + 'unzip'
+      name:           prefix + 'glyfdata_from_blob'
       deterministic:  true
       varargs:        false
-      call:           ( pd_bfr ) => @_unzip pd_bfr
+      call:           ( sid, olt, gd_blob ) => @_glyfdata_from_blob sid, olt, gd_blob
     #.......................................................................................................
     return null
 

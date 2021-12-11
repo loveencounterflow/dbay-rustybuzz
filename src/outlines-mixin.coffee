@@ -107,6 +107,17 @@ jp                        = JSON.parse
   _unzip: ( bfr ) -> ( ZLIB.inflateRawSync bfr ).toString()
 
   #---------------------------------------------------------------------------------------------------------
+  _glyfdata_from_blob: ( sid, olt, gd_blob ) ->
+    gd = @_unzip gd_blob
+    switch olt
+      when 'pd'
+        ### TAINT do not include CSS class here (or use generic ones like `glyf`) ###
+        return "<path class='shady' id='#{sid}' d='#{gd}'/>"
+      else
+        throw new E.Dbr_internal_error '^Drb/outlines@1^', "unknown value for field #{outlines.olt}: #{rpr olt}"
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
   insert_and_walk_outlines: ( cfg ) ->
     ### Given a `cfg.fontnick` and a (list or map of) `cfg.cgid_map`, insert the outlines and bounding
     boxes of the referred glyfs. ###
@@ -123,15 +134,15 @@ jp                        = JSON.parse
     #.......................................................................................................
     try
       @db.begin_transaction() unless @db.within_transaction()
+      olt = 'pd' ### all Glyf Data is in PD (Path Data) format ###
       for [ gid, chrs, ] from cgid_map
         continue if gid <= missing.gid
         { bbox
           pd    }   = @get_single_outline { gid, fontnick, }
         { x,  y,
           x1, y1, } = bbox
-        pd_blob     = @_zip pd
-        row         = @db.first_row insert_outline, { fontnick, gid, chrs, x, y, x1, y1, pd_blob, }
-        delete row.pd_blob
+        gd_blob     = @_zip pd ### Glyf Data Blob ###
+        row         = @db.first_row insert_outline, { fontnick, gid, chrs, x, y, x1, y1, olt, gd_blob, }
         yield row
     catch error
       @db.rollback_transaction() if @db.within_transaction()
