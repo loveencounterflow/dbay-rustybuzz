@@ -182,12 +182,13 @@ class @Drb extends  \
     #.......................................................................................................
     @db.execute SQL"""
       drop table if exists #{schema}.outlines;
-      drop table if exists #{schema}.fontmetrics;
-      drop table if exists #{schema}.fontnicks;
+      drop table if exists #{schema}.outline_types;
       drop index if exists #{schema}.ads_location_idx;
       drop table if exists #{schema}.line_ads;
       drop table if exists #{schema}.ads;
       drop table if exists #{schema}.lines;
+      drop table if exists #{schema}.fontmetrics;
+      drop table if exists #{schema}.fontnicks;
       -- ...................................................................................................
       vacuum #{schema};
       -- ...................................................................................................
