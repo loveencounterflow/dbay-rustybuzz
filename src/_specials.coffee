@@ -28,25 +28,33 @@ guy                       = require 'guy'
 # SPECIALS
 #-----------------------------------------------------------------------------------------------------------
 specials =
-  ignored:
+  missing1:
     chrs:     ''
     gid:      -1
+    width:    500
+  missing2:
+    chrs:     ''
+    gid:      -2
+    width:    1000
+  ignored:
+    chrs:     ''
+    gid:      -3
   spc:
     chrs:     '\u{0020}'  # soft space
     symbolic: '␣'         # U+2423 Open Box
-    gid:      -2
+    gid:      -4
   wbr:
     chrs:     '\u{200b}'  # word break opportunity (as in `foo/bar` with a WBR after the slash)
-    gid:      -3
+    gid:      -5
   shy:
     chrs:     '\u{00ad}'  # soft hyphen
-    gid:      -4
+    gid:      -6
   hhy:
     chrs:     '\u{002d}'  # hard hyphen
   nl:
     chrs:     '\n'        # manual line break
     symbolic: '⏎'         # U+23ce Return Symbol
-    gid:      -6
+    gid:      -7
   missing:
     chrs:     ''
     gid:      0
