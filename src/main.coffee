@@ -53,6 +53,9 @@ class @Drb extends  \
     last_fontidx:       15
     zlib_zip_cfg:       { level: 1, strategy: ZLIB.constants.Z_HUFFMAN_ONLY, }
     specials:           ( require './_specials' ).specials
+    fontmetrics:
+      upem:               1000  ### all fonts will be scaled to this unified design size ###
+      # missing_width:      500   ### width of non-double-width replacement symbol ###
     defaults:
       #.....................................................................................................
       dbr_register_fontnick_cfg:
@@ -229,7 +232,6 @@ class @Drb extends  \
           sgi     integer not null, -- shape group idx, being a suite of ADs that must be reshaped if broken
           -- sgp     integer not null default 0, -- shape group part; 1: up to & incl HHY, 2: right of HHY to end of SG
           osgi    integer, -- when trk > 1, the original SG that this SG replaces
-          gid     integer,
           -- ### TAINT should be x1 + dx = x2, y1 + dy = y2
           x       integer not null,
           y       integer not null,
@@ -238,7 +240,10 @@ class @Drb extends  \
           x1      integer generated always as ( x + dx ) virtual not null,
           -- y1      integer generated always as ( y + dy ) virtual not null,
           chrs    text,
-          sid     text, -- references #{schema}.outlines ( sid ) ??
+          -- sid     text, -- references #{schema}.outlines ( sid ) ??
+          fontnick  text not null references fontnicks,
+          gid     integer,
+          sid     text not null generated always as ( 'o' || gid || fontnick ) virtual,
           nobr    boolean not null, -- if true, must re-shape when separated from previous outline
           br      text );
       -- ...................................................................................................
@@ -302,8 +307,8 @@ class @Drb extends  \
       insert_ad: @db.create_insert {
         schema,
         into:       'ads',
-        fields:     [ 'doc', 'par', 'trk', 'b1', 'b2', 'sgi', 'osgi', 'gid',
-                      'x', 'y', 'dx', 'dy', 'chrs', 'sid', 'nobr', 'br', ]
+        fields:     [ 'doc', 'par', 'trk', 'b1', 'b2', 'sgi', 'osgi', 'fontnick', 'gid',
+                      'x', 'y', 'dx', 'dy', 'chrs', 'nobr', 'br', ]
         returning:  '*', }
       #.....................................................................................................
       insert_line: @db.create_insert {

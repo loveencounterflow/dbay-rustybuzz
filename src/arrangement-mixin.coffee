@@ -150,7 +150,7 @@ jp                        = JSON.parse
           extra_ad.b1   = ad.b2
           extra_ad.br   = null
           extra_ad.gid  = specials.ignored.gid
-          extra_ad.sid  = _get_sid { fontnick, gid: specials.ignored.gid, }
+          # extra_ad.sid  = @_get_sid { fontnick, gid: specials.ignored.gid, }
           ad.chrs       = ad.chrs[ 0 ]
           ad.dx         = 0
           ad.x1         = ad.x
@@ -180,17 +180,19 @@ jp                        = JSON.parse
       doc
       par
       trk
-      osgi      } = cfg
-    skip_ends     = dx0? or dx2? ### TAINT will probably be removed ###
-    b1           ?= 0
-    b2           ?= null
-    dx0          ?= 0 ### TAINT use validation, defaults ###
-    dx2          ?= null
-    font_idx      = @_font_idx_from_fontnick fontnick
-    ads           = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, }
-    ads           = @_prepare_ads text, fontnick, ads
-    { specials  } = @constructor.C
-    { schema    } = @cfg
+      osgi      }   = cfg
+    skip_ends       = dx0? or dx2? ### TAINT will probably be removed ###
+    b1             ?= 0
+    b2             ?= null
+    dx0            ?= 0 ### TAINT use validation, defaults ###
+    dx2            ?= null
+    font_idx        = @_font_idx_from_fontnick fontnick
+    ads             = JSON.parse @RBW.shape_text { format: 'json', text, font_idx, }
+    ads             = @_prepare_ads text, fontnick, ads
+    { specials
+      fontmetrics } = @constructor.C
+    { missing   }   = specials
+    { schema    }   = @cfg
     #.......................................................................................................
     ced_x           = 0 # cumulative error displacement from missing outlines
     ced_y           = 0 # cumulative error displacement from missing outlines
@@ -200,23 +202,25 @@ jp                        = JSON.parse
     like `ffi`) ###
     for ad, idx in ads
       sgi++ unless ad.nobr
-      ad.doc    = doc
-      ad.par    = par
-      ad.trk    = trk
-      ad.b1    += b1
-      ad.b2    += b1
-      ad.sgi    = sgi
-      ad.osgi   = osgi
-      ad.sid    = _get_sid { fontnick, gid: ad.gid, }
-      ad.x     += ced_x
-      ad.y     += ced_y
+      ad.doc      = doc
+      ad.par      = par
+      ad.trk      = trk
+      ad.b1      += b1
+      ad.b2      += b1
+      ad.sgi      = sgi
+      ad.osgi     = osgi
+      ad.fontnick = fontnick
+      ad.x       += ced_x
+      ad.y       += ced_y
       #.....................................................................................................
       # Replace original metrics with those of missing outline:
       if ad.gid is specials.missing.gid
         if ( width_of ( Array.from ad.chrs )[ 0 ] ) < 2
-          width = 500
+          width   = specials.missing1.width
+          ad.gid  = specials.missing1.gid
         else
-          width = 1000
+          width   = specials.missing2.width
+          ad.gid  = specials.missing2.gid
         ed_x    = width - ad.dx
         ced_x  += ed_x
         ad.dx   = width
