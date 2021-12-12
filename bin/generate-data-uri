@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+
+# thx to https://blog.jiayu.co/2019/02/create-data-urls-from-the-command-line/
+# also see https://gist.github.com/puppybits/1565441/378180ab1d9b73a39099a24a2167318a426ee4bb
+
+#-----------------------------------------------------------------------------------------------------------
+if [ -z "$1" ]; then
+  echo "usage: generate-data-uri path/to/file" >&2
+  exit 119
+  fi
+
+#-----------------------------------------------------------------------------------------------------------
+function to_lower_case() {
+  echo "$1" | awk '{print tolower($0)}'; }
+
+#-----------------------------------------------------------------------------------------------------------
+filename="$1"
+ext=${filename##*.}
+ext=$(to_lower_case "$ext")
+
+#-----------------------------------------------------------------------------------------------------------
+if    [ "$ext" == 'gif'     ]; then mimetype='image/gif';
+elif  [ "$ext" == 'jpeg'    ]; then mimetype='image/jpeg';
+elif  [ "$ext" == 'jpg'     ]; then mimetype='image/jpeg';
+elif  [ "$ext" == 'png'     ]; then mimetype='image/png';
+elif  [ "$ext" == 'svg'     ]; then mimetype='image/svg+xml';
+elif  [ "$ext" == 'ico'     ]; then mimetype='image/vnd.microsoft.icon';
+elif  [ "$ext" == 'tif'     ]; then mimetype='image/tiff';
+elif  [ "$ext" == 'tiff'    ]; then mimetype='image/tiff';
+elif  [ "$ext" == 'webp'    ]; then mimetype='image/webp';
+#...........................................................................................................
+elif  [ "$ext" == 'eot'     ]; then mimetype='application/vnd.ms-fontobject';
+elif  [ "$ext" == 'woff'    ]; then mimetype='application/font-woff';
+elif  [ "$ext" == 'woff2'   ]; then mimetype='application/font-woff2';
+elif  [ "$ext" == 'ttf'     ]; then mimetype='application/x-font-truetype';
+elif  [ "$ext" == 'otf'     ]; then mimetype='application/x-font-opentype';
+elif  [ "$ext" == 'sfnt'    ]; then mimetype='application/font-sfnt';
+#...........................................................................................................
+elif  [ "$ext" == 'abw'     ]; then mimetype='application/x-abiword';
+elif  [ "$ext" == 'arc'     ]; then mimetype='application/x-freearc';
+elif  [ "$ext" == 'azw'     ]; then mimetype='application/vnd.amazon.ebook';
+elif  [ "$ext" == 'bin'     ]; then mimetype='application/octet-stream';
+elif  [ "$ext" == 'bz'      ]; then mimetype='application/x-bzip';
+elif  [ "$ext" == 'bz2'     ]; then mimetype='application/x-bzip2';
+elif  [ "$ext" == 'cda'     ]; then mimetype='application/x-cdf';
+elif  [ "$ext" == 'csh'     ]; then mimetype='application/x-csh';
+elif  [ "$ext" == 'doc'     ]; then mimetype='application/msword';
+elif  [ "$ext" == 'docx'    ]; then mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+elif  [ "$ext" == 'epub'    ]; then mimetype='application/epub+zip';
+elif  [ "$ext" == 'gz'      ]; then mimetype='application/gzip';
+elif  [ "$ext" == 'jar'     ]; then mimetype='application/java-archive';
+elif  [ "$ext" == 'json'    ]; then mimetype='application/json';
+elif  [ "$ext" == 'jsonld'  ]; then mimetype='application/ld+json';
+elif  [ "$ext" == 'mpkg'    ]; then mimetype='application/vnd.apple.installer+xml';
+elif  [ "$ext" == 'odp'     ]; then mimetype='application/vnd.oasis.opendocument.presentation';
+elif  [ "$ext" == 'ods'     ]; then mimetype='application/vnd.oasis.opendocument.spreadsheet';
+elif  [ "$ext" == 'odt'     ]; then mimetype='application/vnd.oasis.opendocument.text';
+elif  [ "$ext" == 'ogx'     ]; then mimetype='application/ogg';
+elif  [ "$ext" == 'pdf'     ]; then mimetype='application/pdf';
+elif  [ "$ext" == 'php'     ]; then mimetype='application/x-httpd-php';
+elif  [ "$ext" == 'ppt'     ]; then mimetype='application/vnd.ms-powerpoint';
+elif  [ "$ext" == 'pptx'    ]; then mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation';
+elif  [ "$ext" == 'rar'     ]; then mimetype='application/vnd.rar';
+elif  [ "$ext" == 'rtf'     ]; then mimetype='application/rtf';
+elif  [ "$ext" == 'sh'      ]; then mimetype='application/x-sh';
+elif  [ "$ext" == 'swf'     ]; then mimetype='application/x-shockwave-flash';
+elif  [ "$ext" == 'tar'     ]; then mimetype='application/x-tar';
+elif  [ "$ext" == 'vsd'     ]; then mimetype='application/vnd.visio';
+elif  [ "$ext" == 'xhtml'   ]; then mimetype='application/xhtml+xml';
+elif  [ "$ext" == 'xls'     ]; then mimetype='application/vnd.ms-excel';
+elif  [ "$ext" == 'xlsx'    ]; then mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+elif  [ "$ext" == 'xml'     ]; then mimetype='application/xml';
+elif  [ "$ext" == 'zip'     ]; then mimetype='application/zip';
+elif  [ "$ext" == '7z'      ]; then mimetype='application/x-7z-compressed';
+elif  [ "$ext" == 'aac'     ]; then mimetype='audio/aac';
+elif  [ "$ext" == 'mid'     ]; then mimetype='audio/midi';
+elif  [ "$ext" == 'midi'    ]; then mimetype='audio/midi';
+elif  [ "$ext" == 'mp3'     ]; then mimetype='audio/mpeg';
+elif  [ "$ext" == 'oga'     ]; then mimetype='audio/ogg';
+elif  [ "$ext" == 'opus'    ]; then mimetype='audio/opus';
+elif  [ "$ext" == 'wav'     ]; then mimetype='audio/wav';
+elif  [ "$ext" == 'weba'    ]; then mimetype='audio/webm';
+elif  [ "$ext" == 'css'     ]; then mimetype='text/css';
+elif  [ "$ext" == 'csv'     ]; then mimetype='text/csv';
+elif  [ "$ext" == 'htm'     ]; then mimetype='text/html';
+elif  [ "$ext" == 'html'    ]; then mimetype='text/html';
+elif  [ "$ext" == 'ics'     ]; then mimetype='text/calendar';
+elif  [ "$ext" == 'js'      ]; then mimetype='text/javascript';
+elif  [ "$ext" == 'mjs'     ]; then mimetype='text/javascript';
+elif  [ "$ext" == 'txt'     ]; then mimetype='text/plain';
+elif  [ "$ext" == 'avi'     ]; then mimetype='video/x-msvideo';
+elif  [ "$ext" == 'mp4'     ]; then mimetype='video/mp4';
+elif  [ "$ext" == 'mpeg'    ]; then mimetype='video/mpeg';
+elif  [ "$ext" == 'ogv'     ]; then mimetype='video/ogg';
+elif  [ "$ext" == 'ts'      ]; then mimetype='video/mp2t';
+elif  [ "$ext" == 'webm'    ]; then mimetype='video/webm';
+#...........................................................................................................
+else                              mimetype=$(file -bN --mime-type "$filename"); fi
+
+
+content=$(openssl base64 < "$1" | tr -d '\n')
+printf "%s" "data:$mimetype;base64,$content"
+
+
+
+
+
+
