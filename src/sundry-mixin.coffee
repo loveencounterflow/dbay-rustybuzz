@@ -73,10 +73,11 @@ SQL                       = String.raw
     R             = parts.join specials.wbr.chrs
     ### remove WBR after SHY, SPC? ###
     ### TAINT precompile patterns, always use constants instead of literals ###
-    R             = R.replace /\xad\u200b/g, specials.shy.chrs
-    R             = R.replace /\x20\u200b/g, '\x20'
-    R             = R.replace /\n\u200b/g,   '\n'
-    R             = R.replace /\u200b{2,}/g, specials.wbr.chrs
+    R             = R.replace /\xad{2,}/g,    specials.shy.chrs
+    R             = R.replace /\xad\u200b/g,  specials.shy.chrs
+    R             = R.replace /\x20\u200b/g,  '\x20'
+    R             = R.replace /\n\u200b/g,    '\n'
+    R             = R.replace /\u200b{2,}/g,  specials.wbr.chrs
     R             = R.replace /\u200b$/g, ''
     return R
 
