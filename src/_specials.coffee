@@ -46,11 +46,14 @@ specials =
   wbr:
     chrs:     '\u{200b}'  # word break opportunity (as in `foo/bar` with a WBR after the slash)
     gid:      -5
+    marker:   'w'
   shy:
     chrs:     '\u{00ad}'  # soft hyphen
     gid:      -6
+    marker:   's'
   hhy:
     chrs:     '\u{002d}'  # hard hyphen
+    marker:   'h'
   nl:
     chrs:     '\n'        # manual line break
     symbolic: '⏎'         # U+23ce Return Symbol

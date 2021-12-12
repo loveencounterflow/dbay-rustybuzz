@@ -113,8 +113,10 @@ jp                        = JSON.parse
       when 'pd'
         ### TAINT do not include CSS class here (or use generic ones like `glyf`) ###
         return "<path class='shady' id='#{sid}' d='#{gd}'/>"
+      when 'g'
+        return "<g id='#{sid}'>#{gd}</g>"
       else
-        throw new E.Dbr_internal_error '^Drb/outlines@1^', "unknown value for field #{outlines.olt}: #{rpr olt}"
+        throw new E.Dbr_internal_error '^Drb/outlines@1^', "unknown value for field `outlines.olt`: #{rpr olt}"
     return null
 
   #---------------------------------------------------------------------------------------------------------

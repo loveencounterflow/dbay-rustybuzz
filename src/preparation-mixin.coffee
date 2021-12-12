@@ -87,7 +87,8 @@ jp                        = JSON.parse
     font_bytes  = @_get_font_bytes fspath
     @RBW.register_font font_idx, font_bytes
     @state.font_idx_by_fontnicks[ fontnick ] = font_idx
-    @_add_fontmetrics fontnick, font_idx
+    fm          = @_add_fontmetrics fontnick, font_idx
+    @_add_special_glyfs fontnick, font_idx, fm
     return null
 
   #---------------------------------------------------------------------------------------------------------
@@ -95,7 +96,7 @@ jp                        = JSON.parse
     fm          = JSON.parse @RBW.get_font_metrics font_idx
     fm.fontnick = fontnick
     @db @sql.insert_fontmetric, fm
-    return null
+    return fm
 
   #---------------------------------------------------------------------------------------------------------
   get_fontmetrics: ( cfg ) ->
@@ -109,6 +110,68 @@ jp                        = JSON.parse
         throw new E.Dbr_unknown_or_unprepared_fontnick '^dbr/preparation@5^', fontnick
       throw error
     return R
+
+  #---------------------------------------------------------------------------------------------------------
+  _add_special_glyfs: ( fontnick, font_idx, fm ) ->
+    { specials  } = @constructor.C
+    swdth         = 0.5 # stroke width in mm
+    # swdth        *= 1000 * size_mm * mm_p_u
+    # swdth        *= 1000 * ( 10 ) * ( 10 / 1000 )
+    swdth        *= 100
+    owdth         = 3 * swdth
+    top           = fm.ascender  + 0 * owdth
+    bottom        = fm.descender - 0 * owdth
+    left          = Math.round owdth * 0.5
+    right         = Math.round 1000 - owdth * 0.5
+    # sid           = @_get_sid fontnick, gid
+    ### TAINT consider to use library (`cupofhtml`?) for this ###
+    x1            = 0
+    y1            = bottom
+    x2            = 0
+    y2            = top
+    text_x        = x2
+    text_y        = y2
+    olt           = 'g'
+    # for special_key in [ 'ignored', 'wbr', 'shy', 'hhy', ]
+    for special_key in [ 'ignored', 'wbr', 'shy', ]
+      gid           = specials[ special_key ].gid
+      chrs          = specials[ special_key ].chrs
+      marker        = specials[ special_key ].marker
+      gd            = cleanup_svg """
+        <text
+          class         ='fontmetric #{special_key}'
+          x             ='#{text_x}'
+          y             ='#{text_y}'
+          transform     ='skewX(#{fm.angle})'>#{marker}</text>
+        <line
+          class         ='fontmetric #{special_key}'
+          stroke-width  ='#{swdth}'
+          x1            ='#{x1}'
+          y1            ='#{y1}'
+          x2            ='#{x2}'
+          y2            ='#{y2}'
+          transform     ='skewX(#{fm.angle})'
+          />"""
+      ### TAINT should adapt & use `@insert_outlines()` ###
+      insert_outline      = @db.prepare @sql.insert_outline
+      gd_blob             = @_zip gd ### Glyf Data Blob ###
+      ### TAINT must rename fields x, y, y1, y1 in tables ads, outlines ###
+      row                 = @db.first_row insert_outline, \
+        { fontnick, gid, chrs, x: x1, y: y1, x1: x2, y1: y2, olt, gd_blob, }
+    return null
+
+#-----------------------------------------------------------------------------------------------------------
+cleanup_svg = ( svg ) ->
+  R = svg
+  R = R.replace /\n/g,        '\x20'
+  R = R.replace /\x20{2,}/g,  '\x20'
+  R = R.replace /\x20=\x20/g, '='
+  R = R.replace />\x20</g,    '><'
+  R = R.trim()
+  R = R.replace /\s+\/>$/,    '/>'
+  return R
+
+
 
 
 

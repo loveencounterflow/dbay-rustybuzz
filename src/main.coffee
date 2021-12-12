@@ -129,6 +129,7 @@ class @Drb extends  \
           hora:             PATH.join font_path, 'schäffel.ch/2002_horatius.otf'
           b42:              PATH.join font_path, 'schäffel.ch/1455_gutenberg_b42.otf'
           b36:              PATH.join font_path, 'schäffel.ch/1458_gutenberg_b36.otf'
+          sys:              PATH.join font_path, 'iosevka-fixed-curly-slab-extendedmedium.ttf'
         RBW:              null
 
   #---------------------------------------------------------------------------------------------------------
@@ -221,6 +222,7 @@ class @Drb extends  \
           chrs      text,
           /* Shape ID (SID): */
           /* bounding box */
+          -- ### TAINT must rename fields x, y, y1, y1, as below ###
           x         float   not null,
           y         float   not null,
           x1        float   not null,
