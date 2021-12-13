@@ -119,7 +119,7 @@ jp                        = JSON.parse
     # swdth        *= 1000 * ( 10 ) * ( 10 / 1000 )
     swdth        *= 100
     owdth         = 3 * swdth
-    top           = fm.ascender  + 0 * owdth
+    top           = fm.ascender  + 1 * owdth
     bottom        = fm.descender - 0 * owdth
     left          = Math.round owdth * 0.5
     right         = Math.round 1000 - owdth * 0.5
@@ -130,17 +130,19 @@ jp                        = JSON.parse
     x2            = 0
     y2            = top
     text_x        = x2 - 100
-    text_y        = y2 + 75
+    text_y        = y1 + 75
     olt           = 'g'
     cx            = x2
-    cy            = y2
+    cy            = y1
     cr            = 200
     cswdth        = swdth * 0.5
+    #.......................................................................................................
     # for special_key in [ 'ignored', 'wbr', 'shy', 'hhy', ]
     for special_key in [ 'ignored', 'wbr', 'shy', ]
-      gid           = specials[ special_key ].gid
-      chrs          = specials[ special_key ].chrs
-      marker        = specials[ special_key ].marker
+      special       = specials[ special_key ]
+      gid           = special.gid
+      chrs          = special.chrs
+      marker        = special.marker
       gd            = cleanup_svg """
         <g
           class         ='fontmetric #{special_key}'
@@ -168,6 +170,29 @@ jp                        = JSON.parse
       ### TAINT must rename fields x, y, y1, y1 in tables ads, outlines ###
       row                 = @db.first_row insert_outline, \
         { fontnick, gid, chrs, x: x1, y: y1, x1: x2, y1: y2, olt, gd_blob, }
+    #.......................................................................................................
+    for special_key in [ 'missing1', 'missing2', ]
+      special       = specials[ special_key ]
+      gid           = special.gid
+      width         = special.width
+      rwidth        = width - 3 *swdth
+      # rheight       = bottom - top
+      rheight       = -top
+      gd            = cleanup_svg """
+        <g
+          class         ='fontmetric missing #{special_key}'
+          transform     ='skewX(#{fm.angle})'
+          >
+        <rect x='#{left}' y='#{top}' width='#{rwidth}' height='#{rheight}'/>
+          </g>"""
+        # "M#{left} #{bottom} L#{left} #{top} L#{right} #{top} L#{right} #{bottom}"
+      ### TAINT should adapt & use `@insert_outlines()` ###
+      insert_outline      = @db.prepare @sql.insert_outline
+      gd_blob             = @_zip gd ### Glyf Data Blob ###
+      ### TAINT must rename fields x, y, y1, y1 in tables ads, outlines ###
+      row                 = @db.first_row insert_outline, \
+        { fontnick, gid, chrs, x: 0, y: 0, x1: width, y1: 0, olt, gd_blob, }
+    #.......................................................................................................
     return null
 
 #-----------------------------------------------------------------------------------------------------------

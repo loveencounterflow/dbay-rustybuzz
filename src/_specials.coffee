@@ -39,6 +39,7 @@ specials =
   ignored:
     chrs:     ''
     gid:      -3
+    marker:   'i'
   spc:
     chrs:     '\u{0020}'  # soft space
     symbolic: '␣'         # U+2423 Open Box
