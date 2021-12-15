@@ -10,7 +10,6 @@ specifiers:
   paragate: ^2.0.0
   rustybuzz-wasm: 4.6.0
   to-width: ^1.2.0
-  xxhash-addon: ^1.4.0
 
 dependencies:
   cnd: 9.2.2
@@ -21,7 +20,6 @@ dependencies:
   paragate: 2.0.0
   rustybuzz-wasm: 4.6.0
   to-width: 1.2.0
-  xxhash-addon: 1.4.0
 
 devDependencies:
   dbay: 10.117.0
@@ -752,10 +750,4 @@ packages:
   /xtend/4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
-    dev: false
-
-  /xxhash-addon/1.4.0:
-    resolution: {integrity: sha512-n3Ml0Vgvy7jMYJBlQIoFLjYxXNZQ5CbzW8E2Ynq2QCUpWMqCouooW7j02+7Oud5FijBuSrjQNuN/fCiz1SHN+w==}
-    engines: {node: '>=8.6.0 <9.0.0 || >=10.0.0'}
-    requiresBuild: true
     dev: false
