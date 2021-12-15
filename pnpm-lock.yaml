@@ -3,21 +3,25 @@ lockfileVersion: 5.3
 specifiers:
   cnd: 9.2.2
   dbay: 10.117.0
-  guy: 2.7.0
+  guy: 3.1.0
   hyphenopoly: ^5.0.0-beta.2
   intertext: ^5.0.2
   intertype: 7.7.0
+  paragate: ^2.0.0
   rustybuzz-wasm: 4.6.0
   to-width: ^1.2.0
+  xxhash-addon: ^1.4.0
 
 dependencies:
   cnd: 9.2.2
-  guy: 2.7.0
+  guy: 3.1.0
   hyphenopoly: 5.0.0-beta.2
   intertext: 5.0.2
   intertype: 7.7.0
+  paragate: 2.0.0
   rustybuzz-wasm: 4.6.0
   to-width: 1.2.0
+  xxhash-addon: 1.4.0
 
 devDependencies:
   dbay: 10.117.0
@@ -82,6 +86,12 @@ packages:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
     dev: false
 
+  /chevrotain/7.1.2:
+    resolution: {integrity: sha512-9bQsXVQ7UAvzMs7iUBBJ9Yv//exOy7bIR3PByOEk4M64vIE/LsiOiX7VIkMF/vEMlrSStwsaE884Bp9CpjtC5g==}
+    dependencies:
+      regexp-to-ast: 0.5.0
+    dev: false
+
   /cnd/9.2.1:
     resolution: {integrity: sha512-JszZtSlOCxkIvNPKpw1PmIcQUjYO+pBqVoKVH2STHLtG4JHHJ1NHowv39lhyxzlPxUTZk7pZ3qO7CfrfJ8ZSKw==}
     hasBin: true
@@ -124,6 +134,14 @@ packages:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
     dev: false
 
+  /cupofjoe/0.1.1:
+    resolution: {integrity: sha512-lNapdhUmwN0y94FGYvGubow+ZznI/A8+AlETPRli5+N4WkSnCys9Md1MiG8ZFPhjpS5Z+/NYC8nWdu+sLOOd/Q==}
+    dependencies:
+      cnd: 9.2.2
+      intertype: 7.7.0
+      multimix: 4.1.0
+    dev: false
+
   /cupofjoe/0.2.1:
     resolution: {integrity: sha512-kZHlb3DmPu2jV0rmZvqsGwI8OEy+VEyN+50bUFp95HrD1buun7G9BVpf286UiL+sNfjXEn4EdbAFHASkxibSHQ==}
     dependencies:
@@ -141,6 +159,17 @@ packages:
 
   /dash-ast/2.0.1:
     resolution: {integrity: sha512-5TXltWJGc+RdnabUGzhRae1TRq6m4gr+3K2wQX0is5/F2yS6MJXJvLyI3ErAnsAXuJoGqvfVD5icRgim07DrxQ==}
+    dev: false
+
+  /datom/7.0.3:
+    resolution: {integrity: sha512-0t2/KrbaYkAzTCGexM8lS6dQkPuKjG2udpdRzrgWTHtOyK3TxWW1lGXfY18NK8SqZYCSJvjNPqKfGNfI4Msm2Q==}
+    dependencies:
+      cnd: 9.2.2
+      cupofjoe: 0.1.1
+      emittery: 0.6.0
+      intertype: 7.7.0
+      letsfreezethat: 2.2.5
+      multimix: 4.1.0
     dev: false
 
   /datom/8.0.3:
@@ -311,6 +340,17 @@ packages:
       cnd: 9.2.2
       intertype: 7.6.7
       letsfreezethat: 3.1.0
+    dev: true
+
+  /guy/3.1.0:
+    resolution: {integrity: sha512-5bxlACi0FcjbF/hqDOs0nMyfPLQxzF9so8XJiTDv4g5xuWGOWMs7m/f2wIrstN6JsNlUJiGfxniHX9XoSfaZgg==}
+    peerDependencies:
+      deasync: ^0.1.22
+    dependencies:
+      cnd: 9.2.2
+      intertype: 7.6.7
+      letsfreezethat: 3.1.0
+    dev: false
 
   /has/1.0.3:
     resolution: {integrity: sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==}
@@ -398,6 +438,10 @@ packages:
   /jsx-number-format/0.1.4:
     resolution: {integrity: sha512-uPc/Q90XqZoRE7Cu1OLFQB2cSrA2Dy8+okzPOtML8vbagNFDSipbndIPme+q0odBjEhL+wf3WH3Wo52was4Tsg==}
 
+  /letsfreezethat/2.2.5:
+    resolution: {integrity: sha512-w4XD73ki7rClXBft9OmvngG6abnE71h0BTMNCCXdmDGI3zYNIZYjG6/fOhRjz1crWc5ic/XGKdl6KkusftiKpA==}
+    dev: false
+
   /letsfreezethat/3.1.0:
     resolution: {integrity: sha512-jJ1nvvQi6unW0WifjNPMIb64Byom0EXzSKWFYA++EpyjK3qv1J2pqeSoEJ61tGJoNG0GoNjPoeLYhxW16riZaA==}
 
@@ -433,6 +477,12 @@ packages:
     resolution: {integrity: sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==}
     dev: false
 
+  /multimix/4.1.0:
+    resolution: {integrity: sha512-GUV1SMXk7ZS/DiLHNYA6G43I+ORymTRvixCXBebR8kIFWy/1Syl7WmoI0dBvPzvs7goIK3VbCRO+EtIEP2R11w==}
+    dependencies:
+      cnd: 9.2.2
+    dev: false
+
   /multimix/5.0.0:
     resolution: {integrity: sha512-N9cdGSDDD7kxOV7R6e4iZqsHTZ4F4iiSDWqMcVqx4gEH6HBtRXav39Gj3fgT1YqvBcwPCQuf0Oa5R2cDaLWK8A==}
 
@@ -464,6 +514,18 @@ packages:
 
   /pako/0.2.9:
     resolution: {integrity: sha1-8/dSL073gjSNqBYbrZ7P1Rv4OnU=}
+    dev: false
+
+  /paragate/2.0.0:
+    resolution: {integrity: sha512-DYaBtbr6JSdVDwEOOtwRoofG7PmTJv8xejOnKF90TzwHhyzXO9RzdapE530caYwjYuMG1XiEB9lB0v/Wi7aw/w==}
+    dependencies:
+      chevrotain: 7.1.2
+      cnd: 9.2.2
+      datom: 7.0.3
+      intertext: 5.0.2
+      intertype: 7.7.0
+      multimix: 4.1.0
+      steampipes: 6.7.1
     dev: false
 
   /path-parse/1.0.7:
@@ -498,6 +560,10 @@ packages:
       safe-buffer: 5.1.2
       string_decoder: 1.1.1
       util-deprecate: 1.0.2
+    dev: false
+
+  /regexp-to-ast/0.5.0:
+    resolution: {integrity: sha512-tlbJqcMHnPKI9zSrystikWKwHkBqu2a/Sgw01h3zFjvYrMxEDYHzzoMZnUrbIfpTFEsoRnnviOXNCzFiSc54Qw==}
     dev: false
 
   /resolve/1.20.0:
@@ -686,4 +752,10 @@ packages:
   /xtend/4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
+    dev: false
+
+  /xxhash-addon/1.4.0:
+    resolution: {integrity: sha512-n3Ml0Vgvy7jMYJBlQIoFLjYxXNZQ5CbzW8E2Ynq2QCUpWMqCouooW7j02+7Oud5FijBuSrjQNuN/fCiz1SHN+w==}
+    engines: {node: '>=8.6.0 <9.0.0 || >=10.0.0'}
+    requiresBuild: true
     dev: false

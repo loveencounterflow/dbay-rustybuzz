@@ -28,12 +28,14 @@
   "homepage": "https://github.com/loveencounterflow/dbay-rustybuzz#readme",
   "dependencies": {
     "cnd": "9.2.2",
-    "guy": "2.7.0",
+    "guy": "3.1.0",
     "hyphenopoly": "^5.0.0-beta.2",
     "intertext": "^5.0.2",
     "intertype": "7.7.0",
+    "paragate": "^2.0.0",
     "rustybuzz-wasm": "4.6.0",
-    "to-width": "^1.2.0"
+    "to-width": "^1.2.0",
+    "xxhash-addon": "^1.4.0"
   },
   "devDependencies": {
     "dbay": "10.117.0"
