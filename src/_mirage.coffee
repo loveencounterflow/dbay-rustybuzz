@@ -22,7 +22,7 @@ types                     = new ( require 'intertype' ).Intertype()
   validate_list_of }      = types.export()
 SQL                       = String.raw
 GUY                       = require 'guy'
-XXHADD                    = require 'xxhash-addon'
+
 
 #===========================================================================================================
 types.declare 'constructor_cfg', tests:
