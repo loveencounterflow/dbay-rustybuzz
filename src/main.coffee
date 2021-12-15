@@ -31,6 +31,7 @@ E                         = require './errors'
 { Drb_codepoints        } = require './codepoints-mixin'
 { Drb_distribution      } = require './distribution-mixin'
 { Drb_sundry            } = require './sundry-mixin'
+{ Mrg                   } = require './_mirage'
 font_path                 = PATH.resolve PATH.join __dirname, '../fonts'
 ZLIB                      = require 'zlib'
 
@@ -173,8 +174,14 @@ class @Drb extends  \
     @_$arrangement_initialize?()
     @_$distribution_initialize?()
     @_$codepoints_initialize?()
+    @_procure_mirage?()
     @_open_drb_db()
     return undefined
+
+  #---------------------------------------------------------------------------------------------------------
+  _procure_mirage: ->
+    guy.props.hide @, 'mrg', new Mrg { db: @db, }
+    return null
 
   #---------------------------------------------------------------------------------------------------------
   _create_db_structure: ->
