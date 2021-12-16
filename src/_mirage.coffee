@@ -42,6 +42,11 @@ types.declare 'mrg_append_to_loc_cfg', tests:
   "@isa.nonempty_text x.locid":   ( x ) -> @isa.nonempty_text x.locid
   "@isa.text x.text":             ( x ) -> @isa.text x.text
 
+#-----------------------------------------------------------------------------------------------------------
+types.declare 'mrg_walk_line_rows_cfg', tests:
+  "@isa.object x":                ( x ) -> @isa.object x
+  "@isa.nonempty_text x.dsk":     ( x ) -> @isa.nonempty_text x.dsk
+
 
 #===========================================================================================================
 class @Mrg
@@ -61,6 +66,9 @@ class @Mrg
         force:            false
       #.....................................................................................................
       mrg_append_to_loc_cfg:
+        dsk:              null
+      #.....................................................................................................
+      mrg_walk_line_rows_cfg:
         dsk:              null
         locid:            null
         text:             null
@@ -144,7 +152,8 @@ class @Mrg
       #.....................................................................................................
       insert_xtra: @db.create_insert {
         into:       prefix + '_mirror',
-        fields:     [ 'dsk', 'lnr', 'lnpart', 'xtra', 'line', ], }
+        fields:     [ 'dsk', 'lnr', 'lnpart', 'xtra', 'line', ],
+        returning:  '*', }
       #.....................................................................................................
       insert_locid: @db.create_insert {
         into:       prefix + '_locs',
@@ -212,6 +221,28 @@ class @Mrg
 
 
   #=========================================================================================================
+  # CONTENT RETRIEVAL
+  #---------------------------------------------------------------------------------------------------------
+  walk_line_rows: ( cfg ) ->
+    validate.mrg_walk_line_rows_cfg ( cfg = { @constructor.C.defaults.mrg_walk_line_rows_cfg..., cfg..., } )
+    { dsk     } = cfg
+    { prefix  } = @cfg
+    return @db SQL"""
+      select distinct
+          dsk                                             as dsk,
+          lnr                                             as lnr,
+          coalesce( group_concat( line, '' ) over w, '' ) as line
+        from #{prefix}_mirror
+        where true
+          and ( dsk = $dsk )
+          and ( not isloc )
+        window w as (
+          partition by lnr
+          order by lnpart, xtra
+          range between unbounded preceding and unbounded following );
+      """, { dsk, }
+
+  #=========================================================================================================
   # CONTENT MANIPULATION
   #---------------------------------------------------------------------------------------------------------
   append_to_loc: ( cfg ) ->
@@ -224,8 +255,8 @@ class @Mrg
     ### Given a datasource `dsk` and a location ID `locid`, find the line and line part numbers, `lnr` and
     `lnpart`. This is possible because when inserting, we split up the line into several parts such that
     each location marker got its own line part separate from any other material: ###
-    @db =>
-      debug '^334^', { lnr, lnpart, } = @db.single_row SQL"""
+    return @db =>
+      { lnr, lnpart, } = @db.single_row SQL"""
         select
             lnr,
             lnpart
@@ -248,9 +279,7 @@ class @Mrg
           limit 1;""", { dsk, locid, lnr, lnpart, }
       console.table [{ dsk, locid, lnr, lnpart, prv_xtra, nxt_xtra, }]
       ### Insert the material at the appropriate point: ###
-      insert_xtra.run { dsk, locid, lnr, lnpart, xtra: nxt_xtra, line: text, }
-    # return R
-    return null
+      return @db.first_row insert_xtra, { dsk, locid, lnr, lnpart, xtra: nxt_xtra, line: text, }
 
 
 
