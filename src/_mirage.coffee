@@ -235,7 +235,7 @@ class @Mrg
         from #{prefix}_mirror
         where true
           and ( dsk = $dsk )
-          and ( not isloc )
+          -- and ( not isloc )
         window w as (
           partition by lnr
           order by lnpart, xtra
@@ -267,6 +267,20 @@ class @Mrg
           limit 1;""", { dsk, locid, }
       ### Given a datasource `dsk`, a line number `lnr` and a line part number `lnpart`, find the previous and
       next extra material numbers `prv_xtra`, `nxt_xtra`:  ###
+      urge '^4545689^'; console.table @db.all_rows SQL"""
+        select
+            dsk,
+            lnr,
+            lnpart,
+            $locid          as locid,
+            min( xtra ) - 1 as prv_xtra,
+            max( xtra ) + 1 as nxt_xtra
+          from #{prefix}_mirror
+          where true
+            and ( dsk     = $dsk      )
+            and ( lnr     = $lnr      )
+            and ( lnpart  = $lnpart   )
+          limit 1;""", { dsk, locid, lnr, lnpart, }
       { prv_xtra, nxt_xtra, } = @db.single_row SQL"""
         select
             min( xtra ) - 1 as prv_xtra,
