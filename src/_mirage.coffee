@@ -231,7 +231,7 @@ class @Mrg
             insert_line.run { dsk, lnr, line, }
           else
             isloc   = true
-            lnpart  = 0
+            lnpart  = -1
             for part in parts
               lnpart++
               if ( isloc = not isloc )
