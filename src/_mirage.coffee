@@ -185,6 +185,18 @@ class @Mrg
         fields:     [ 'dsk', 'lnr', 'lnpart', 'xtra', 'line', ],
         returning:  '*', }
       #.....................................................................................................
+      insert_xtra_using_dsk_locid: SQL"""
+        -- needs variables 'dsk', 'locid'
+        insert into #{prefix}_mirror ( dsk, lnr, lnpart, xtra, line )
+          select
+              $dsk          as dsk,
+              lnr           as lnr,
+              lnpart        as lnpart,
+              nxt_xtra      as nxt_xtra,
+              $text         as line
+            from #{prefix}_prv_nxt_xtra_from_dsk_locid
+          returning *;"""
+      #.....................................................................................................
       insert_locid: @db.create_insert {
         into:       prefix + '_locs',
         fields:     [ 'dsk', 'locid', 'lnr', 'lnpart', ], }
@@ -277,17 +289,28 @@ class @Mrg
 
   #=========================================================================================================
   # CONTENT MANIPULATION
-  #---------------------------------------------------------------------------------------------------------
-  _lnr_lnpart_from_dsk_locid: ( dsk, locid ) ->
-    @db.setv 'dsk',   dsk
-    @db.setv 'locid', locid
-    return @db.single_row SQL"select * from #{@cfg.prefix}_location_from_dsk_locid;"
+  # #---------------------------------------------------------------------------------------------------------
+  # _lnr_lnpart_from_dsk_locid: ( dsk, locid ) ->
+  #   @db.setv 'dsk',   dsk
+  #   @db.setv 'locid', locid
+  #   return @db.single_row SQL"select * from #{@cfg.prefix}_location_from_dsk_locid;"
 
-  #---------------------------------------------------------------------------------------------------------
-  _prv_nxt_xtra_from_dsk_locid: ( dsk, locid ) ->
-    @db.setv 'dsk',   dsk
-    @db.setv 'locid', locid
-    return @db.single_row SQL"select * from #{@cfg.prefix}_prv_nxt_xtra_from_dsk_locid;"
+  # #---------------------------------------------------------------------------------------------------------
+  # _prv_nxt_xtra_from_dsk_locid: ( dsk, locid ) ->
+  #   @db.setv 'dsk',   dsk
+  #   @db.setv 'locid', locid
+  #   return @db.single_row SQL"select * from #{@cfg.prefix}_prv_nxt_xtra_from_dsk_locid;"
+
+  # #---------------------------------------------------------------------------------------------------------
+  # append_to_loc_OLD: ( cfg ) ->
+  #   validate.mrg_append_to_loc_cfg ( cfg = { @constructor.C.defaults.mrg_append_to_loc_cfg..., cfg..., } )
+  #   { dsk
+  #     locid
+  #     text    } = cfg
+  #   insert_xtra = @db.prepare @sql.insert_xtra
+  #   return @db =>
+  #     { lnr, lnpart, prv_xtra, nxt_xtra, } = @_prv_nxt_xtra_from_dsk_locid dsk, locid
+  #     return @db.first_row insert_xtra, { dsk, locid, lnr, lnpart, xtra: nxt_xtra, line: text, }
 
   #---------------------------------------------------------------------------------------------------------
   append_to_loc: ( cfg ) ->
@@ -296,18 +319,9 @@ class @Mrg
       locid
       text    } = cfg
     { prefix  } = @cfg
-    insert_xtra = @db.prepare @sql.insert_xtra
-    ### Given a datasource `dsk` and a location ID `locid`, find the line and line part numbers, `lnr` and
-    `lnpart`. This is possible because when inserting, we split up the line into several parts such that
-    each location marker got its own line part separate from any other material: ###
-    return @db =>
-      # urge '^4545689^'; console.table @_lnr_lnpart_from_dsk_locid   dsk, locid
-      # urge '^4545689^'; console.table @_prv_nxt_xtra_from_dsk_locid dsk, locid
-      { lnr, lnpart, prv_xtra, nxt_xtra, } = @_prv_nxt_xtra_from_dsk_locid dsk, locid
-      debug '^55875^', { lnr, lnpart, prv_xtra, nxt_xtra, }
-      # console.table [{ dsk, locid, lnr, lnpart, prv_xtra, nxt_xtra, }]
-      ### Insert the material at the appropriate point: ###
-      return @db.first_row insert_xtra, { dsk, locid, lnr, lnpart, xtra: nxt_xtra, line: text, }
+    @db.setv 'dsk',   dsk
+    @db.setv 'locid', locid
+    return @db.first_row @sql.insert_xtra_using_dsk_locid, { dsk, text, }
 
 
 
