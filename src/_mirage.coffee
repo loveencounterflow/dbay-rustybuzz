@@ -80,12 +80,17 @@ class @Mrg
     @types.validate.constructor_cfg @cfg
     { db, } = GUY.obj.pluck_with_fallback @cfg, null, 'db'
     GUY.props.hide @, 'db', db
-    @db.create_stdlib()
     @cfg    = GUY.lft.freeze @cfg
+    @db.create_stdlib()
+    @_set_variables?()
     @_create_sql_functions?()
     @_compile_sql?()
     @_procure_infrastructure?()
     return undefined
+
+  #---------------------------------------------------------------------------------------------------------
+  _set_variables: ->
+    @db.setv 'allow_change_on_mirror', 0
 
   #---------------------------------------------------------------------------------------------------------
   _procure_infrastructure: ->
@@ -113,6 +118,24 @@ class @Mrg
           line    text    not null,
         foreign key ( dsk ) references #{prefix}_datasources,
         primary key ( dsk, lnr, lnpart, xtra ) );
+      -- ...................................................................................................
+      create trigger #{prefix}_before_delete_on_mirror before delete on #{prefix}_mirror
+        begin
+          select case when old.xtra = 0 and not std_getv( 'allow_change_on_mirror' ) then
+          raise( fail, '^mirage@1^ not allowed to modify table #{prefix}_mirror for xtra = 0' ) end;
+          end;
+      -- ...................................................................................................
+      create trigger #{prefix}_before_insert_on_mirror before insert on #{prefix}_mirror
+        begin
+          select case when new.xtra = 0 and not std_getv( 'allow_change_on_mirror' ) then
+          raise( fail, '^mirage@2^ not allowed to modify table #{prefix}_mirror for xtra = 0' ) end;
+          end;
+      -- ...................................................................................................
+      create trigger #{prefix}_before_update_on_mirror before update on #{prefix}_mirror
+        begin
+          select case when old.xtra = 0 and not std_getv( 'allow_change_on_mirror' ) then
+          raise( fail, '^mirage@3^ not allowed to modify table #{prefix}_mirror for xtra = 0' ) end;
+          end;
       -- ...................................................................................................
       create table #{prefix}_locs (
           dsk     text    not null,
@@ -218,6 +241,15 @@ class @Mrg
 
   #---------------------------------------------------------------------------------------------------------
   refresh_datasource: ( cfg ) ->
+    @db.setv 'allow_change_on_mirror', 1
+    try
+      R = @_refresh_datasource cfg
+    finally
+      @db.setv 'allow_change_on_mirror', 0
+    return R
+
+  #---------------------------------------------------------------------------------------------------------
+  _refresh_datasource: ( cfg ) ->
     validate.mrg_refresh_datasource_cfg ( cfg = { @constructor.C.defaults.mrg_refresh_datasource_cfg..., cfg..., } )
     { dsk         
       force       } = cfg
