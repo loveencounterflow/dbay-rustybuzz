@@ -46,6 +46,13 @@ types.declare 'mrg_append_to_loc_cfg', tests:
 types.declare 'mrg_walk_line_rows_cfg', tests:
   "@isa.object x":                ( x ) -> @isa.object x
   "@isa.nonempty_text x.dsk":     ( x ) -> @isa.nonempty_text x.dsk
+  "@isa.boolean x.keep_locs":     ( x ) -> @isa.boolean x.keep_locs
+
+# #-----------------------------------------------------------------------------------------------------------
+# types.declare 'mrg_get_text_cfg', tests:
+#   "@isa.object x":                ( x ) -> @isa.object x
+#   "@isa.nonempty_text x.dsk":     ( x ) -> @isa.nonempty_text x.dsk
+#   "@isa.boolean x.keep_locs":     ( x ) -> @isa.boolean x.keep_locs
 
 
 #===========================================================================================================
@@ -70,8 +77,11 @@ class @Mrg
       #.....................................................................................................
       mrg_walk_line_rows_cfg:
         dsk:              null
-        locid:            null
-        text:             null
+        keep_locs:        true
+      # #.....................................................................................................
+      # mrg_get_text_cfg:
+      #   dsk:              null
+      #   keep_locs:        true
 
   #---------------------------------------------------------------------------------------------------------
   constructor: ( cfg ) ->
@@ -299,13 +309,20 @@ class @Mrg
   #=========================================================================================================
   # CONTENT RETRIEVAL
   #---------------------------------------------------------------------------------------------------------
+  get_text: ( cfg ) ->
+    # validate.mrg_get_text_cfg ( cfg = { @constructor.C.defaults.mrg_get_text_cfg..., cfg..., } )
+    return ( d.line for d from @walk_line_rows cfg ).join '\n'
+
+  #---------------------------------------------------------------------------------------------------------
   get_line_rows: ( cfg ) -> [ ( @walk_line_rows cfg )..., ]
 
   #---------------------------------------------------------------------------------------------------------
   walk_line_rows: ( cfg ) ->
     validate.mrg_walk_line_rows_cfg ( cfg = { @constructor.C.defaults.mrg_walk_line_rows_cfg..., cfg..., } )
-    { dsk     } = cfg
-    { prefix  } = @cfg
+    { dsk
+      keep_locs } = cfg
+    { prefix    } = @cfg
+    keep_locs     = if keep_locs then 1 else 0
     return @db SQL"""
       select distinct
           dsk                                             as dsk,
@@ -314,12 +331,12 @@ class @Mrg
         from #{prefix}_mirror
         where true
           and ( dsk = $dsk )
-          -- and ( not isloc )
+          and ( case when $keep_locs then true else not isloc end )
         window w as (
           partition by lnr
           order by lnpart, xtra
           range between unbounded preceding and unbounded following );
-      """, { dsk, }
+      """, { dsk, keep_locs, }
 
   #=========================================================================================================
   # CONTENT MANIPULATION
