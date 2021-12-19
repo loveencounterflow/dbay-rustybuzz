@@ -92,62 +92,64 @@ class @Mrg
     ### TAINT skip if tables found ###
     { prefix } = @cfg
     @db SQL"""
-      drop table if exists #{prefix}_mirror;
-      drop table if exists #{prefix}_datasources;
+      drop table  if exists #{prefix}_mirror;
+      drop table  if exists #{prefix}_datasources;
+      drop table  if exists #{prefix}_locs;
+      drop view   if exists #{prefix}_location_from_dsk_locid;
+      drop view   if exists #{prefix}_prv_nxt_xtra_from_dsk_locid;
       -- ...................................................................................................
       create table #{prefix}_datasources (
-        dsk     text not null,
-        path    text not null,
-        digest  text default null,
+          dsk     text not null,
+          path    text not null,
+          digest  text default null,
         primary key ( dsk ) );
       -- ...................................................................................................
       create table #{prefix}_mirror (
-        dsk     text    not null,
-        lnr     integer not null,
-        lnpart  integer not null default 0,
-        xtra    integer not null default 0,
-        isloc   boolean not null default 0,
-        line    text    not null,
+          dsk     text    not null,
+          lnr     integer not null,
+          lnpart  integer not null default 0,
+          xtra    integer not null default 0,
+          isloc   boolean not null default 0,
+          line    text    not null,
         foreign key ( dsk ) references #{prefix}_datasources,
         primary key ( dsk, lnr, lnpart, xtra ) );
       -- ...................................................................................................
       create table #{prefix}_locs (
-        dsk     text    not null,
-        locid   text    not null,
-        lnr     integer not null,
-        lnpart  integer not null,
+          dsk     text    not null,
+          locid   text    not null,
+          lnr     integer not null,
+          lnpart  integer not null,
         foreign key ( dsk ) references #{prefix}_datasources,
         primary key ( dsk, locid ) );
       -- ...................................................................................................
       -- needs variables 'dsk', 'locid'
       create view #{prefix}_location_from_dsk_locid as select
-            dsk,
-            locid,
-            lnr,
-            lnpart
-          from #{prefix}_locs
-          where true
-            and ( dsk   = std_getv( 'dsk'   ) )
-            and ( locid = std_getv( 'locid' ) )
-          limit 1;
+          dsk,
+          locid,
+          lnr,
+          lnpart
+        from #{prefix}_locs
+        where true
+          and ( dsk   = std_getv( 'dsk'   ) )
+          and ( locid = std_getv( 'locid' ) )
+        limit 1;
       -- ...................................................................................................
       -- needs variables 'dsk', 'locid'
       create view #{prefix}_prv_nxt_xtra_from_dsk_locid as select
-            r1.dsk,
-            std_getv( 'locid' ) as locid,
-            r1.lnr,
-            r1.lnpart,
-            min( r1.xtra ) - 1  as prv_xtra,
-            max( r1.xtra ) + 1  as nxt_xtra
-          from
-            #{prefix}_mirror as r1,
-            ( select lnr, lnpart from #{prefix}_location_from_dsk_locid ) as r2
-          where true
-            and ( r1.dsk     = std_getv( 'dsk' ) )
-            and ( r1.lnr     = r2.lnr            )
-            and ( r1.lnpart  = r2.lnpart         )
-          limit 1;
-      """
+          r1.dsk,
+          std_getv( 'locid' ) as locid,
+          r1.lnr,
+          r1.lnpart,
+          min( r1.xtra ) - 1  as prv_xtra,
+          max( r1.xtra ) + 1  as nxt_xtra
+        from
+          #{prefix}_mirror as r1,
+          ( select lnr, lnpart from #{prefix}_location_from_dsk_locid ) as r2
+        where true
+          and ( r1.dsk     = std_getv( 'dsk' ) )
+          and ( r1.lnr     = r2.lnr            )
+          and ( r1.lnpart  = r2.lnpart         )
+        limit 1;"""
 
   #---------------------------------------------------------------------------------------------------------
   _compile_sql: ->
