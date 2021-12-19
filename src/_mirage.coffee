@@ -80,6 +80,7 @@ class @Mrg
     @types.validate.constructor_cfg @cfg
     { db, } = GUY.obj.pluck_with_fallback @cfg, null, 'db'
     GUY.props.hide @, 'db', db
+    @db.create_stdlib()
     @cfg    = GUY.lft.freeze @cfg
     @_create_sql_functions?()
     @_compile_sql?()
@@ -117,6 +118,33 @@ class @Mrg
         lnpart  integer not null,
         foreign key ( dsk ) references #{prefix}_datasources,
         primary key ( dsk, locid ) );
+      -- ...................................................................................................
+      create view #{prefix}_location_from_dsk_locid as select
+            dsk,
+            locid,
+            lnr,
+            lnpart
+          from #{prefix}_locs
+          where true
+            and ( dsk   = std_getv( 'dsk'   ) )
+            and ( locid = std_getv( 'locid' ) )
+          limit 1;
+      -- ...................................................................................................
+      create view #{prefix}_prv_nxt_xtra_from_dsk_locid as select
+            r1.dsk,
+            std_getv( 'locid' ) as locid,
+            r1.lnr,
+            r1.lnpart,
+            min( r1.xtra ) - 1  as prv_xtra,
+            max( r1.xtra ) + 1  as nxt_xtra
+          from
+            #{prefix}_mirror as r1,
+            ( select lnr, lnpart from #{prefix}_location_from_dsk_locid ) as r2
+          where true
+            and ( r1.dsk     = std_getv( 'dsk' ) )
+            and ( r1.lnr     = r2.lnr            )
+            and ( r1.lnpart  = r2.lnpart         )
+          limit 1;
       """
 
   #---------------------------------------------------------------------------------------------------------
@@ -223,6 +251,9 @@ class @Mrg
   #=========================================================================================================
   # CONTENT RETRIEVAL
   #---------------------------------------------------------------------------------------------------------
+  get_line_rows: ( cfg ) -> [ ( @walk_line_rows cfg )..., ]
+
+  #---------------------------------------------------------------------------------------------------------
   walk_line_rows: ( cfg ) ->
     validate.mrg_walk_line_rows_cfg ( cfg = { @constructor.C.defaults.mrg_walk_line_rows_cfg..., cfg..., } )
     { dsk     } = cfg
@@ -245,6 +276,18 @@ class @Mrg
   #=========================================================================================================
   # CONTENT MANIPULATION
   #---------------------------------------------------------------------------------------------------------
+  _lnr_lnpart_from_dsk_locid: ( dsk, locid ) ->
+    @db.setv 'dsk',   dsk
+    @db.setv 'locid', locid
+    return @db.single_row SQL"select * from #{@cfg.prefix}_location_from_dsk_locid;"
+
+  #---------------------------------------------------------------------------------------------------------
+  _prv_nxt_xtra_from_dsk_locid: ( dsk, locid ) ->
+    @db.setv 'dsk',   dsk
+    @db.setv 'locid', locid
+    return @db.single_row SQL"select * from #{@cfg.prefix}_prv_nxt_xtra_from_dsk_locid;"
+
+  #---------------------------------------------------------------------------------------------------------
   append_to_loc: ( cfg ) ->
     validate.mrg_append_to_loc_cfg ( cfg = { @constructor.C.defaults.mrg_append_to_loc_cfg..., cfg..., } )
     { dsk
@@ -256,42 +299,11 @@ class @Mrg
     `lnpart`. This is possible because when inserting, we split up the line into several parts such that
     each location marker got its own line part separate from any other material: ###
     return @db =>
-      { lnr, lnpart, } = @db.single_row SQL"""
-        select
-            lnr,
-            lnpart
-          from #{prefix}_locs
-          where true
-            and ( dsk   = $dsk    )
-            and ( locid = $locid  )
-          limit 1;""", { dsk, locid, }
-      ### Given a datasource `dsk`, a line number `lnr` and a line part number `lnpart`, find the previous and
-      next extra material numbers `prv_xtra`, `nxt_xtra`:  ###
-      urge '^4545689^'; console.table @db.all_rows SQL"""
-        select
-            dsk,
-            lnr,
-            lnpart,
-            $locid          as locid,
-            min( xtra ) - 1 as prv_xtra,
-            max( xtra ) + 1 as nxt_xtra
-          from #{prefix}_mirror
-          where true
-            and ( dsk     = $dsk      )
-            and ( lnr     = $lnr      )
-            and ( lnpart  = $lnpart   )
-          limit 1;""", { dsk, locid, lnr, lnpart, }
-      { prv_xtra, nxt_xtra, } = @db.single_row SQL"""
-        select
-            min( xtra ) - 1 as prv_xtra,
-            max( xtra ) + 1 as nxt_xtra
-          from #{prefix}_mirror
-          where true
-            and ( dsk     = $dsk      )
-            and ( lnr     = $lnr      )
-            and ( lnpart  = $lnpart   )
-          limit 1;""", { dsk, locid, lnr, lnpart, }
-      console.table [{ dsk, locid, lnr, lnpart, prv_xtra, nxt_xtra, }]
+      # urge '^4545689^'; console.table @_lnr_lnpart_from_dsk_locid   dsk, locid
+      # urge '^4545689^'; console.table @_prv_nxt_xtra_from_dsk_locid dsk, locid
+      { lnr, lnpart, prv_xtra, nxt_xtra, } = @_prv_nxt_xtra_from_dsk_locid dsk, locid
+      debug '^55875^', { lnr, lnpart, prv_xtra, nxt_xtra, }
+      # console.table [{ dsk, locid, lnr, lnpart, prv_xtra, nxt_xtra, }]
       ### Insert the material at the appropriate point: ###
       return @db.first_row insert_xtra, { dsk, locid, lnr, lnpart, xtra: nxt_xtra, line: text, }
 
