@@ -154,7 +154,7 @@ class @Mrg
     GUY.props.hide @, 'sql',
       #.....................................................................................................
       get_db_object_count:  SQL"""
-        select count(*) as count from sqlite_schema where starts_with( $name, $prefix_ );"""
+        select count(*) as count from sqlite_schema where starts_with( $name, $prefix || '_' );"""
       #.....................................................................................................
       ds_entry_from_dsk:  SQL"""
         select * from #{prefix}_datasources where dsk = $dsk;"""
