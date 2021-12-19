@@ -119,6 +119,7 @@ class @Mrg
         foreign key ( dsk ) references #{prefix}_datasources,
         primary key ( dsk, locid ) );
       -- ...................................................................................................
+      -- needs variables 'dsk', 'locid'
       create view #{prefix}_location_from_dsk_locid as select
             dsk,
             locid,
@@ -130,6 +131,7 @@ class @Mrg
             and ( locid = std_getv( 'locid' ) )
           limit 1;
       -- ...................................................................................................
+      -- needs variables 'dsk', 'locid'
       create view #{prefix}_prv_nxt_xtra_from_dsk_locid as select
             r1.dsk,
             std_getv( 'locid' ) as locid,
