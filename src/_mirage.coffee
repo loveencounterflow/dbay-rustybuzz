@@ -154,21 +154,37 @@ class @Mrg
           lnpart  integer not null,
         foreign key ( dsk ) references #{prefix}_datasources,
         primary key ( dsk, locid ) );
+      -- -- ...................................................................................................
+      -- -- needs variables 'dsk', 'locid'
+      -- create view #{prefix}_safe_locs as select
+      --       std_assert( dsk, '^546^ expected an entry, got nothing' )   as dsk,
+      --       locid                                                       as locid,
+      --       lnr                                                         as lnr,
+      --       lnpart                                                      as lnpart
       -- ...................................................................................................
       -- needs variables 'dsk', 'locid'
       create view #{prefix}_location_from_dsk_locid as select
-          dsk,
-          locid,
-          lnr,
-          lnpart
-        from #{prefix}_locs
-        where true
-          and ( dsk   = std_getv( 'dsk'   ) )
-          and ( locid = std_getv( 'locid' ) )
-        limit 1;
+          std_assert(
+            dsk,
+            '^#{prefix}_location_from_dsk_locid@546^' ||
+            ' unknown locid ' || quote( std_getv( 'locid' ) ) )   as dsk,
+          locid                                                   as locid,
+          lnr                                                     as lnr,
+          lnpart                                                  as lnpart
+        from ( select
+            *,
+            count( locid ) as _count
+          from #{prefix}_locs
+          where true
+            and ( dsk   = std_getv( 'dsk'   ) )
+            and ( locid = std_getv( 'locid' ) )
+          limit 1 );
       -- ...................................................................................................
       -- needs variables 'dsk', 'locid'
-      create view #{prefix}_prv_nxt_xtra_from_dsk_locid as select
+      create view #{prefix}_prv_nxt_xtra_from_dsk_locid as
+        -- with v1 as ( select raise( fail, 'xxx' ) )
+        with r2 as ( select lnr, lnpart from #{prefix}_location_from_dsk_locid )
+        select
           r1.dsk,
           std_getv( 'locid' ) as locid,
           r1.lnr,
@@ -176,8 +192,7 @@ class @Mrg
           min( r1.xtra ) - 1  as prv_xtra,
           max( r1.xtra ) + 1  as nxt_xtra
         from
-          #{prefix}_mirror as r1,
-          ( select lnr, lnpart from #{prefix}_location_from_dsk_locid ) as r2
+          #{prefix}_mirror as r1, r2
         where true
           and ( r1.dsk     = std_getv( 'dsk' ) )
           and ( r1.lnr     = r2.lnr            )
@@ -222,13 +237,17 @@ class @Mrg
       #.....................................................................................................
       insert_xtra_using_dsk_locid: SQL"""
         -- needs variables 'dsk', 'locid'
+        -- unfortunately, got to repeat the `std_assert()` call here
         insert into #{prefix}_mirror ( dsk, lnr, lnpart, xtra, line )
           select
-              $dsk          as dsk,
-              lnr           as lnr,
-              lnpart        as lnpart,
-              nxt_xtra      as nxt_xtra,
-              $text         as line
+              $dsk                                                    as dsk,
+              std_assert(
+                lnr,
+                '^insert_xtra_using_dsk_locid@546^' ||
+                ' unknown locid ' || quote( std_getv( 'locid' ) ) )   as lnr,
+              lnpart                                                  as lnpart,
+              nxt_xtra                                                as nxt_xtra,
+              $text                                                   as line
             from #{prefix}_prv_nxt_xtra_from_dsk_locid
           returning *;"""
       #.....................................................................................................
@@ -340,7 +359,7 @@ class @Mrg
 
   #=========================================================================================================
   # CONTENT MANIPULATION
-  # #---------------------------------------------------------------------------------------------------------
+  #---------------------------------------------------------------------------------------------------------
   # _lnr_lnpart_from_dsk_locid: ( dsk, locid ) ->
   #   @db.setv 'dsk',   dsk
   #   @db.setv 'locid', locid
