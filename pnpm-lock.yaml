@@ -2,7 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   cnd: 9.2.2
-  dbay: 10.118.0
+  dbay: 10.119.0
   guy: 3.1.0
   hyphenopoly: ^5.0.0-beta.2
   intertext: ^5.0.2
@@ -22,7 +22,7 @@ dependencies:
   to-width: 1.2.0
 
 devDependencies:
-  dbay: 10.118.0
+  dbay: 10.119.0
 
 packages:
 
@@ -181,8 +181,8 @@ packages:
       multimix: 5.0.0
     dev: false
 
-  /dbay/10.118.0:
-    resolution: {integrity: sha512-qzULHGYnUiG71uyBnkoIiw/UHcymgGjukjPeoHNQeehFyVeZ3z8qlAyGxAxmmlSndUjBgDc9SV9aurPNXn7wDQ==}
+  /dbay/10.119.0:
+    resolution: {integrity: sha512-SpeXiswK+Tu4pTZg0E8WFISPf0dlb9+PI/cmrHH5aOciWBnCxS+LGhWql8nMSgQn40okqpdOhciexKPPt+V8rw==}
     requiresBuild: true
     dependencies:
       cnd: 9.2.2
