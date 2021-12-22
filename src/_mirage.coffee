@@ -178,12 +178,15 @@ class @Mrg
         -- with v1 as ( select raise( fail, 'xxx' ) )
         with r2 as ( select lnr, lnpart from #{prefix}_location_from_dsk_locid )
         select
-          r1.dsk,
-          std_getv( 'locid' ) as locid,
-          r1.lnr,
-          r1.lnpart,
-          min( r1.xtra ) - 1  as prv_xtra,
-          max( r1.xtra ) + 1  as nxt_xtra
+          std_assert(
+            r1.dsk,
+            '^#{prefix}_location_from_dsk_locid@546^' ||
+            ' unknown locid ' || quote( std_getv( 'locid' ) ) )   as dsk,
+          std_getv( 'locid' )                                     as locid,
+          r1.lnr                                                  as lnr,
+          r1.lnpart                                               as lnpart,
+          min( r1.xtra ) - 1                                      as prv_xtra,
+          max( r1.xtra ) + 1                                      as nxt_xtra
         from
           #{prefix}_mirror as r1, r2
         where true
