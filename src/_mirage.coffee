@@ -175,7 +175,6 @@ class @Mrg
     @db SQL"""
       -- needs variables 'dsk', 'locid'
       create view #{prefix}_prv_nxt_xtra_from_dsk_locid as
-        -- with v1 as ( select raise( fail, 'xxx' ) )
         with r2 as ( select lnr, lnpart from #{prefix}_location_from_dsk_locid )
         select
           std_assert(
