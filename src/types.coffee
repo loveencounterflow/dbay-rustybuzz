@@ -25,7 +25,7 @@ dbay_types                = require 'dbay/lib/types'
 @declare 'constructor_cfg', tests:
   "@isa.object x":                                  ( x ) -> @isa.object x
   "@isa.nonempty_text x.prefix":                    ( x ) -> @isa.nonempty_text x.prefix
-  "@isa_optional.nonempty_text x.path":             ( x ) -> @isa_optional.nonempty_text x.path
+  "@isa.unset x.path":                              ( x ) -> @isa.unset x.path
   "dbay_types.dbay_schema x.schema":                ( x ) -> dbay_types.isa.dbay_schema x.schema
   "@isa.boolean x.rebuild":                         ( x ) -> @isa.boolean x.rebuild
   "( @isa.object x.db ) or ( @isa.function x.db ":  ( x ) -> ( @isa.object x.db ) or ( @isa.function x.db )

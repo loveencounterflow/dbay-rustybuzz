@@ -122,7 +122,6 @@ class @Drb extends  \
         prefix:           'drb_'
         schema:           'drb'
         rebuild:          false
-        # path:             PATH.join home,      'cmudict.sqlite'
         std_fontnicks:
           gi:               PATH.join font_path, 'ebgaramond/EBGaramond12-Italic.otf'
           gr:               PATH.join font_path, 'ebgaramond/EBGaramond12-Regular.otf'
