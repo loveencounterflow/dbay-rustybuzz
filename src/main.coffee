@@ -388,26 +388,4 @@ class @Drb extends  \
         @db upsert_fontnick, { fontnick, fspath, }
     return null
 
-  # #---------------------------------------------------------------------------------------------------------
-  # _cache_spellings: ->
-  #   cache = ( @cache.spellings ?= {} )
-  #   count = 0
-  #   for line from guy.fs.walk_lines @cfg.paths.spellings
-  #     continue if line.startsWith '#'
-  #     line = line.trim()
-  #     continue if line.length is 0
-  #     continue unless ( match = line.match /(?<lc>\S+)\s+(?<spelling>.*)$/ )?
-  #     #.....................................................................................................
-  #     count++
-  #     if count > @cfg.max_entry_count
-  #       warn '^dbay-cmudict/main@3^', "shortcutting at #{@cfg.max_entry_count} entries"
-  #       break
-  #     #.....................................................................................................
-  #     { lc,
-  #       spelling, } = match.groups
-  #     lc            = lc.toLowerCase()
-  #     spelling      = spelling.trimEnd()
-  #     cache[ lc ]   = spelling
-  #   return null
-
 
