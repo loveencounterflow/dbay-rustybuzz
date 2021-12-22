@@ -107,12 +107,11 @@ class @Mrg
     ### TAINT skip if tables found ###
     { prefix } = @cfg
     @db SQL"""
-      drop table  if exists #{prefix}_mirror;
-      drop table  if exists #{prefix}_datasources;
-      drop table  if exists #{prefix}_locs;
       drop view   if exists #{prefix}_location_from_dsk_locid;
       drop view   if exists #{prefix}_prv_nxt_xtra_from_dsk_locid;
-      -- ...................................................................................................
+      drop table  if exists #{prefix}_locs;
+      drop table  if exists #{prefix}_mirror;
+      drop table  if exists #{prefix}_datasources;"""
       create table #{prefix}_datasources (
           dsk     text not null,
           path    text not null,
