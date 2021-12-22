@@ -112,12 +112,13 @@ class @Mrg
       drop table  if exists #{prefix}_locs;
       drop table  if exists #{prefix}_mirror;
       drop table  if exists #{prefix}_datasources;"""
+    @db SQL"""
       create table #{prefix}_datasources (
           dsk     text not null,
           path    text not null,
           digest  text default null,
-        primary key ( dsk ) );
-      -- ...................................................................................................
+        primary key ( dsk ) );"""
+    @db SQL"""
       create table #{prefix}_mirror (
           dsk     text    not null,
           lnr     integer not null,
@@ -126,41 +127,34 @@ class @Mrg
           isloc   boolean not null default 0,
           line    text    not null,
         foreign key ( dsk ) references #{prefix}_datasources,
-        primary key ( dsk, lnr, lnpart, xtra ) );
-      -- ...................................................................................................
+        primary key ( dsk, lnr, lnpart, xtra ) );"""
+    @db SQL"""
       create trigger #{prefix}_before_delete_on_mirror before delete on #{prefix}_mirror
         begin
           select case when old.xtra = 0 and not std_getv( 'allow_change_on_mirror' ) then
           raise( fail, '^mirage@1^ not allowed to modify table #{prefix}_mirror for xtra = 0' ) end;
-          end;
-      -- ...................................................................................................
+          end;"""
+    @db SQL"""
       create trigger #{prefix}_before_insert_on_mirror before insert on #{prefix}_mirror
         begin
           select case when new.xtra = 0 and not std_getv( 'allow_change_on_mirror' ) then
           raise( fail, '^mirage@2^ not allowed to modify table #{prefix}_mirror for xtra = 0' ) end;
-          end;
-      -- ...................................................................................................
+          end;"""
+    @db SQL"""
       create trigger #{prefix}_before_update_on_mirror before update on #{prefix}_mirror
         begin
           select case when old.xtra = 0 and not std_getv( 'allow_change_on_mirror' ) then
           raise( fail, '^mirage@3^ not allowed to modify table #{prefix}_mirror for xtra = 0' ) end;
-          end;
-      -- ...................................................................................................
+          end;"""
+    @db SQL"""
       create table #{prefix}_locs (
           dsk     text    not null,
           locid   text    not null,
           lnr     integer not null,
           lnpart  integer not null,
         foreign key ( dsk ) references #{prefix}_datasources,
-        primary key ( dsk, locid ) );
-      -- -- ...................................................................................................
-      -- -- needs variables 'dsk', 'locid'
-      -- create view #{prefix}_safe_locs as select
-      --       std_assert( dsk, '^546^ expected an entry, got nothing' )   as dsk,
-      --       locid                                                       as locid,
-      --       lnr                                                         as lnr,
-      --       lnpart                                                      as lnpart
-      -- ...................................................................................................
+        primary key ( dsk, locid ) );"""
+    @db SQL"""
       -- needs variables 'dsk', 'locid'
       create view #{prefix}_location_from_dsk_locid as select
           std_assert(
@@ -177,8 +171,8 @@ class @Mrg
           where true
             and ( dsk   = std_getv( 'dsk'   ) )
             and ( locid = std_getv( 'locid' ) )
-          limit 1 );
-      -- ...................................................................................................
+          limit 1 );"""
+    @db SQL"""
       -- needs variables 'dsk', 'locid'
       create view #{prefix}_prv_nxt_xtra_from_dsk_locid as
         -- with v1 as ( select raise( fail, 'xxx' ) )
