@@ -309,7 +309,7 @@ class @Mrg
               if ( isloc = not isloc )
                 { locid, }  = ( part.match locid_re ).groups
                 insert_locid.run  { dsk, lnr, lnpart, locid, }
-                insert_lnpart.run   { dsk, lnr, lnpart, isloc: 1, line: part, }
+                insert_lnpart.run { dsk, lnr, lnpart, isloc: 1, line: part, }
               else
                 insert_lnpart.run { dsk, lnr, lnpart, isloc: 0, line: part, }
         #...................................................................................................
