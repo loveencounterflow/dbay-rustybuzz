@@ -152,6 +152,8 @@ class @Mrg
           locid   text    not null,
           lnr     integer not null,
           lnpart  integer not null,
+          props   json,
+          del     boolean not null default false,
         foreign key ( dsk ) references #{prefix}_datasources,
         primary key ( dsk, locid ) );"""
     @db SQL"""
@@ -163,7 +165,9 @@ class @Mrg
             ' unknown locid ' || quote( std_getv( 'locid' ) ) )   as dsk,
           locid                                                   as locid,
           lnr                                                     as lnr,
-          lnpart                                                  as lnpart
+          lnpart                                                  as lnpart,
+          props                                                   as props,
+          del                                                     as del
         from ( select
             *,
             count( locid ) as _count
@@ -175,7 +179,12 @@ class @Mrg
     @db SQL"""
       -- needs variables 'dsk', 'locid'
       create view #{prefix}_prv_nxt_xtra_from_dsk_locid as
-        with r2 as ( select lnr, lnpart from #{prefix}_location_from_dsk_locid )
+        with r2 as ( select
+            lnr,
+            lnpart,
+            props,
+            del
+          from #{prefix}_location_from_dsk_locid )
         select
           std_assert(
             r1.dsk,
@@ -184,6 +193,8 @@ class @Mrg
           std_getv( 'locid' )                                     as locid,
           r1.lnr                                                  as lnr,
           r1.lnpart                                               as lnpart,
+          r2.props                                                as props,
+          r2.del                                                  as del,
           min( r1.xtra ) - 1                                      as prv_xtra,
           max( r1.xtra ) + 1                                      as nxt_xtra
         from
@@ -248,7 +259,7 @@ class @Mrg
       #.....................................................................................................
       insert_locid: @db.create_insert {
         into:       prefix + '_locs',
-        fields:     [ 'dsk', 'locid', 'lnr', 'lnpart', ], }
+        fields:     [ 'dsk', 'locid', 'lnr', 'lnpart', 'props', 'del', ], }
     #.......................................................................................................
     return null
 
@@ -299,7 +310,6 @@ class @Mrg
           counts.bytes   += line.length
           line            = line.toString 'utf-8'
           parts           = line.split loc_splitter
-          debug '^345345^', parts
           if parts.length is 1
             insert_line.run { dsk, lnr, line, }
           else
@@ -310,9 +320,9 @@ class @Mrg
               if ( isloc = not isloc )
                 kernel                        = part[ 1 ... part.length - 2 ]
                 { id: locid, class: props,  } = ITXH.parse_compact_tagname kernel, true
-                props                        ?= []
-                urge '^345345^', ( rpr part ), { locid, props, }
-                insert_locid.run  { dsk, lnr, lnpart, locid, }
+                del                           = if 'delete-marker' in ( props ? [] ) then 1 else 0
+                props                         = if props? then JSON.stringify props else null
+                insert_locid.run  { dsk, lnr, lnpart, locid, props, del, }
                 insert_lnpart.run { dsk, lnr, lnpart, isloc: 1, line: part, }
               else
                 insert_lnpart.run { dsk, lnr, lnpart, isloc: 0, line: part, }
