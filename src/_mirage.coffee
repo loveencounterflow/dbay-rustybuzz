@@ -22,6 +22,7 @@ types                     = new ( require 'intertype' ).Intertype()
   validate_list_of }      = types.export()
 SQL                       = String.raw
 GUY                       = require 'guy'
+{ HTMLISH: ITXH }         = require 'intertext'
 
 
 #===========================================================================================================
@@ -65,8 +66,7 @@ class @Mrg
       constructor_cfg:
         db:               null
         prefix:           'mrg'
-        loc_splitter:     /(<mrg:loc#[_a-zA-Z][-_a-zA-Z0-9]*\/>)/g
-        locid_re:         /#(?<locid>[^\/]+)/
+        loc_splitter:     /(<mrg:loc[#.][-_a-zA-Z0-9]*\/>)/g
       #.....................................................................................................
       mrg_refresh_datasource_cfg:
         dsk:              null
@@ -307,7 +307,10 @@ class @Mrg
             for part in parts
               lnpart++
               if ( isloc = not isloc )
-                { locid, }  = ( part.match locid_re ).groups
+                kernel                        = part[ 1 ... part.length - 2 ]
+                { id: locid, class: props,  } = ITXH.parse_compact_tagname kernel, true
+                props                        ?= []
+                # debug '^345345^', ( rpr part ), { locid, props, }
                 insert_locid.run  { dsk, lnr, lnpart, locid, }
                 insert_lnpart.run { dsk, lnr, lnpart, isloc: 1, line: part, }
               else
