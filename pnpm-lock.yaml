@@ -5,7 +5,7 @@ specifiers:
   dbay: 10.119.0
   guy: 3.1.0
   hyphenopoly: ^5.0.0-beta.2
-  intertext: ^5.0.2
+  intertext: 7.0.0
   intertype: 7.7.0
   paragate: ^2.0.0
   rustybuzz-wasm: 4.6.0
@@ -15,7 +15,7 @@ dependencies:
   cnd: 9.2.2
   guy: 3.1.0
   hyphenopoly: 5.0.0-beta.2
-  intertext: 5.0.2
+  intertext: 7.0.0
   intertype: 7.7.0
   paragate: 2.0.0
   rustybuzz-wasm: 4.6.0
@@ -389,6 +389,21 @@ packages:
       hyphenopoly: 4.12.0
       intertype: 7.6.7
       linebreak: 1.0.2
+      multimix: 5.0.0
+      steampipes: 6.7.1
+      to-width: 1.2.0
+    dev: false
+
+  /intertext/7.0.0:
+    resolution: {integrity: sha512-r60kH/UTSgGHfwKgArwTH0u2pobqtzBg2X5LCcTapZ2KbW9Of8DhkH/OqJszcd3fStIEW2XObrzXYEkUQiV6GQ==}
+    dependencies:
+      cnd: 9.2.2
+      color-convert: 2.0.1
+      cupofjoe: 0.2.1
+      datom: 8.0.3
+      diff-match-patch: 1.0.5
+      hyphenopoly: 4.12.0
+      intertype: 7.7.0
       multimix: 5.0.0
       steampipes: 6.7.1
       to-width: 1.2.0
