@@ -284,7 +284,9 @@ excerpt of table `ads` with `trk` track 1:               .. and with `trk` track
   * **[–]** **SHY** hyphenation points
   * **[–]** **GID** Glyph IDs
   * **[–]** 'Tofus' for missing characters (one for half-width, one for full-width codepoints)
-  * **[–]** **BBOX** glyph bounding box
+  * **[–]** **BBOX** glyph bounding boxes
+    * **[–]** for all glyfs,
+    * **[–]** only for ligatures (multiple Unicode codepoints rendered as a single glyf)
   * **[–]** **NL** manual line breaks
 
 
