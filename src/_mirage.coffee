@@ -49,11 +49,6 @@ types.declare 'mrg_walk_line_rows_cfg', tests:
   "@isa.nonempty_text x.dsk":           ( x ) -> @isa.nonempty_text x.dsk
   "@isa_optional.boolean x.keep_locs":  ( x ) -> @isa_optional.boolean x.keep_locs
 
-# #-----------------------------------------------------------------------------------------------------------
-# types.declare 'mrg_get_text_cfg', tests:
-#   "@isa.object x":                ( x ) -> @isa.object x
-#   "@isa.nonempty_text x.dsk":     ( x ) -> @isa.nonempty_text x.dsk
-#   "@isa.boolean x.keep_locs":     ( x ) -> @isa.boolean x.keep_locs
 
 
 #===========================================================================================================
@@ -78,10 +73,6 @@ class @Mrg
       mrg_walk_line_rows_cfg:
         dsk:              null
         keep_locs:        true
-      # #.....................................................................................................
-      # mrg_get_text_cfg:
-      #   dsk:              null
-      #   keep_locs:        true
 
   #---------------------------------------------------------------------------------------------------------
   constructor: ( cfg ) ->
@@ -295,7 +286,6 @@ class @Mrg
 
   #---------------------------------------------------------------------------------------------------------
   register_dsk: ( cfg ) ->
-    # { dsk, path, }  = cfg
     @db @sql.upsert_datasource, cfg
     return null
 
@@ -367,12 +357,8 @@ class @Mrg
   #=========================================================================================================
   # CONTENT RETRIEVAL
   #---------------------------------------------------------------------------------------------------------
-  get_text: ( cfg ) ->
-    # validate.mrg_get_text_cfg ( cfg = { @constructor.C.defaults.mrg_get_text_cfg..., cfg..., } )
-    return ( d.line for d from @walk_line_rows cfg ).join '\n'
-
-  #---------------------------------------------------------------------------------------------------------
-  get_line_rows: ( cfg ) -> [ ( @walk_line_rows cfg )..., ]
+  get_text:       ( cfg ) -> ( d.line for d from @walk_line_rows cfg ).join '\n'
+  get_line_rows:  ( cfg ) -> [ ( @walk_line_rows cfg )..., ]
 
   #---------------------------------------------------------------------------------------------------------
   walk_line_rows: ( cfg ) ->
@@ -384,31 +370,9 @@ class @Mrg
     @db.setv 'keep_locs', if keep_locs? then ( if keep_locs then 1 else 0 ) else null
     return @db SQL"select * from #{prefix}_lines;"
 
+
   #=========================================================================================================
   # CONTENT MANIPULATION
-  #---------------------------------------------------------------------------------------------------------
-  # _lnr_lnpart_from_dsk_locid: ( dsk, locid ) ->
-  #   @db.setv 'dsk',   dsk
-  #   @db.setv 'locid', locid
-  #   return @db.single_row SQL"select * from #{@cfg.prefix}_location_from_dsk_locid;"
-
-  # #---------------------------------------------------------------------------------------------------------
-  # _prv_nxt_xtra_from_dsk_locid: ( dsk, locid ) ->
-  #   @db.setv 'dsk',   dsk
-  #   @db.setv 'locid', locid
-  #   return @db.single_row SQL"select * from #{@cfg.prefix}_prv_nxt_xtra_from_dsk_locid;"
-
-  # #---------------------------------------------------------------------------------------------------------
-  # append_to_loc_OLD: ( cfg ) ->
-  #   validate.mrg_append_to_loc_cfg ( cfg = { @constructor.C.defaults.mrg_append_to_loc_cfg..., cfg..., } )
-  #   { dsk
-  #     locid
-  #     text    } = cfg
-  #   insert_xtra = @db.prepare @sql.insert_xtra
-  #   return @db =>
-  #     { lnr, lnpart, prv_xtra, nxt_xtra, } = @_prv_nxt_xtra_from_dsk_locid dsk, locid
-  #     return @db.first_row insert_xtra, { dsk, locid, lnr, lnpart, xtra: nxt_xtra, line: text, }
-
   #---------------------------------------------------------------------------------------------------------
   append_to_loc: ( cfg ) ->
     validate.mrg_append_to_loc_cfg ( cfg = { @constructor.C.defaults.mrg_append_to_loc_cfg..., cfg..., } )
