@@ -195,8 +195,8 @@ class @Mrg
         left join #{prefix}_locs as r2 using ( dsk, locid )
         where true
           and ( r1.dsk = std_getv( 'dsk' ) )
-          and ( ( del is null ) or
-            case when std_getv( 'keep_locs' ) is null then not del
+          and ( ( r2.del is null ) or
+            case when std_getv( 'keep_locs' ) is null then not r2.del
             else std_getv( 'keep_locs' ) end  )
         window w as (
           partition by r1.lnr
