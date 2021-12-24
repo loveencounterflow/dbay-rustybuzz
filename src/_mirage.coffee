@@ -98,6 +98,7 @@ class @Mrg
     ### TAINT skip if tables found ###
     { prefix } = @cfg
     @db SQL"""
+      drop view   if exists #{prefix}_lines;
       drop view   if exists #{prefix}_location_from_dsk_locid;
       drop view   if exists #{prefix}_prv_nxt_xtra_from_dsk_locid;
       drop table  if exists #{prefix}_locs;
