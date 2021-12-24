@@ -45,9 +45,9 @@ types.declare 'mrg_append_to_loc_cfg', tests:
 
 #-----------------------------------------------------------------------------------------------------------
 types.declare 'mrg_walk_line_rows_cfg', tests:
-  "@isa.object x":                ( x ) -> @isa.object x
-  "@isa.nonempty_text x.dsk":     ( x ) -> @isa.nonempty_text x.dsk
-  "@isa.boolean x.keep_locs":     ( x ) -> @isa.boolean x.keep_locs
+  "@isa.object x":                      ( x ) -> @isa.object x
+  "@isa.nonempty_text x.dsk":           ( x ) -> @isa.nonempty_text x.dsk
+  "@isa_optional.boolean x.keep_locs":  ( x ) -> @isa_optional.boolean x.keep_locs
 
 # #-----------------------------------------------------------------------------------------------------------
 # types.declare 'mrg_get_text_cfg', tests:
@@ -124,7 +124,7 @@ class @Mrg
           lnr     integer not null,
           lnpart  integer not null default 0,
           xtra    integer not null default 0,
-          isloc   boolean not null default 0,
+          locid   text default null,
           line    text    not null,
         foreign key ( dsk ) references #{prefix}_datasources,
         primary key ( dsk, lnr, lnpart, xtra ) );"""
@@ -234,7 +234,7 @@ class @Mrg
       #.....................................................................................................
       insert_lnpart: @db.create_insert {
         into:       prefix + '_mirror',
-        fields:     [ 'dsk', 'lnr', 'lnpart', 'isloc', 'line', ], }
+        fields:     [ 'dsk', 'lnr', 'lnpart', 'locid', 'line', ], }
       #.....................................................................................................
       insert_xtra: @db.create_insert {
         into:       prefix + '_mirror',
@@ -313,19 +313,19 @@ class @Mrg
           if parts.length is 1
             insert_line.run { dsk, lnr, line, }
           else
-            isloc   = true
+            is_loc  = true
             lnpart  = -1
             for part in parts
               lnpart++
-              if ( isloc = not isloc )
+              if ( is_loc = not is_loc )
                 kernel                        = part[ 1 ... part.length - 2 ]
                 { id: locid, class: props,  } = ITXH.parse_compact_tagname kernel, true
                 del                           = if 'delete-marker' in ( props ? [] ) then 1 else 0
                 props                         = if props? then JSON.stringify props else null
                 insert_locid.run  { dsk, lnr, lnpart, locid, props, del, }
-                insert_lnpart.run { dsk, lnr, lnpart, isloc: 1, line: part, }
+                insert_lnpart.run { dsk, lnr, lnpart, locid, line: part, }
               else
-                insert_lnpart.run { dsk, lnr, lnpart, isloc: 0, line: part, }
+                insert_lnpart.run { dsk, lnr, lnpart, locid: null, line: part, }
         #...................................................................................................
         counts.files++
         @_update_digest dsk, current_digest
@@ -359,7 +359,7 @@ class @Mrg
         from #{prefix}_mirror
         where true
           and ( dsk = $dsk )
-          and ( case when $keep_locs then true else not isloc end )
+          and ( case when $keep_locs then true else ( locid is not null ) end )
         window w as (
           partition by lnr
           order by lnpart, xtra
