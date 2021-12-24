@@ -350,19 +350,22 @@ class @Mrg
     { dsk
       keep_locs } = cfg
     { prefix    } = @cfg
-    keep_locs     = if keep_locs then 1 else 0
+    keep_locs     = if keep_locs? then ( if keep_locs then 1 else 0 ) else null
     return @db SQL"""
       select distinct
-          dsk                                             as dsk,
-          lnr                                             as lnr,
-          coalesce( group_concat( line, '' ) over w, '' ) as line
-        from #{prefix}_mirror
+          r1.dsk                                              as dsk,
+          r1.lnr                                              as lnr,
+          coalesce( group_concat( r1.line, '' ) over w, '' )  as line
+        from #{prefix}_mirror as r1
+        left join #{prefix}_locs as r2 using ( dsk, locid )
         where true
-          and ( dsk = $dsk )
-          and ( case when $keep_locs then true else ( locid is not null ) end )
+          and ( r1.dsk = $dsk )
+          and ( ( del is null ) or
+            case when $keep_locs is null then not del
+            else $keep_locs end  )
         window w as (
-          partition by lnr
-          order by lnpart, xtra
+          partition by r1.lnr
+          order by r1.lnpart, r1.xtra
           range between unbounded preceding and unbounded following );
       """, { dsk, keep_locs, }
 
