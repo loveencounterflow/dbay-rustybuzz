@@ -164,6 +164,7 @@ class @Mrg
             and ( dsk   = std_getv( 'dsk'   ) )
             and ( locid = std_getv( 'locid' ) )
           limit 1 );"""
+    #.......................................................................................................
     @db SQL"""
       -- needs variables 'dsk', 'locid'
       create view #{prefix}_prv_nxt_xtra_from_dsk_locid as
@@ -192,6 +193,24 @@ class @Mrg
           and ( r1.lnr     = r2.lnr            )
           and ( r1.lnpart  = r2.lnpart         )
         limit 1;"""
+    #.......................................................................................................
+    @db SQL"""
+      -- needs variables 'dsk', 'keep_locs'
+      create view #{prefix}_lines as select distinct
+          r1.dsk                                              as dsk,
+          r1.lnr                                              as lnr,
+          coalesce( group_concat( r1.line, '' ) over w, '' )  as line
+        from #{prefix}_mirror as r1
+        left join #{prefix}_locs as r2 using ( dsk, locid )
+        where true
+          and ( r1.dsk = std_getv( 'dsk' ) )
+          and ( ( del is null ) or
+            case when std_getv( 'keep_locs' ) is null then not del
+            else std_getv( 'keep_locs' ) end  )
+        window w as (
+          partition by r1.lnr
+          order by r1.lnpart, r1.xtra
+          range between unbounded preceding and unbounded following );"""
     #-------------------------------------------------------------------------------------------------------
     # TRIGGERS
     #.......................................................................................................
@@ -361,24 +380,9 @@ class @Mrg
     { dsk
       keep_locs } = cfg
     { prefix    } = @cfg
-    keep_locs     = if keep_locs? then ( if keep_locs then 1 else 0 ) else null
-    return @db SQL"""
-      select distinct
-          r1.dsk                                              as dsk,
-          r1.lnr                                              as lnr,
-          coalesce( group_concat( r1.line, '' ) over w, '' )  as line
-        from #{prefix}_mirror as r1
-        left join #{prefix}_locs as r2 using ( dsk, locid )
-        where true
-          and ( r1.dsk = $dsk )
-          and ( ( del is null ) or
-            case when $keep_locs is null then not del
-            else $keep_locs end  )
-        window w as (
-          partition by r1.lnr
-          order by r1.lnpart, r1.xtra
-          range between unbounded preceding and unbounded following );
-      """, { dsk, keep_locs, }
+    @db.setv 'dsk',       dsk
+    @db.setv 'keep_locs', if keep_locs? then ( if keep_locs then 1 else 0 ) else null
+    return @db SQL"select * from #{prefix}_lines;"
 
   #=========================================================================================================
   # CONTENT MANIPULATION
