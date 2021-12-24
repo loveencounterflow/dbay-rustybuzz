@@ -35,6 +35,35 @@
     regular expression.
   * A future version may support marking regions between an opening and a closing tag.
 
+* `keep_locs` { `true`, `false`, `null`, }; `del` { `true`, `false`, `null`, }:
+
+```
+keep_locs | T     F     null
+----------+-----------------
+del     T | T     F     T
+del     F | T     F     F
+del  null | T     T     T
+```
+
+```
++----+-----+------+
+| kl | del | keep |
++----+-----+------+
+| 1  | 1   | 1    |
+| 1  | 0   | 1    |
+| 1  | ∎   | 1    |
+| 0  | 1   | 0    |
+| 0  | 0   | 0    |
+| 0  | ∎   | 1    |
+| ∎  | 1   | 0    | 1
+| ∎  | 0   | 0    |
+| ∎  | ∎   | 1    |
++----+-----+------+
+```
+
+
+
+
 ## To Do
 
 * **[–]** Documentation.
