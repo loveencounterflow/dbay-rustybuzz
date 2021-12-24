@@ -35,33 +35,19 @@
     regular expression.
   * A future version may support marking regions between an opening and a closing tag.
 
+* Location markers can have 'props' (properties); the only prop so far implemented is `delete-marker`
+  * use a leading dot, can place after name or after ID as in `<mrg:loc.delete-marker#first/>`,
+    `<mrg:loc#first.delete-marker/>`.
+  * By default, only location markers with a `delete-marker` prop will be deleted from the generated
+    HTML+SVG; however, one can explicitly set `keep_locs` (currently available in `get_text()`,
+    `get_line_rows()`, `walk_line_rows()`) to
+    * `null` for the per-location-marker default behavior,
+    * `true` to unconditionally keep all markers, or
+    * `false` to unconditionally drop all location markers.
+
+
+
 * `keep_locs` { `true`, `false`, `null`, }; `del` { `true`, `false`, `null`, }:
-
-```
-keep_locs | T     F     null
-----------+-----------------
-del     T | T     F     T
-del     F | T     F     F
-del  null | T     T     T
-```
-
-```
-+----+-----+------+
-| kl | del | keep |
-+----+-----+------+
-| 1  | 1   | 1    |
-| 1  | 0   | 1    |
-| 1  | ∎   | 1    |
-| 0  | 1   | 0    |
-| 0  | 0   | 0    |
-| 0  | ∎   | 1    |
-| ∎  | 1   | 0    | 1
-| ∎  | 0   | 0    |
-| ∎  | ∎   | 1    |
-+----+-----+------+
-```
-
-
 
 
 ## To Do
