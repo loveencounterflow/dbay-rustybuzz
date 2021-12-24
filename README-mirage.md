@@ -53,7 +53,7 @@
 ## To Do
 
 * **[–]** Documentation.
-* **[–]** Allow to pass options in location markers as pseudo CSS classes, such as
+* **[+]** Allow to pass options in location markers as pseudo CSS classes, such as
   `<mrg:loc.delete#first/>`.
 * **[–]** Allow to use location markers multiple times or to use (auto-) numbered location markers.
 
