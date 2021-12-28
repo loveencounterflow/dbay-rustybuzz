@@ -383,10 +383,12 @@ class @Mrg
     validate.mrg_append_to_loc_cfg ( cfg = { @constructor.C.defaults.mrg_append_to_loc_cfg..., cfg..., } )
     { dsk
       locid
+      nl
       text    } = cfg
     { prefix  } = @cfg
     @db.setv 'dsk',   dsk
     @db.setv 'locid', locid
+    text += '\n' if nl
     return @db.first_row @sql.insert_xtra_using_dsk_locid, { dsk, text, }
 
 
