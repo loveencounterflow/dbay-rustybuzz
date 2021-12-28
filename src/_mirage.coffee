@@ -42,6 +42,7 @@ types.declare 'mrg_append_to_loc_cfg', tests:
   "@isa.nonempty_text x.dsk":     ( x ) -> @isa.nonempty_text x.dsk
   "@isa.nonempty_text x.locid":   ( x ) -> @isa.nonempty_text x.locid
   "@isa.text x.text":             ( x ) -> @isa.text x.text
+  "@isa.boolean x.nl":            ( x ) -> @isa.boolean x.nl
 
 #-----------------------------------------------------------------------------------------------------------
 types.declare 'mrg_walk_line_rows_cfg', tests:
@@ -69,6 +70,9 @@ class @Mrg
       #.....................................................................................................
       mrg_append_to_loc_cfg:
         dsk:              null
+        locid:            null
+        text:             null
+        nl:               true
       #.....................................................................................................
       mrg_walk_line_rows_cfg:
         dsk:              null
