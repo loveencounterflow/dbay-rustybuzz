@@ -37,7 +37,7 @@
     "to-width": "^1.2.0"
   },
   "devDependencies": {
-    "dbay": "10.119.0"
+    "dbay": "10.121.0"
   },
   "peerDependencies": {
     "dbay": "10.113.1"

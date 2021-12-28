@@ -2,7 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   cnd: 9.2.2
-  dbay: 10.119.0
+  dbay: 10.121.0
   guy: 3.1.0
   hyphenopoly: ^5.0.0-beta.2
   intertext: 8.0.0
@@ -22,7 +22,7 @@ dependencies:
   to-width: 1.2.0
 
 devDependencies:
-  dbay: 10.119.0
+  dbay: 10.121.0
 
 packages:
 
@@ -103,14 +103,14 @@ packages:
       multimix: 5.0.0
     dev: false
 
-  /dbay/10.119.0:
-    resolution: {integrity: sha512-SpeXiswK+Tu4pTZg0E8WFISPf0dlb9+PI/cmrHH5aOciWBnCxS+LGhWql8nMSgQn40okqpdOhciexKPPt+V8rw==}
+  /dbay/10.121.0:
+    resolution: {integrity: sha512-8EU/Rtfh6bczfclfKiMu2XMujXnKLjYQrM4pqA3HqdhoDs2qJp+MmuOOYbWBSNegblcOOgkbyx6zDwHp4W3OkQ==}
     requiresBuild: true
     dependencies:
       cnd: 9.2.2
       exit-hook: 2.2.1
-      guy: 2.7.0
-      intertype: 7.6.7
+      guy: 3.1.0
+      intertype: 7.7.0
     transitivePeerDependencies:
       - deasync
     dev: true
@@ -133,16 +133,6 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /guy/2.7.0:
-    resolution: {integrity: sha512-yA2pHwCesUoAR/b5Y4bbIvZYLDNYKAymbih+tvTeSnNjp9/6YvDJXlTjsQiPLC6vaftWl1OQ1ErchiK4F9wXjg==}
-    peerDependencies:
-      deasync: ^0.1.22
-    dependencies:
-      cnd: 9.2.2
-      intertype: 7.6.7
-      letsfreezethat: 3.1.0
-    dev: true
-
   /guy/3.1.0:
     resolution: {integrity: sha512-5bxlACi0FcjbF/hqDOs0nMyfPLQxzF9so8XJiTDv4g5xuWGOWMs7m/f2wIrstN6JsNlUJiGfxniHX9XoSfaZgg==}
     peerDependencies:
@@ -151,7 +141,6 @@ packages:
       cnd: 9.2.2
       intertype: 7.6.7
       letsfreezethat: 3.1.0
-    dev: false
 
   /hyphenopoly/4.12.0:
     resolution: {integrity: sha512-2AbkggnLa42cZFQ+VncvZCw/oB4aGMrmW6yb7/HzZfaUk0XXjaU2/wttOhVf4/sleHwp03rpPCLO/3dHJlsreg==}
@@ -200,7 +189,6 @@ packages:
     resolution: {integrity: sha512-Sv923oXpq9In8/CuxP5KAKc3FIETOEl23ltwSfLOnn/8V8A5pDRlxWo0vhaA6p7WybRMgeZXsE4Etw98tWUMPA==}
     dependencies:
       multimix: 5.0.0
-    dev: false
 
   /is-fullwidth-code-point/3.0.0:
     resolution: {integrity: sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==}
