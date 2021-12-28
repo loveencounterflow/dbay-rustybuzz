@@ -289,6 +289,7 @@ excerpt of table `ads` with `trk` track 1:               .. and with `trk` track
     * **[–]** only for ligatures (multiple Unicode codepoints rendered as a single glyf)
   * **[–]** **NL** manual line breaks
 
+* **[–]** see https://john-doe.neocities.org, https://github.com/cadars/john-doe for single-file multi-page HTML documents
 
 
 
