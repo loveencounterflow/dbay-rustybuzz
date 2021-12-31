@@ -48,10 +48,12 @@ specials =
     chrs:     '\u{200b}'  # word break opportunity (as in `foo/bar` with a WBR after the slash)
     gid:      -5
     marker:   'w'
+    svg:      "<path fill='red' stroke='black' id='shy' d='M-204,887h178v-802h50v802h178v70h-406z'/>"
   shy:
     chrs:     '\u{00ad}'  # soft hyphen
     gid:      -6
     marker:   's'
+    svg:      "<path fill='red' stroke='black' id='wbr' d='M0,660l-147,166h293z'/>"
   hhy:
     chrs:     '\u{002d}'  # hard hyphen
     marker:   'h'
