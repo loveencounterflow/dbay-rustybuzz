@@ -12,6 +12,7 @@
     - [General Procedure](#general-procedure)
     - [IDs of SVG Paths / Glyf Outlines](#ids-of-svg-paths--glyf-outlines)
     - [Selectable Text](#selectable-text)
+  - [Layout: Galleys and Columns](#layout-galleys-and-columns)
   - [DB Structure](#db-structure)
   - [To Do](#to-do)
 
@@ -140,6 +141,22 @@ unless special care is taken.
 --><span style='left:50mm;top:50mm;'>fourth line</span>
 <!--?textcontainer-end?--></textcontainer>
 ```
+
+## Layout: Galleys and Columns
+
+* A Page defines one surface of a piece of paper. Putting material (text or images) outside the space
+  defined by a page is technically possible and will be shown in the browser when so configured, but will
+  lead to content not being printed. Many printers are not able to print right up to the edge of sheets so
+  certain margins must be left to account for that.
+* Pages may contain one or more Galleys.
+* A Galley defines the space on a page where regular layout can occur; this is where the mass of text will
+  ordinarily be placed. Content such as marginalia, column and / or page headers and page numbers is
+  regularly placed *outside* of the galley. Most often one will want to have one galley per page.
+* Galleys may contain one or more Columns.
+* Columns may be implemented as arbitrary SVG shapes. While rectangles are the appropriate standard choice
+  for most printed matter, circles, polylines, or arbitrary paths are also possible.
+* A Column may contain one or more Lineboxes.
+
 
 ## DB Structure
 
@@ -291,6 +308,10 @@ excerpt of table `ads` with `trk` track 1:               .. and with `trk` track
 
 * **[–]** see https://john-doe.neocities.org, https://github.com/cadars/john-doe for single-file multi-page HTML documents
 
-
+* **[–]** Consider to rename table `lines` (which holds positioned glyfs) to better sets its role apart from
+  table `baselines` (which defines the geometry of typesetting targets).
+  * may want to use prefixes for differentiating between different parts of the DB such as layout, outline
+    data, typesetting results, HTML+SVG
+  * observe we currently have tables `lines`, `outlines`, `baselines`, which is confusing
 
 
