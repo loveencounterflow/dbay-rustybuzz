@@ -188,6 +188,7 @@ class @Drb extends  \
       schema    } = @cfg
     #.......................................................................................................
     @db.execute SQL"""
+      drop table if exists #{schema}.baselines;
       drop table if exists #{schema}.outlines;
       drop table if exists #{schema}.outline_types;
       drop index if exists #{schema}.ads_location_idx;
@@ -290,6 +291,16 @@ class @Drb extends  \
           primary key ( doc, par, lnr, ads_id ),
           foreign key ( doc, par, lnr ) references lines,
           foreign key ( ads_id )        references ads ( id ) );
+      -- ...................................................................................................
+      create table #{schema}.baselines (
+          doc     integer not null, -- document idx  ### TAINT should be FK
+          clm     integer not null, -- column idx    ### TAINT should be FK
+          bln     integer not null, -- baseline nr
+          x1      integer not null, -- horizontal,
+          y1      integer not null, -- vertical position relative to column
+          length  integer not null, -- length of straight line
+          angle   float   not null, -- degrees clockwise anchored on `( 0, 0 )`
+          primary key ( doc, clm, bln ) );
       """
     return null
 
