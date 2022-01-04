@@ -144,26 +144,10 @@ jp                        = JSON.parse
       chrs          = special.chrs
       marker        = special.marker
       gd            = cleanup_svg """
-        <g
-          class         ='fontmetric #{special_key}'
-          transform     ='skewX(#{fm.angle})'
-          >
-        <line
-          x1            ='#{x1}'
-          y1            ='#{y1}'
-          x2            ='#{x2}'
-          y2            ='#{y2}'
-          />
-        <circle
-          cx            = '#{cx}'
-          cy            = '#{cy}'
-          r             = '#{cr}'
-          />
-        <text
-          x             ='#{text_x}'
-          y             ='#{text_y}'
-          >#{marker}</text>
-          </g>"""
+        <path
+          class='fontmetric #{special_key}'
+          transform='skewX(#{fm.angle})'
+          d='#{specials[ special_key ].pd}'/>"""
       ### TAINT should adapt & use `@insert_outlines()` ###
       insert_outline      = @db.prepare @sql.insert_outline
       gd_blob             = @_zip gd ### Glyf Data Blob ###
