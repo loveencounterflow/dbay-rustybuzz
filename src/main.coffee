@@ -299,7 +299,7 @@ class @Drb extends  \
           x1      integer not null, -- horizontal,
           y1      integer not null, -- vertical position relative to column
           length  integer not null, -- length of straight line
-          angle   float   not null, -- degrees clockwise anchored on `( 0, 0 )`
+          angle   float   not null default 0, -- degrees clockwise anchored on `( 0, 0 )`
           primary key ( doc, clm, bln ) );
       """
     return null
