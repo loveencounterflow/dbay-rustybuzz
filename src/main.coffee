@@ -350,6 +350,11 @@ class @Drb extends  \
         into:       'line_ads',
         fields:     [ 'doc', 'par', 'lnr', 'ads_id', 'x', 'y', ] }
       #.....................................................................................................
+      insert_baseline: @db.create_insert {
+        schema,
+        into:       'baselines',
+        fields:     [ 'doc', 'clm', 'bln', 'x1', 'y1', 'length', 'angle', ] }
+      #.....................................................................................................
       fspath_from_fontnick: SQL"select fspath from fontnicks where fontnick = $fontnick;"
     #.......................................................................................................
     return null
